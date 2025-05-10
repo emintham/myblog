@@ -1,14 +1,14 @@
 /* Import your chosen fonts (example using Google Fonts) */
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@300;400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@300;400;700&display=swap");
 
 :root {
-  --font-serif: 'Lora', serif;
-  --font-sans: 'Montserrat', sans-serif;
+  --font-serif: "Lora", serif;
+  --font-sans: "Montserrat", sans-serif;
 
-  --color-background: #FAF9F6; /* Creamy off-white */
-  --color-text: #333333;      /* Dark grey */
-  --color-accent: #5D7A88;    /* Muted blue-grey */
-  --color-meta: #777777;      /* For dates, subtle info */
+  --color-background: #faf9f6; /* Creamy off-white */
+  --color-text: #333333; /* Dark grey */
+  --color-accent: #5d7a88; /* Muted blue-grey */
+  --color-meta: #777777; /* For dates, subtle info */
   --color-border-subtle: #eeeeee;
 
   --content-max-width: 720px; /* Adjust for optimal line length */
@@ -26,7 +26,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-sans);
   font-weight: 700; /* Or a lighter weight for a more airy feel */
   line-height: 1.3;
@@ -35,9 +40,15 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-text); /* Or a slightly darker shade for emphasis */
 }
 
-h1 { font-size: 2.5rem; }
-h2 { font-size: 2rem; }
-h3 { font-size: 1.5rem; }
+h1 {
+  font-size: 2.5rem;
+}
+h2 {
+  font-size: 2rem;
+}
+h3 {
+  font-size: 1.5rem;
+}
 
 p {
   margin-bottom: 1.5em;
@@ -49,7 +60,8 @@ a {
   transition: color 0.2s ease-in-out;
 }
 
-a:hover, a:focus {
+a:hover,
+a:focus {
   text-decoration: underline;
   color: var(--color-text); /* Or slightly darken accent */
 }
@@ -118,7 +130,8 @@ pre {
   border-bottom: none;
 }
 
-.list-item-name { /* For the main link in a list item */
+.list-item-name {
+  /* For the main link in a list item */
   font-size: 1.1rem;
   color: var(--color-accent);
   text-decoration: none;
@@ -179,4 +192,3 @@ pre {
   margin-top: 2rem;
   padding: 1rem;
 }
-

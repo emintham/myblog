@@ -1,20 +1,24 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import BlogPostPreview from '../components/BlogPostPreview.astro';
-import { getCollection } from 'astro:content';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import BlogPostPreview from "../components/BlogPostPreview.astro";
+import { getCollection } from "astro:content";
 
-const allPosts = await getCollection('blog', ({data}) => {
+const allPosts = await getCollection("blog", ({ data }) => {
   // return data.draft !== true; // Filter out drafts if you add a draft field
   return true;
 });
 // Sort posts by date, newest first
-const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const sortedPosts = allPosts.sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
 ---
-<BaseLayout title="My Blog - Home" description="A collection of thoughts and writings.">
+
+<BaseLayout
+  title="My Blog - Home"
+  description="A collection of thoughts and writings."
+>
   <section class="post-list">
     <h1 class="section-title">Latest Writings</h1>
-    {sortedPosts.map(post => (
-      <BlogPostPreview post={post} />
-    ))}
+    {sortedPosts.map((post) => <BlogPostPreview post={post} />)}
   </section>
 </BaseLayout>

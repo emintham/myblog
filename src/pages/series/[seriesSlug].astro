@@ -1,22 +1,22 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import BlogPostPreview from '../../components/BlogPostPreview.astro'; // Reuse your post preview component
-import { getCollection } from 'astro:content';
-import { generateSlug } from '../../utils/slugify';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BlogPostPreview from "../../components/BlogPostPreview.astro"; // Reuse your post preview component
+import { getCollection } from "astro:content";
+import { generateSlug } from "../../utils/slugify";
 
 export async function getStaticPaths() {
-  const allPosts = await getCollection('blog', ({data}) => {
+  const allPosts = await getCollection("blog", ({ data }) => {
     return import.meta.env.PROD ? data.draft !== true : true;
   });
 
   const uniqueSeries = new Set<string>();
-  allPosts.forEach(post => {
+  allPosts.forEach((post) => {
     if (post.data.series) {
       uniqueSeries.add(post.data.series);
     }
   });
 
-  return Array.from(uniqueSeries).map(seriesName => ({
+  return Array.from(uniqueSeries).map((seriesName) => ({
     params: { seriesSlug: generateSlug(seriesName) },
     props: { seriesName },
   }));
@@ -24,17 +24,18 @@ export async function getStaticPaths() {
 
 const { seriesName } = Astro.props;
 
-const allPosts = await getCollection('blog', ({data}) => {
+const allPosts = await getCollection("blog", ({ data }) => {
   return import.meta.env.PROD ? data.draft !== true : true;
 });
 
 const postsInSeries = allPosts
-  .filter(post => post.data.series === seriesName)
+  .filter((post) => post.data.series === seriesName)
   .sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf()); // Chronological: oldest first
 
 const pageTitle = `Series: ${seriesName}`;
 const pageDescription = `Posts in the series "${seriesName}", in chronological order.`;
 ---
+
 <BaseLayout title={pageTitle} description={pageDescription}>
   <section class="series-detail-section">
     <header class="page-detail-header">
@@ -42,17 +43,19 @@ const pageDescription = `Posts in the series "${seriesName}", in chronological o
         <a href="/series/">All Series</a> &rarr;
       </p>
       <h1>{seriesName}</h1>
-      </header>
+    </header>
 
-    {postsInSeries.length > 0 ? (
-      <div class="posts-list">
-        {postsInSeries.map(post => (
-          <BlogPostPreview post={post} />
-        ))}
-      </div>
+    {
+      postsInSeries.length > 0 ? (
+        <div class="posts-list">
+          {postsInSeries.map((post) => (
+            <BlogPostPreview post={post} />
+          ))}
+        </div>
       ) : (
-      <p>No posts found in this series yet.</p>
-      )}
+        <p>No posts found in this series yet.</p>
+      )
+    }
   </section>
 </BaseLayout>
 
@@ -60,7 +63,8 @@ const pageDescription = `Posts in the series "${seriesName}", in chronological o
   .posts-list {
     /* Styles for the list of posts, BlogPostPreview will handle individual item styling */
   }
-  .posts-list > :global(article) { /* Target the article tag from BlogPostPreview if needed */
-      margin-bottom: 2.5rem; /* Add space between post previews */
+  .posts-list > :global(article) {
+    /* Target the article tag from BlogPostPreview if needed */
+    margin-bottom: 2.5rem; /* Add space between post previews */
   }
 </style>

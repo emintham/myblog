@@ -1,19 +1,26 @@
 ---
 // src/components/BlogPostPreview.astro
 const { post } = Astro.props; // Expects a post object from content collections
-const firstParagraph = post.body.split('\n\n')[0]; // Simple way to get first paragraph
+const firstParagraph = post.body.split("\n\n")[0]; // Simple way to get first paragraph
 ---
+
 <article class="post-preview">
   <h2><a href={`/blog/${post.slug}/`}>{post.data.title}</a></h2>
   <p class="meta">
     <time datetime={post.data.pubDate.toISOString()}>
-      {new Date(post.data.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+      {
+        new Date(post.data.pubDate).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      }
     </time>
     &bull; by {post.data.author}
   </p>
   <div class="preview-content">
     <Fragment set:html={firstParagraph} />
-    </div>
+  </div>
   <a href={`/blog/${post.slug}/`} class="read-more">Read More &rarr;</a>
 </article>
 
@@ -50,7 +57,8 @@ const firstParagraph = post.body.split('\n\n')[0]; // Simple way to get first pa
     margin-bottom: 1rem;
   }
 
-  .preview-content p { /* If rendering HTML of first paragraph */
+  .preview-content p {
+    /* If rendering HTML of first paragraph */
     margin-bottom: 1rem;
     font-size: 1rem; /* Slightly smaller for preview */
     line-height: 1.6;

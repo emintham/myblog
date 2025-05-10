@@ -1,18 +1,18 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-import { generateSlug } from '../../utils/slugify';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { generateSlug } from "../../utils/slugify";
 
 // Fetch all blog posts, filtering out drafts if you have that logic
-const allPosts = await getCollection('blog', ({data}) => {
+const allPosts = await getCollection("blog", ({ data }) => {
   return import.meta.env.PROD ? data.draft !== true : true;
 });
 
 const tagCounts = new Map<string, number>();
 
-allPosts.forEach(post => {
+allPosts.forEach((post) => {
   if (post.data.tags && Array.isArray(post.data.tags)) {
-    post.data.tags.forEach(tag => {
+    post.data.tags.forEach((tag) => {
       const normalizedTag = tag.toLowerCase();
       tagCounts.set(normalizedTag, (tagCounts.get(normalizedTag) || 0) + 1);
     });
@@ -27,29 +27,38 @@ const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => {
 });
 
 const pageTitle = "All Tags";
-const pageDescription = "An overview of all topics discussed on the blog, sorted by frequency."
+const pageDescription =
+  "An overview of all topics discussed on the blog, sorted by frequency.";
 ---
+
 <BaseLayout title={pageTitle} description={pageDescription}>
   <section class="tags-listing-section">
-
-    <h1 class="section-title">{pageTitle}</h1> {/* This is "All Tags" */}
+    <h1 class="section-title">{pageTitle}</h1>
+    {/* This is "All Tags" */}
 
     <p class="page-intro-text-style">{pageDescription}</p>
 
-    {sortedTags.length > 0 ? (
-      <ul class="item-list-container">
-        {sortedTags.map(([tag, count]) => (
-          <li class="list-item-entry">
-            <a href={`/tags/${generateSlug(tag)}/`} class="list-item-name tag-specific-style">
-              {tag}
-            </a>
-            <span class="list-item-count">({count})</span>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p class="empty-state-message">No tags found yet. Start tagging your posts!</p>
-    )}
+    {
+      sortedTags.length > 0 ? (
+        <ul class="item-list-container">
+          {sortedTags.map(([tag, count]) => (
+            <li class="list-item-entry">
+              <a
+                href={`/tags/${generateSlug(tag)}/`}
+                class="list-item-name tag-specific-style"
+              >
+                {tag}
+              </a>
+              <span class="list-item-count">({count})</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="empty-state-message">
+          No tags found yet. Start tagging your posts!
+        </p>
+      )
+    }
   </section>
 </BaseLayout>
 

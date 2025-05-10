@@ -5,4 +5,5 @@ series: "The Grand Adventure"
 description: "Challenges arise, testing our resolve."
 tags: ["travel", "narrative"]
 ---
+
 The storm hit us without warning...

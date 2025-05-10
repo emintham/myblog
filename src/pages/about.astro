@@ -1,35 +1,43 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from "../layouts/BaseLayout.astro";
 
 const pageTitle = "About"; // This will be styled like "Latest Writings"
-const pageIntroText = "A little more about this space, its purpose, and the voice behind it."; // A brief intro text below the title
+const pageIntroText =
+  "A little more about this space, its purpose, and the voice behind it."; // A brief intro text below the title
 ---
+
 <BaseLayout title={pageTitle} description={pageIntroText}>
   <section class="about-page-container">
-
     <h1 class="section-title">{pageTitle}</h1>
 
     <p class="page-intro-text">{pageIntroText}</p>
 
-    <div class="prose-content-area"> {/* For the main body of the about page */}
+    <div class="prose-content-area">
+      {/* For the main body of the about page */}
       <p>
-        This is a space dedicated to [mention your blog's primary themes, e.g., thoughtful exploration, simple living, technological insights, creative pursuits].
-        Inspired by clarity and a desire for focused reading, the design here is intentionally spare, allowing words and ideas to take precedence.
+        This is a space dedicated to [mention your blog's primary themes, e.g.,
+        thoughtful exploration, simple living, technological insights, creative
+        pursuits]. Inspired by clarity and a desire for focused reading, the
+        design here is intentionally spare, allowing words and ideas to take
+        precedence.
       </p>
       <p>
-        I believe in [mention a core philosophy or interest that drives the blog, e.g., the beauty of well-crafted things, the power of quiet observation, the importance of continuous learning].
-        This blog serves as a personal journal and a place to share reflections, discoveries, and perhaps, to spark a quiet conversation.
+        I believe in [mention a core philosophy or interest that drives the
+        blog, e.g., the beauty of well-crafted things, the power of quiet
+        observation, the importance of continuous learning]. This blog serves as
+        a personal journal and a place to share reflections, discoveries, and
+        perhaps, to spark a quiet conversation.
       </p>
-      <p>
-        Thank you for spending a moment here.
-      </p>
+      <p>Thank you for spending a moment here.</p>
 
-      {/* Optional:
+      {
+        /* Optional:
       <h2 class="subsection-heading-style">Contact</h2>
       <p>
         If you'd like to get in touch, you can reach out via [mention email if comfortable, or a professional social media link].
       </p>
-      */}
+      */
+      }
     </div>
   </section>
 </BaseLayout>
@@ -50,7 +58,8 @@ const pageIntroText = "A little more about this space, its purpose, and the voic
   }
 
   /* Optional styling for H2 if you add subsections */
-  .subsection-heading-style { /* This is an H2 */
+  .subsection-heading-style {
+    /* This is an H2 */
     font-family: var(--font-sans);
     font-size: 1.8rem;
     color: var(--color-text);
