@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Disallow specific paths if needed, e.g.:
+# Disallow: /admin/
+# Disallow: /private-area/
+
+# TODO:
+Sitemap: https://your-blog-url.com/sitemap-index.xml
