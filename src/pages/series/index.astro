@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { generateSlug } from '../../utils/slugify'; // Import the slugify function
+
+const allPosts = await getCollection('blog', ({data}) => {
+  return import.meta.env.PROD ? data.draft !== true : true;
+});
+
+const seriesMap = new Map<string, { count: number, posts: any[] }>();
+
+allPosts.forEach(post => {
+  if (post.data.series) {
+    const seriesName = post.data.series;
+    if (!seriesMap.has(seriesName)) {
+      seriesMap.set(seriesName, { count: 0, posts: [] });
+    }
+    const currentSeries = seriesMap.get(seriesName)!;
+    currentSeries.count += 1;
+    currentSeries.posts.push(post); // Store post if needed for other sorting, e.g., by latest post in series
+  }
+});
+
+// Sort series alphabetically by name
+const sortedSeries = Array.from(seriesMap.entries())
+  .map(([name, data]) => ({ name, count: data.count }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+const pageTitle = "All Series";
+const pageDescription = "Browse collections of posts organized by series.";
+---
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section class="series-listing-section">
+    <h1 class="section-title">{pageTitle}</h1>
+    <p class="page-intro-text">{pageDescription}</p>
+
+    {sortedSeries.length > 0 ? (
+      <ul class="item-list-container">
+        {sortedSeries.map(series => (
+          <li class="list-item-entry">
+            <a href={`/series/${generateSlug(series.name)}/`} class="list-item-name">
+              {series.name}
+            </a>
+            <span class="list-item-count">({series.count} {series.count === 1 ? 'post' : 'posts'})</span>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="empty-state-message">No series found yet. Stay tuned!</p>
+    )}
+  </section>
+</BaseLayout>

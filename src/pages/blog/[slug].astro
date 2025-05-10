@@ -1,0 +1,81 @@
+---
+// src/pages/blog/[slug].astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, getEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const blogEntries = await getCollection('blog');
+  return blogEntries.map(entry => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content, remarkPluginFrontmatter } = await entry.render();
+// remarkPluginFrontmatter contains data from the Markdown frontmatter after rendering
+---
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <article class="blog-post">
+    <header class="post-header">
+      <h1>{entry.data.title}</h1>
+      <p class="meta">
+        Published on <time datetime={entry.data.pubDate.toISOString()}>
+          {new Date(entry.data.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </time>
+         by {entry.data.author}
+      </p>
+    </header>
+    <div class="post-content">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .blog-post {
+    /* Styles for single post layout */
+  }
+  .post-header {
+    text-align: left; /* Or center for a more formal Kinfolk feel */
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee; /* Very subtle */
+  }
+  .post-header h1 {
+    font-size: 2.8rem; /* Larger for post title */
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+  .post-header .meta {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--color-meta);
+  }
+
+  .post-content {
+    /* Typography here will be largely inherited from global.css */
+  }
+
+  /* Deeper styling for elements within .post-content if needed */
+  .post-content h2 {
+    margin-top: 2.5em;
+    margin-bottom: 1em;
+    /* font-weight: normal; /* Lighter headings in body */
+  }
+  .post-content img { /* Minimal images, but style them well if used */
+    max-width: 100%;
+    height: auto;
+    margin: 2em 0;
+    border-radius: 4px; /* Subtle rounding */
+    display: block;
+  }
+  .post-content blockquote {
+    border-left: 3px solid var(--color-accent);
+    padding-left: 1.5em;
+    margin-left: 0;
+    margin-right: 0;
+    font-style: italic;
+    color: var(--color-meta);
+  }
+</style>

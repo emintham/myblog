@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlogPostPreview from '../../components/BlogPostPreview.astro';
+import { getCollection } from 'astro:content';
+import { generateSlug } from '../../utils/slugify';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog', ({data}) => {
+    // Filter out drafts for path generation as well
+    return import.meta.env.PROD ? data.draft !== true : true;
+  });
+
+  const uniqueTags = new Set<string>();
+  allPosts.forEach(post => {
+    if (post.data.tags && Array.isArray(post.data.tags)) {
+      post.data.tags.forEach(tag => {
+        uniqueTags.add(tag.toLowerCase()); // Normalize tags for path generation
+      });
+    }
+  });
+
+  return Array.from(uniqueTags).map(tagName => ({
+    params: { tagSlug: generateSlug(tagName) }, // Use the slugified version for the URL param
+    props: { tagName }, // Pass the original (normalized) tag name as a prop
+  }));
+}
+
+const { tagName } = Astro.props; // This is the normalized tag name (e.g., lowercase)
+
+// Fetch all posts again to filter
+// (Consider performance implications for very large sites; for most, this is fine)
+const allPosts = await getCollection('blog', ({data}) => {
+  return import.meta.env.PROD ? data.draft !== true : true;
+});
+
+const postsWithThisTag = allPosts
+  .filter(post => {
+    if (post.data.tags && Array.isArray(post.data.tags)) {
+      // Check if the post's tags (normalized) include the current tagName
+      return post.data.tags.map(t => t.toLowerCase()).includes(tagName);
+    }
+    return false;
+  })
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()); // Newest first
+
+// For display, it's nice to have a more presentable version of the tag if it was cased differently
+// However, since we normalized to lowercase for routing, `tagName` is already lowercase.
+// If you stored original casing elsewhere, you could use it. For now, capitalize the slug.
+const displayTagName = tagName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+
+
+const pageTitle = `Posts tagged: ${displayTagName}`;
+const pageDescription = `All blog posts tagged with "${displayTagName}".`;
+---
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section class="tag-detail-section">
+    <header class="page-detail-header">
+      <p class="breadcrumb-nav">
+        <a href="/tags/">All Tags</a> &rarr;
+      </p>
+      <h1>Posts tagged: <span class="highlighted-tag">{displayTagName}</span></h1>
+    </header>
+
+    {postsWithThisTag.length > 0 ? (
+      <div class="posts-list">
+        {postsWithThisTag.map(post => (
+          <BlogPostPreview post={post} />
+        ))}
+      </div>
+    ) : (
+      <p class="empty-state-message">No posts found with this tag yet.</p>
+    )}
+  </section>
+</BaseLayout>
+
+<style>
+  .highlighted-tag {
+    color: var(--color-accent); /* Or another distinct color */
+    /* font-style: italic; /* Optional styling */
+  }
+
+  .posts-list {
+    /* Styles for the list of posts */
+  }
+  .posts-list > :global(article) { /* Target the article tag from BlogPostPreview */
+      margin-bottom: 2.5rem; /* Add space between post previews */
+  }
+  .no-posts-message {
+    text-align: center;
+    font-family: var(--font-serif);
+    color: var(--color-meta);
+    margin-top: 2rem;
+  }
+</style>

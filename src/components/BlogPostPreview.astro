@@ -1,0 +1,72 @@
+---
+// src/components/BlogPostPreview.astro
+const { post } = Astro.props; // Expects a post object from content collections
+const firstParagraph = post.body.split('\n\n')[0]; // Simple way to get first paragraph
+---
+<article class="post-preview">
+  <h2><a href={`/blog/${post.slug}/`}>{post.data.title}</a></h2>
+  <p class="meta">
+    <time datetime={post.data.pubDate.toISOString()}>
+      {new Date(post.data.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+    </time>
+    &bull; by {post.data.author}
+  </p>
+  <div class="preview-content">
+    <Fragment set:html={firstParagraph} />
+    </div>
+  <a href={`/blog/${post.slug}/`} class="read-more">Read More &rarr;</a>
+</article>
+
+<style>
+  .post-preview {
+    margin-bottom: 3rem; /* Space between previews */
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #eee; /* Subtle separator */
+  }
+
+  .post-preview:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .post-preview h2 {
+    font-size: 1.8rem; /* Adjust to your liking */
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+  }
+
+  .post-preview h2 a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .post-preview h2 a:hover {
+    color: var(--color-accent);
+  }
+
+  .meta {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--color-meta);
+    margin-bottom: 1rem;
+  }
+
+  .preview-content p { /* If rendering HTML of first paragraph */
+    margin-bottom: 1rem;
+    font-size: 1rem; /* Slightly smaller for preview */
+    line-height: 1.6;
+  }
+
+  .read-more {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-accent);
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 0.5rem;
+  }
+  .read-more:hover {
+    color: var(--color-text);
+  }
+</style>
