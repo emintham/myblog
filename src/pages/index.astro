@@ -14,11 +14,11 @@ const sortedPosts = allPosts.sort(
 ---
 
 <BaseLayout
-  title="Your Blog - Home"
+  title="Emin Tham - Blog"
   description="A collection of thoughts and writings."
 >
   <section class="post-list">
-    <h1 class="section-title">Latest Writings</h1>
+    <h1 class="section-title">Latest Posts</h1>
     {sortedPosts.map((post) => <BlogPostPreview post={post} />)}
   </section>
 </BaseLayout>

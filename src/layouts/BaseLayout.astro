@@ -4,7 +4,7 @@ import Navigation from "../components/Navigation.astro";
 import "../styles/global.css"; // Or move styles here with <style is:global>
 
 const {
-  title = "Your Blog",
+  title = "Emin Tham's Blog",
   description = "Personal writings and thoughts.",
 } = Astro.props;
 ---
@@ -24,7 +24,7 @@ const {
       <slot />
     </main>
     <footer>
-      <p>&copy; {new Date().getFullYear()} Your Name</p>
+      <p>&copy; {new Date().getFullYear()} Emin Tham</p>
     </footer>
     <style>
       main {
