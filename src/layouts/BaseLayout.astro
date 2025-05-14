@@ -1,5 +1,4 @@
 ---
-// src/layouts/BaseLayout.astro
 import Navigation from "../components/Navigation.astro";
 import "../styles/global.css"; // Or move styles here with <style is:global>
 
@@ -7,6 +6,8 @@ const {
   title = "Emin's Notes",
   description = "Personal writings and thoughts.",
 } = Astro.props;
+
+const googleFontsURL = "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@300;400;700&family=Spectral:wght@400;700&display=swap";
 ---
 
 <!doctype html>
@@ -17,6 +18,17 @@ const {
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    {/* Preconnect to Google Fonts servers */}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    {/* Load Google Fonts CSS asynchronously */}
+    <link rel="stylesheet" href={googleFontsURL} media="print" onload="this.media='all'">
+
+    {/* Fallback for users with JavaScript disabled (less critical for fonts but good practice) */}
+    <noscript><link rel="stylesheet" href={googleFontsURL}></noscript>
+
   </head>
   <body>
     <Navigation />
