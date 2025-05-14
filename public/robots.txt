@@ -6,4 +6,4 @@ Allow: /
 # Disallow: /private-area/
 
 # TODO:
-Sitemap: https://your-blog-url.com/sitemap-index.xml
+Sitemap: https://emintham.com/sitemap-index.xml
