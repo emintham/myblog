@@ -1,5 +1,5 @@
 {
-  "name": "worker-name",
+  "name": "myblog",
   "compatibility_date": "2025-05-13",
   "assets": {
     "directory": "./dist"
