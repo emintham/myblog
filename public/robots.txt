@@ -5,5 +5,4 @@ Allow: /
 # Disallow: /admin/
 # Disallow: /private-area/
 
-# TODO:
 Sitemap: https://emintham.com/sitemap-index.xml
