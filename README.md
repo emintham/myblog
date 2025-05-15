@@ -34,7 +34,35 @@ This assumes that you do not have any local code changes to the template.
 
 # Features
 
+## Main Page
 ![Main](screenshots/IMG_0028.PNG)
+
+## Tags
+
+Tags are auto-populated and counted
 ![Tags](screenshots/IMG_0029.PNG)
+
+## Series
+
+You can create different series of articles. Each series has its own page and
+is sorted in chronological order.
 ![Series](screenshots/IMG_0030.PNG)
+
+## Side Notes
+
+Tufte style side notes are supported.
 ![Side Notes](screenshots/IMG_0032.jpeg)
+
+Example:
+```markdown
+This is the main text of your article. You might want to add a little extra detail here.[^1]
+Further down, another point could benefit from a marginal note.[^2]
+
+And a third one for good measure.[^3]
+
+[^1]: This is the first sidenote. It provides a brief clarification.
+
+[^2]: Here's the second sidenote, perhaps a bit longer, offering more context or a citation.
+
+[^3]: A final thought, placed in the margin.
+```
