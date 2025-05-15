@@ -2,10 +2,8 @@
 import Navigation from "../components/Navigation.astro";
 import "../styles/global.css"; // Or move styles here with <style is:global>
 
-const {
-  title = "Your Blog",
-  description = "Personal writings and thoughts.",
-} = Astro.props;
+const { title = "Your Blog", description = "Personal writings and thoughts." } =
+  Astro.props;
 ---
 
 <!doctype html>
@@ -38,4 +36,5 @@ const {
       }
     </style>
   </body>
+  <script src="/scripts/sidenotes.js" defer></script>
 </html>
