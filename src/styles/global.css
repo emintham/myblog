@@ -190,3 +190,89 @@ pre {
   margin-top: 2rem;
   padding: 1rem;
 }
+
+/* src/styles/global.css or your specific layout's style */
+
+/* Style for the superscript reference numbers in text */
+sup[id^="fnref-"] a {
+  text-decoration: none;
+  color: var(--color-accent);
+  font-weight: normal; /* Or bold if you prefer */
+  font-size: 0.75em; /* Slightly smaller than normal text */
+  vertical-align: super;
+  line-height: 0; /* Prevents affecting line height of main text */
+  padding: 0 0.1em;
+}
+
+.sidenote {
+  display: none; /* Hidden by default, shown by media query */
+  position: absolute; /* Positioned by JavaScript */
+  width: 180px; /* Adjust as needed */
+  padding: 0.75em 1em;
+  font-family: var(--font-sans); /* Or --font-serif, try what looks best */
+  font-size: 0.8rem; /* Smaller than main text */
+  line-height: 1.5;
+  color: var(--color-meta); /* Subtler text color */
+  background-color: transparent; /* Or a very light background like var(--color-background) */
+  /* border-left: 2px solid var(--color-border-subtle); /* Optional separator */
+  z-index: 10; /* Ensure it's above other content if necessary */
+}
+
+.sidenote p {
+  margin: 0 0 0.5em 0; /* Spacing for paragraphs within a sidenote */
+}
+.sidenote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Hides the original footnote list at the bottom when sidenotes are active (on wider screens) */
+section.footnotes.sidenotes-transformed {
+  display: none;
+}
+
+/* Media Query for Sidenotes (Desktop) */
+@media (min-width: 1100px) {
+  /* Adjust breakpoint as needed based on your --content-max-width */
+  .sidenote {
+    display: block; /* Show sidenotes */
+  }
+  /* The original footnote section at the bottom remains hidden due to .sidenotes-transformed */
+}
+
+/* Styles for Original Footnotes (Mobile/Fallback) */
+@media (max-width: 1099px) {
+  section.footnotes.sidenotes-transformed {
+    display: block !important; /* Ensure original footnotes are visible */
+  }
+  .sidenote {
+    display: none !important; /* Ensure JS-created sidenotes are hidden */
+  }
+
+  /* Optional: Style the default footnote list nicely for mobile */
+  section.footnotes {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border-subtle);
+    font-size: 0.9rem;
+    color: var(--color-meta);
+  }
+  section.footnotes .footnotes-list {
+    padding-left: 1.5rem;
+  }
+  section.footnotes .footnote-item p {
+    margin-bottom: 0.5em;
+    line-height: 1.5;
+  }
+  .footnote-backref {
+    text-decoration: none;
+    margin-left: 0.25em;
+  }
+}
+
+.sidenote-number {
+  font-weight: 600; /* Make the number slightly bolder */
+  margin-right: 0.4em; /* Space between number and text */
+  color: var(
+    --color-text
+  ); /* Or keep it var(--color-meta) like the rest of the sidenote */
+}

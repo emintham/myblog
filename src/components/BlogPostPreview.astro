@@ -1,7 +1,13 @@
 ---
-// src/components/BlogPostPreview.astro
-const { post } = Astro.props; // Expects a post object from content collections
-const firstParagraph = post.body.split("\n\n")[0]; // Simple way to get first paragraph
+const { post } = Astro.props;
+const firstParagraphMatch = post.body.match(/<p>.*?<\/p>/s);
+let firstParagraph = post.data.description || "";
+if (!firstParagraph && firstParagraphMatch) {
+  firstParagraph = firstParagraphMatch[0];
+} else if (!firstParagraph && post.body) {
+  // Fallback for plain text body to get first paragraph (less ideal if body contains HTML)
+  firstParagraph = post.body.split("\n\n")[0];
+}
 ---
 
 <article class="post-preview">
@@ -37,9 +43,12 @@ const firstParagraph = post.body.split("\n\n")[0]; // Simple way to get first pa
   }
 
   .post-preview h2 {
-    font-size: 1.8rem; /* Adjust to your liking */
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1.3;
     margin-top: 0;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.35rem;
+    color: var(--color-text);
   }
 
   .post-preview h2 a {
@@ -63,6 +72,16 @@ const firstParagraph = post.body.split("\n\n")[0]; // Simple way to get first pa
     font-size: 1rem; /* Slightly smaller for preview */
     line-height: 1.6;
   }
+  .preview-content :global(p) {
+    /* Targets the p tag rendered by set:html */
+    font-size: 1rem; /* Or your base body font size for excerpts */
+    line-height: 1.65;
+    color: var(--color-text);
+    margin-bottom: 1rem; /* Ensure space before "Read More" */
+  }
+  .preview-content :global(p:last-child) {
+    margin-bottom: 1rem; /* Ensure space even if it's the only paragraph */
+  }
 
   .read-more {
     font-family: var(--font-sans);
@@ -76,5 +95,35 @@ const firstParagraph = post.body.split("\n\n")[0]; // Simple way to get first pa
   }
   .read-more:hover {
     color: var(--color-text);
+  }
+
+  /* --- Mobile Adjustments --- */
+  @media (max-width: 768px) {
+    /* Common breakpoint for tablets and mobiles */
+    .post-preview h2 {
+      font-size: 1.6rem; /* Reduce font size for post titles */
+      line-height: 1.35; /* Slightly more line-height if titles wrap */
+      margin-bottom: 0.3rem;
+    }
+
+    .preview-content :global(p) {
+      font-size: 0.95rem; /* Slightly smaller excerpt text */
+      line-height: 1.6;
+    }
+
+    .meta {
+      font-size: 0.8rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    /* Further adjustments for smaller mobile screens */
+    .post-preview h2 {
+      font-size: 1.4rem; /* Even smaller font size */
+      line-height: 1.4; /* Can increase a bit more for very narrow screens */
+    }
+    .preview-content :global(p) {
+      font-size: 0.9rem;
+    }
   }
 </style>
