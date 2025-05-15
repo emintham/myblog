@@ -4,7 +4,7 @@ A minimalist, text-focused blog template built with [Astro](https://astro.build/
 inspired by the clean aesthetic of Kinfolk magazine. Designed for writers and developers
 who appreciate typography and a serene reading experience.
 
-`[ Live Demo ](https://emintham.com)`
+[Live Demo](https://emintham.com)
 
 ## Features
 
