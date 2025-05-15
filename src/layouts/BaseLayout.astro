@@ -4,6 +4,7 @@ import "../styles/global.css"; // Or move styles here with <style is:global>
 
 const { title = "Your Blog", description = "Personal writings and thoughts." } =
   Astro.props;
+const googleFontsURL = "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@300;400;700&family=Spectral:wght@400;700&display=swap";
 const TEMPLATE_GITHUB_URL = "https://github.com/emintham/blog-template";
 const TEMPLATE_AUTHOR_URL = "https://emintham.com";
 const TEMPLATE_AUTHOR_NAME = "Emin Tham + Gemini 2.5 Pro";
@@ -17,6 +18,15 @@ const TEMPLATE_AUTHOR_NAME = "Emin Tham + Gemini 2.5 Pro";
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {/* Preconnect to Google Fonts servers */}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    {/* Load Google Fonts CSS asynchronously */}
+    <link rel="stylesheet" href={googleFontsURL} media="print" onload="this.media='all'">
+
+    {/* Fallback for users with JavaScript disabled (less critical for fonts but good practice) */}
+    <noscript><link rel="stylesheet" href={googleFontsURL}></noscript>
   </head>
   <body>
     <Navigation />
