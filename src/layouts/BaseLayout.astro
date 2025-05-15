@@ -4,6 +4,9 @@ import "../styles/global.css"; // Or move styles here with <style is:global>
 
 const { title = "Your Blog", description = "Personal writings and thoughts." } =
   Astro.props;
+const TEMPLATE_GITHUB_URL = "https://github.com/emintham/blog-template";
+const TEMPLATE_AUTHOR_URL = "https://emintham.com";
+const TEMPLATE_AUTHOR_NAME = "Emin Tham + Gemini 2.5 Pro";
 ---
 
 <!doctype html>
@@ -22,17 +25,43 @@ const { title = "Your Blog", description = "Personal writings and thoughts." } =
     </main>
     <footer>
       <p>&copy; {new Date().getFullYear()} Your Name</p>
+      <p class="attribution">
+        <a href={TEMPLATE_GITHUB_URL} target="_blank" rel="noopener noreferrer"
+          >Template</a
+        > by <a
+          href={TEMPLATE_AUTHOR_URL}
+          target="_blank"
+          rel="noopener noreferrer">{TEMPLATE_AUTHOR_NAME}</a
+        >.
+      </p>
     </footer>
     <style>
       main {
-        min-height: calc(100vh - 150px); /* Adjust based on nav/footer height */
+        min-height: calc(100vh - 180px); /* Adjust based on nav/footer height */
       }
       footer {
         text-align: center;
-        padding: 2rem 1rem;
+        padding: 2.5rem 1rem 2.5rem; /* Increased padding slightly */
         font-size: 0.85rem;
         color: var(--color-meta);
-        font-family: var(--font-sans);
+        font-family: var(--font-sans); /* Open Sans for footer text */
+        border-top: 1px solid var(--color-border-subtle); /* Adds a nice separator */
+        margin-top: 4rem; /* More space above the footer */
+      }
+
+      footer p {
+        margin: 0.4em 0; /* A little space between lines in the footer */
+      }
+
+      footer a {
+        color: var(--color-accent); /* Use accent color for links */
+        text-decoration: none;
+        transition: color 0.2s ease-in-out;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+        color: var(--color-text); /* Or slightly darken accent */
       }
     </style>
   </body>
