@@ -16,32 +16,43 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content, remarkPluginFrontmatter } = await entry.render();
+const frontmatter = entry.data;
 // remarkPluginFrontmatter contains data from the Markdown frontmatter after rendering
 
 // Variables for the series link
-const seriesName = entry.data.series;
+const seriesName = frontmatter.series;
 let seriesLinkPath = null;
 if (seriesName && typeof seriesName === 'string') {
   const seriesSlug = generateSlug(seriesName);
   seriesLinkPath = `/series/${seriesSlug}/`;
 }
+
+const postTags = (frontmatter.tags && Array.isArray(frontmatter.tags) && frontmatter.tags.length > 0)
+  ? frontmatter.tags.map(tag => {
+      const tagName = tag.trim(); // Trim whitespace from tag name
+      return {
+        name: tagName, // Original name for display
+        href: `/tags/${generateSlug(tagName)}/` // Link to the tag page
+      };
+    }).filter(tag => tag.name) // Ensure no empty tags after trimming
+  : [];
 ---
 
-<BaseLayout title={entry.data.title} description={entry.data.description}>
+<BaseLayout title={frontmatter.title} description={frontmatter.description}>
   <article class="blog-post">
     <header class="post-header">
-      <h1>{entry.data.title}</h1>
+      <h1>{frontmatter.title}</h1>
       <p class="meta">
-        Published on <time datetime={entry.data.pubDate.toISOString()}>
+        Published on <time datetime={frontmatter.pubDate.toISOString()}>
           {
-            new Date(entry.data.pubDate).toLocaleDateString("en-US", {
+            new Date(frontmatter.pubDate).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
               day: "numeric",
             })
           }
         </time>
-        by {entry.data.author}
+        by {frontmatter.author}
         {seriesName && seriesLinkPath && (
           <span class="series-meta-inline">
             &bull; In series: <a href={seriesLinkPath} aria-label={`Read all posts in the series: ${seriesName}`}>{seriesName}</a>
@@ -53,15 +64,29 @@ if (seriesName && typeof seriesName === 'string') {
       <Content />
     </div>
 
-    {/* Conditionally render the series link footer */}
-    {seriesLinkPath && seriesName && (
-      <footer class="post-series-navigation">
-        <p>
-          This post is part of the series:
-          <a href={seriesLinkPath} aria-label={`View all posts in the "${seriesName}" series`}>
-            {seriesName}
-          </a>.
-        </p>
+    {/* Consolidated Tags and Series Footer */}
+    {(postTags.length > 0 || (seriesLinkPath && seriesName)) && (
+      <footer class="post-meta-footer">
+        {seriesLinkPath && seriesName && (
+          <div class="meta-item series-meta-item">
+            <p class="series-statement"> {/* Changed to p for semantic block content */}
+              This post is part of <a href={seriesLinkPath} aria-label={`View all posts in the "${seriesName}" series`}>{seriesName}</a>.
+            </p>
+          </div>
+        )}
+
+        {postTags.length > 0 && (
+          <div class="meta-item tags-meta-item">
+            <span class="meta-label">TAGS</span>
+            <ul class="tags-list-style">
+              {postTags.map(tag => (
+                <li>
+                  <a href={tag.href}>#{tag.name}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </footer>
     )}
   </article>
@@ -115,25 +140,70 @@ if (seriesName && typeof seriesName === 'string') {
     color: var(--color-meta);
   }
 
-  /* Styles for the new series link section at the bottom */
-  .post-series-navigation {
-    margin-top: 3.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--color-border-subtle);
-    text-align: center;
-    font-family: var(--font-sans);
-    font-size: 0.95rem;
-    color: var(--color-meta);
+
+  .post-meta-footer {
+    margin-top: 3.5rem; /* Space above the entire meta footer */
+    padding-top: 1.5rem; /* Space below the border-top */
+    border-top: 1px solid var(--color-border-subtle); /* Single border for the whole section */
+    font-family: var(--font-sans); /* Open Sans */
+    font-size: 0.9rem; /* Base size for this section */
   }
-  .post-series-navigation p {
+
+  .meta-item {
+    margin-bottom: 1.25rem; /* Space between "Tags" block and "Series" block if both appear */
+  }
+  .meta-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .meta-label {
+    display: block; /* Label on its own line */
+    font-weight: 600;
+    color: var(--color-meta); /* Softer color for the label */
+    margin-bottom: 0.6em;
+    font-size: 0.8rem; /* Smaller label text */
+    text-transform: uppercase;
+    letter-spacing: 0.075em; /* Kinfolk-style letter spacing */
+  }
+
+  .tags-list-style { /* For the list of tags */
+    list-style: none;
+    padding: 0;
     margin: 0;
+    display: flex; /* Tags flow inline */
+    flex-wrap: wrap; /* Allow wrapping */
+    gap: 0.3em 0.8em; /* Vertical and horizontal gap between tags */
   }
-  .post-series-navigation a {
+
+  .tags-list-style li {
+    /* Individual list item styling if needed beyond gap */
+  }
+
+  .tags-list-style a {
     color: var(--color-accent);
     text-decoration: none;
-    font-weight: 600;
+    font-size: 0.9rem; /* Match base size of section */
   }
-  .post-series-navigation a:hover {
+
+  .tags-list-style a:hover {
+    text-decoration: underline;
+    color: var(--color-text);
+  }
+
+  .series-statement { /* For the "This post is part of..." line */
+    margin: 0; /* Remove default p margin */
+    color: var(--color-text); /* Or var(--color-meta) if you want it more subdued */
+    line-height: 1.6;
+    font-size: 0.9rem; /* Match base size of section */
+  }
+
+  .series-statement a {
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 600; /* Make series name stand out */
+  }
+
+  .series-statement a:hover {
     text-decoration: underline;
     color: var(--color-text);
   }
