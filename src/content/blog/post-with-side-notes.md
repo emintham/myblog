@@ -15,4 +15,4 @@ And a third one for good measure.[^3]
 
 [^2]: Here's the second sidenote, perhaps a bit longer, offering more context or a citation.
 
-[^3]: A final thought, placed in the margin.
+[^3]: A final thought, placed in the margin, with a [link](https://emintham.com) for good measure.

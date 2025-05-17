@@ -276,3 +276,24 @@ section.footnotes.sidenotes-transformed {
     --color-text
   ); /* Or keep it var(--color-meta) like the rest of the sidenote */
 }
+
+.sidenote a {
+  color: var(--color-accent);   /* Use your site's main accent color for the link */
+  text-decoration: none;      /* No underline by default, consistent with other links */
+  font-weight: 600;           /* Make link text slightly bolder than surrounding sidenote text */
+  transition: color 0.2s ease-in-out; /* Smooth color transition on hover */
+}
+
+.sidenote a:hover {
+  text-decoration: underline; /* Underline on hover for clear interaction feedback */
+  /* Optional: Slightly change color on hover if desired */
+  /* color: var(--color-text); */
+}
+
+/* Ensure paragraphs within sidenotes have their default margins if not already set */
+.sidenote p {
+  margin: 0 0 0.5em 0;
+}
+.sidenote p:last-child {
+  margin-bottom: 0;
+}
