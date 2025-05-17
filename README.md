@@ -50,9 +50,7 @@ who appreciate typography and a serene reading experience.
 3.  **Initial Configuration (Important TODOs):**
     * **Site URL:** Open `astro.config.mjs` and set the `site` property to your blog's final URL (e.g., `site: 'https://your-domain.com',`). This is crucial for SEO and sitemap generation.
     * **Site Name & Author Details:**
-        * Open `src/layouts/BaseLayout.astro`.
-        * Find and replace placeholder values for `siteName` with your own details.
-        * Search for other instances of `"Your Name"` or `"Your Blog Name"` throughout the project (e.g., in `src/content/config.ts` for default author) and update them. Use `rg TODO` (ripgrep) or `grep -r TODO .` to find all placeholders.
+        * Modify `src/siteConfig.ts` to match your details.
     * **About Page:** Customize the content in `src/pages/about.astro`.
     * **Favicon & Public Assets:** Replace `public/favicon.svg` with your own. Update other assets in `public/` as needed.
 

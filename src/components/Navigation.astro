@@ -1,4 +1,6 @@
 ---
+import { SITE_TITLE } from "../siteConfig.ts";
+
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/tags", label: "Tags" },
@@ -10,7 +12,7 @@ const navLinks = [
 <nav>
   <div class="nav-container">
     <div class="blog-title">
-      <a href="/">Your Blog</a>
+      <a href="/">{SITE_TITLE}</a>
     </div>
     <ul class="nav-links">
       {
