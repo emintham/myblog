@@ -1,4 +1,5 @@
 import { defineCollection, z } from "astro:content";
+import { AUTHOR_NAME } from "../siteConfig.ts";
 
 const blogCollection = defineCollection({
   type: "content",
@@ -6,7 +7,7 @@ const blogCollection = defineCollection({
     title: z.string(),
     pubDate: z.date(),
     description: z.string().optional(),
-    author: z.string().default("Emin Tham"),
+    author: z.string().default(AUTHOR_NAME),
     tags: z.array(z.string()).optional(),
     series: z.string().optional(),
     draft: z.boolean().optional(),

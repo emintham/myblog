@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import BlogPostPreview from "../components/BlogPostPreview.astro";
 import { getCollection } from "astro:content";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../siteConfig.ts";
 
 const allPosts = await getCollection("blog", ({ data }) => {
   // return data.draft !== true; // Filter out drafts if you add a draft field
@@ -14,8 +15,8 @@ const sortedPosts = allPosts.sort(
 ---
 
 <BaseLayout
-  title="Emin Tham"
-  description="A collection of thoughts and writings."
+  title={SITE_TITLE}
+  description={SITE_DESCRIPTION}
 >
   <section class="post-list">
     <h1 class="section-title">Latest Posts</h1>
