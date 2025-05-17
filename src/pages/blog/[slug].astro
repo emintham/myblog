@@ -207,4 +207,45 @@ const postTags = (frontmatter.tags && Array.isArray(frontmatter.tags) && frontma
     text-decoration: underline;
     color: var(--color-text);
   }
+
+  .post-content :global(blockquote) {
+    font-family: var(--font-serif); /* Keep Lora, or switch to sans-serif */
+    font-style: italic;           /* Keep or remove italic */
+    color: var(--color-meta);      /* Or var(--color-text) */
+
+    border: none; /* Remove the side border if using large quotes */
+    padding: 1em 2em;
+    margin: 2.5em auto; /* Center the blockquote if it's narrower */
+    max-width: 55ch;
+    position: relative; /* Needed for positioning pseudo-elements */
+    text-align: center; /* Optional: center short quotes */
+  }
+
+  .post-content :global(blockquote::before),
+  .post-content :global(blockquote::after) {
+    font-family: var(--font-serif); /* Or a specific display serif */
+    font-size: 4em; /* Large quote marks */
+    color: var(--color-border-subtle); /* Light grey for quote marks */
+    position: absolute;
+    line-height: 0;
+  }
+
+  .post-content :global(blockquote::before) {
+    content: "“"; /* Opening smart quote */
+    top: 0.2em;   /* Adjust vertical position */
+    left: -0.1em; /* Adjust horizontal position */
+  }
+
+  .post-content :global(blockquote::after) {
+    content: "”"; /* Closing smart quote */
+    bottom: 0.1em; /* Adjust vertical position */
+    right: -0.1em; /* Adjust horizontal position */
+  }
+
+  .post-content :global(blockquote p) {
+    margin-bottom: 0.75em;
+  }
+  .post-content :global(blockquote p:last-child) {
+    margin-bottom: 0;
+  }
 </style>
