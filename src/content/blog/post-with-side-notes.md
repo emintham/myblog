@@ -3,6 +3,7 @@ title: "Side notes included"
 pubDate: 2025-05-14
 description: "An article with side notes"
 tags: ["features"]
+draft: true
 ---
 
 This is the main text of your article. You might want to add a little extra detail here.[^1]

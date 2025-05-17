@@ -5,6 +5,7 @@ inspired by the clean aesthetic of Kinfolk magazine. Designed for writers and de
 who appreciate typography and a serene reading experience.
 
 [Live Demo](https://emintham.com)
+[Changelog](https://github.com/emintham/blog-template/blob/master/CHANGELOG.md)
 
 ## Features
 

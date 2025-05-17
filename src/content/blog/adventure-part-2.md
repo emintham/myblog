@@ -4,6 +4,7 @@ pubDate: 2025-03-15
 series: "The Grand Adventure"
 description: "Challenges arise, testing our resolve."
 tags: ["travel", "narrative"]
+draft: true
 ---
 
 The storm hit us without warning...
