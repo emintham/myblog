@@ -1,9 +1,13 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCollection, getEntry } from "astro:content";
+import { generateSlug } from "../../utils/slugify";
 
 export async function getStaticPaths() {
-  const blogEntries = await getCollection("blog");
+  const blogEntries = await getCollection("blog", ({data}) => {
+    // Filter out drafts for path generation in production
+    return import.meta.env.PROD ? data.draft !== true : true;
+  });
   return blogEntries.map((entry) => ({
     params: { slug: entry.slug },
     props: { entry },
@@ -13,6 +17,14 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content, remarkPluginFrontmatter } = await entry.render();
 // remarkPluginFrontmatter contains data from the Markdown frontmatter after rendering
+
+// Variables for the series link
+const seriesName = entry.data.series;
+let seriesLinkPath = null;
+if (seriesName && typeof seriesName === 'string') {
+  const seriesSlug = generateSlug(seriesName);
+  seriesLinkPath = `/series/${seriesSlug}/`;
+}
 ---
 
 <BaseLayout title={entry.data.title} description={entry.data.description}>
@@ -30,11 +42,28 @@ const { Content, remarkPluginFrontmatter } = await entry.render();
           }
         </time>
         by {entry.data.author}
+        {seriesName && seriesLinkPath && (
+          <span class="series-meta-inline">
+            &bull; In series: <a href={seriesLinkPath} aria-label={`Read all posts in the series: ${seriesName}`}>{seriesName}</a>
+          </span>
+        )}
       </p>
     </header>
     <div class="post-content">
       <Content />
     </div>
+
+    {/* Conditionally render the series link footer */}
+    {seriesLinkPath && seriesName && (
+      <footer class="post-series-navigation">
+        <p>
+          This post is part of the series:
+          <a href={seriesLinkPath} aria-label={`View all posts in the "${seriesName}" series`}>
+            {seriesName}
+          </a>.
+        </p>
+      </footer>
+    )}
   </article>
 </BaseLayout>
 
@@ -84,5 +113,28 @@ const { Content, remarkPluginFrontmatter } = await entry.render();
     margin-right: 0;
     font-style: italic;
     color: var(--color-meta);
+  }
+
+  /* Styles for the new series link section at the bottom */
+  .post-series-navigation {
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border-subtle);
+    text-align: center;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--color-meta);
+  }
+  .post-series-navigation p {
+    margin: 0;
+  }
+  .post-series-navigation a {
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .post-series-navigation a:hover {
+    text-decoration: underline;
+    color: var(--color-text);
   }
 </style>
