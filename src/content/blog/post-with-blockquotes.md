@@ -3,6 +3,7 @@ title: "Post with Blockquotes"
 pubDate: 2025-05-17
 description: "let's style some blockquotes"
 tags: ["features"]
+draft: true
 ---
 
 Here is some text followed by a quote:

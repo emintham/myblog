@@ -4,3 +4,4 @@
 - Added support for marking article tags for better discovery.
 - Added styling for blockquotes.
 - Fixed new-post script.
+- Mark all example posts as drafts so that they are not accidentally published in prod but show up in dev.
