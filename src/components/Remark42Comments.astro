@@ -1,0 +1,88 @@
+---
+import { REMARK42_HOST, REMARK42_SITE_ID } from "../siteConfig.ts";
+export interface Props {
+  pageUrl: string; // Canonical URL of the page for comments
+  pageTitle?: string; // Optional: Title of the page, Remark42 might use this
+  theme?: "light" | "dark" | string; // Allow specifying theme or custom theme name
+}
+
+const {
+  pageUrl,
+  pageTitle, // Not directly used in basic Remark42 config but good to have
+  theme = "light", // Default to light theme, can be overridden
+} = Astro.props;
+
+// This object will be passed to the client-side script.
+// Using camelCase here as it's an Astro/JS variable.
+const remarkConfigForClient = {
+  host: REMARK42_HOST,
+  site_id: REMARK42_SITE_ID,
+  url: pageUrl,
+  theme: theme,
+  // title: pageTitle, // Optional: if Remark42 uses it for context
+  // components: ['embed'], // Usually default
+  // locale: 'en',
+  // max_shown_comments: 15,
+};
+
+// Development warning for placeholder values
+let configWarning = false;
+if (
+  REMARK42_HOST === "https://YOUR_REMARK42_SERVER_DOMAIN.com" || // Check against typical placeholder
+  REMARK42_HOST === "" || // Check if empty
+  REMARK42_SITE_ID === "your_site_id" || // Check against typical placeholder
+  REMARK42_SITE_ID === ""
+) {
+  // Check if empty
+  configWarning = true;
+  if (import.meta.env.DEV) {
+    console.warn(
+      "Remark42Comments: REMARK42_HOST or REMARK42_SITE_ID might be using placeholder or empty values from siteConfig.ts. Please ensure they are correctly set. Comments may not load."
+    );
+  }
+}
+---
+
+{
+  configWarning && import.meta.env.DEV && (
+    <div style="padding: 1em; background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; text-align: center; margin-bottom: 1em;">
+      <strong>Remark42 Configuration Incomplete:</strong> Check console. Ensure
+      REMARK42_HOST and REMARK42_SITE_ID are correctly set in{" "}
+      <code>src/siteConfig.ts</code>.
+    </div>
+  )
+}
+
+<div class="remark42-comments-container">
+  <div id="remark42"></div>
+  <script define:vars={{ clientSideRemarkConfig: remarkConfigForClient }}>
+    // 1. Assign the configuration to window.remark_config (snake_case)
+    //    The variable `clientSideRemarkConfig` here is what Astro makes available from define:vars.
+    window.remark_config = clientSideRemarkConfig;
+
+    // 2. Standard Remark42 loader script.
+    //    It will now correctly find window.remark_config.
+    (function (c) {
+      for (var i = 0; i < c.length; i++) {
+        var d = document,
+          s = d.createElement("script");
+        // The embed.js script loaded here is designed to look for window.remark_config
+        s.src = window.remark_config.host + "/web/" + c[i] + ".js";
+        s.defer = true;
+        (d.head || d.body).appendChild(s);
+      }
+      // The IIFE itself also uses window.remark_config for components
+    })(window.remark_config.components || ["embed"]);
+  </script>
+  <noscript
+    >Please enable JavaScript to view comments powered by Remark42.</noscript
+  >
+</div>
+
+<style>
+  .remark42-comments-container {
+    margin-top: 3rem; /* Space above the comments section */
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border-subtle); /* Optional separator */
+  }
+</style>
