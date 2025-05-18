@@ -11,4 +11,6 @@
 - Extract site-wide variables into a separate file for easier management.
 
 ## May 17
+
 - Add Remark42 commenting system.
+- Style changes.

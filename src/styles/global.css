@@ -33,7 +33,6 @@ h6 {
   font-family: var(--font-sans);
   font-weight: 400; /* Or a lighter weight for a more airy feel */
   line-height: 0.6;
-  margin-top: 2em;
   margin-bottom: 1em;
   color: var(--color-text); /* Or a slightly darker shade for emphasis */
 }
