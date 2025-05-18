@@ -30,6 +30,8 @@ who appreciate typography and a serene reading experience.
   [^2]: This is the second one.
   ```
 
+- **Short Posts**: Short, compact posts for fleeting thoughts that don't require a full blog post and don't have a "Read More" link.
+  ![Short Post Screenshot](screenshots/IMG_0041.jpeg)
 - **Homepage:** Lists recent posts with previews.
   ![Main Page Screenshot](screenshots/IMG_0028.PNG)
 

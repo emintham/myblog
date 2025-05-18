@@ -1,0 +1,172 @@
+---
+// src/components/FleetingThoughtPreview.astro
+const { post } = Astro.props;
+
+// For fleeting thoughts, display the entire body
+const contentToDisplay = post.body;
+
+// Define a background color for the note paper.
+// Aiming for a color very close to your main page background (var(--color-background, #faf9f6)).
+// Defaulting to #fdfcfb (very subtly lighter/whiter than #faf9f6).
+// Best practice: Define --color-note-paper in your global.css.
+const noteBackgroundColor = "var(--color-note-paper, #fdfcfb)";
+---
+
+<article class="post-preview is-fleeting-thought">
+  <div
+    class="fleeting-thought-inner-wrapper"
+    style={`background-color: ${noteBackgroundColor};`}
+  >
+    <h2 class="fleeting-title">{post.data.title}</h2>
+    <p class="meta">
+      <time datetime={post.data.pubDate.toISOString()}>
+        {
+          new Date(post.data.pubDate).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        }
+      </time>
+      &bull; by {post.data.author}
+    </p>
+    <div class="preview-content">
+      <Fragment set:html={contentToDisplay} />
+    </div>
+  </div>
+</article>
+
+<style>
+  /* --- Styling for Fleeting Thoughts (Subtle Gradient Border Note Style) --- */
+  .post-preview.is-fleeting-thought {
+    /* This outer article is now the gradient border container */
+    border: 1px solid transparent; /* Border thickness, transparent as color comes from border-image */
+    border-radius: 7px; /* Outer radius for the border */
+
+    /* Extremely subtle gradient for the border.
+       Uses very faint, almost transparent black for a slight shadow/edge.
+       Adjust opacity (0.02, 0.04) or color if needed.
+    */
+    border-image-source: linear-gradient(
+      135deg,
+      transparent 30%,
+      rgba(0, 0, 0, 0.03) 45%,
+      /* Very faint dark shade */ rgba(0, 0, 0, 0.02) 55%,
+      /* Even fainter dark shade */ transparent 70%
+    );
+    border-image-slice: 1; /* Ensures the gradient fills the border area */
+
+    padding: 0; /* User indicated padding was removed. The inner wrapper will provide content padding. */
+
+    margin-top: 1rem;
+    margin-bottom: 3rem;
+    box-shadow: none;
+  }
+
+  .fleeting-thought-inner-wrapper {
+    /* background-color is set inline via style attribute */
+    padding: 1.75rem; /* Inner padding for the content */
+    border-radius: 6px; /* Inner radius, should be outer radius - border thickness */
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .post-preview.is-fleeting-thought:last-child {
+    margin-bottom: 1rem;
+  }
+
+  /* Styles for content INSIDE the fleeting thought wrapper */
+  .post-preview.is-fleeting-thought .fleeting-title {
+    font-family: var(--font-fleeting-title);
+    font-size: 2.4rem;
+    font-weight: 400;
+    color: var(--color-text);
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    text-align: left;
+    line-height: 1.45;
+  }
+
+  .post-preview.is-fleeting-thought .meta {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-style: italic;
+    color: var(--color-meta);
+    margin-bottom: 1rem;
+    text-align: left;
+    line-height: 1.5;
+  }
+
+  .post-preview.is-fleeting-thought .preview-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 0;
+    font-style: italic;
+  }
+
+  .post-preview.is-fleeting-thought .preview-content :global(p) {
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--color-text);
+    padding: 0.05em 0;
+    margin-bottom: 1em;
+  }
+  .post-preview.is-fleeting-thought .preview-content :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .post-preview.is-fleeting-thought .preview-content :global(em),
+  .post-preview.is-fleeting-thought .preview-content :global(i) {
+    font-style: normal;
+  }
+
+  .post-preview.is-fleeting-thought .preview-content :global(h1),
+  .post-preview.is-fleeting-thought .preview-content :global(h2),
+  .post-preview.is-fleeting-thought .preview-content :global(h3),
+  .post-preview.is-fleeting-thought .preview-content :global(h4),
+  .post-preview.is-fleeting-thought .preview-content :global(h5),
+  .post-preview.is-fleeting-thought .preview-content :global(h6) {
+    font-size: 1rem;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    font-family: var(--font-serif);
+    font-weight: normal;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  /* --- Mobile Adjustments for Fleeting Thoughts --- */
+  @media (max-width: 768px) {
+    .post-preview.is-fleeting-thought {
+      border-width: 1px; /* Ensure border thickness is maintained if overridden */
+      border-radius: 7px;
+      margin-top: 0.5rem;
+    }
+    .fleeting-thought-inner-wrapper {
+      padding: 1.25rem;
+      border-radius: 6px;
+    }
+    .post-preview.is-fleeting-thought .fleeting-title {
+      font-size: 1.8rem;
+    }
+    .post-preview.is-fleeting-thought .preview-content :global(p) {
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .fleeting-thought-inner-wrapper {
+      padding: 1rem;
+    }
+    .post-preview.is-fleeting-thought .fleeting-title {
+      font-size: 1.5rem;
+    }
+    .post-preview.is-fleeting-thought .preview-content :global(p) {
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+  }
+</style>

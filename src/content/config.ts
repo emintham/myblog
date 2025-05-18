@@ -1,3 +1,4 @@
+// src/content/config.ts
 import { defineCollection, z } from "astro:content";
 import { AUTHOR_NAME } from "../siteConfig.ts";
 
@@ -11,6 +12,7 @@ const blogCollection = defineCollection({
     tags: z.array(z.string()).optional(),
     series: z.string().optional(),
     draft: z.boolean().optional(),
+    postType: z.enum(["fleeting", "standard"]).optional().default("standard"),
   }),
 });
 

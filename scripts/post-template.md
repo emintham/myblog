@@ -5,6 +5,7 @@ description: "{{DESCRIPTION}}"
 {{TAGS_LINE_PLACEHOLDER}}
 {{SERIES_LINE_PLACEHOLDER}}
 draft: true
+postType: "standard"
 ---
 
 Start writing your blog post here...

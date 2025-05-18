@@ -14,3 +14,7 @@
 
 - Add Remark42 commenting system.
 - Style changes.
+
+## May 18
+
+- Added support for shorter posts "fleeting".

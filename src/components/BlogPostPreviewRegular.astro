@@ -1,13 +1,17 @@
 ---
+// src/components/BlogPostPreviewRegular.astro
 const { post } = Astro.props;
+
+// Logic for first paragraph or description (remains the same for regular posts)
 const firstParagraphMatch = post.body.match(/<p>.*?<\/p>/s);
 let firstParagraph = post.data.description || "";
 if (!firstParagraph && firstParagraphMatch) {
   firstParagraph = firstParagraphMatch[0];
 } else if (!firstParagraph && post.body) {
-  // Fallback for plain text body to get first paragraph (less ideal if body contains HTML)
+  // Fallback for plain text body to get first paragraph
   firstParagraph = post.body.split("\n\n")[0];
 }
+const contentToDisplay = firstParagraph;
 ---
 
 <article class="post-preview">
@@ -25,16 +29,17 @@ if (!firstParagraph && firstParagraphMatch) {
     &bull; by {post.data.author}
   </p>
   <div class="preview-content">
-    <Fragment set:html={firstParagraph} />
+    <Fragment set:html={contentToDisplay} />
   </div>
   <a href={`/blog/${post.slug}/`} class="read-more">Read More &rarr;</a>
 </article>
 
 <style>
+  /* Styles for REGULAR post previews */
   .post-preview {
-    margin-bottom: 3rem; /* Space between previews */
+    margin-bottom: 3rem;
     padding-bottom: 2rem;
-    border-bottom: 1px solid #eee; /* Subtle separator */
+    border-bottom: 1px solid var(--color-border-subtle);
   }
 
   .post-preview:last-child {
@@ -44,6 +49,7 @@ if (!firstParagraph && firstParagraphMatch) {
 
   .post-preview h2 {
     font-size: 1.9rem;
+    font-family: var(--font-display-title);
     font-weight: 700;
     line-height: 1.3;
     margin-top: 0;
@@ -60,70 +66,56 @@ if (!firstParagraph && firstParagraphMatch) {
   }
 
   .meta {
+    /* This class is used by both components, ensure it's consistently styled or scoped if needed */
     font-family: var(--font-sans);
     font-size: 0.85rem;
     color: var(--color-meta);
     margin-bottom: 1rem;
   }
 
-  .preview-content p {
-    /* If rendering HTML of first paragraph */
+  .preview-content {
+    /* Also used by both, ensure consistency or scope */
     margin-bottom: 1rem;
-    font-size: 1rem; /* Slightly smaller for preview */
+    font-size: 1rem;
     line-height: 1.6;
   }
+
   .preview-content :global(p) {
-    /* Targets the p tag rendered by set:html */
-    font-size: 1rem; /* Or your base body font size for excerpts */
+    font-size: 1rem;
     line-height: 1.65;
     color: var(--color-text);
-    margin-bottom: 1rem; /* Ensure space before "Read More" */
+    margin-bottom: 1em;
   }
   .preview-content :global(p:last-child) {
-    margin-bottom: 1rem; /* Ensure space even if it's the only paragraph */
+    margin-bottom: 0;
   }
 
   .read-more {
     font-family: var(--font-sans);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.03em;
     color: var(--color-accent);
     text-decoration: none;
     display: inline-block;
-    margin-top: 0.5rem;
+    margin-top: 1.2rem;
   }
   .read-more:hover {
     color: var(--color-text);
   }
 
-  /* --- Mobile Adjustments --- */
+  /* --- Mobile Adjustments for Regular Posts --- */
   @media (max-width: 768px) {
-    /* Common breakpoint for tablets and mobiles */
     .post-preview h2 {
-      font-size: 1.6rem; /* Reduce font size for post titles */
-      line-height: 1.35; /* Slightly more line-height if titles wrap */
-      margin-bottom: 0.3rem;
+      font-size: 1.6rem;
     }
-
-    .preview-content :global(p) {
-      font-size: 0.95rem; /* Slightly smaller excerpt text */
-      line-height: 1.6;
-    }
-
-    .meta {
-      font-size: 0.8rem;
-    }
+    /* Add any other mobile specific styles for regular previews if needed */
   }
 
   @media (max-width: 480px) {
-    /* Further adjustments for smaller mobile screens */
     .post-preview h2 {
-      font-size: 1.4rem; /* Even smaller font size */
-      line-height: 1.4; /* Can increase a bit more for very narrow screens */
+      font-size: 1.4rem;
     }
-    .preview-content :global(p) {
-      font-size: 0.9rem;
-    }
+    /* Add any other mobile specific styles for regular previews if needed */
   }
 </style>

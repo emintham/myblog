@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import BlogPostPreview from "../../components/BlogPostPreview.astro";
+import PostPreview from "../../components/PostPreview.astro";
 import { getCollection } from "astro:content";
 import { generateSlug } from "../../utils/slugify";
 
@@ -70,7 +70,7 @@ const pageDescription = `All blog posts tagged with "${displayTagName}".`;
       postsWithThisTag.length > 0 ? (
         <div class="posts-list">
           {postsWithThisTag.map((post) => (
-            <BlogPostPreview post={post} />
+            <PostPreview post={post} />
           ))}
         </div>
       ) : (
