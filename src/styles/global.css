@@ -278,9 +278,11 @@ section.footnotes.sidenotes-transformed {
 }
 
 .sidenote a {
-  color: var(--color-accent);   /* Use your site's main accent color for the link */
-  text-decoration: none;      /* No underline by default, consistent with other links */
-  font-weight: 600;           /* Make link text slightly bolder than surrounding sidenote text */
+  color: var(
+    --color-accent
+  ); /* Use your site's main accent color for the link */
+  text-decoration: none; /* No underline by default, consistent with other links */
+  font-weight: 600; /* Make link text slightly bolder than surrounding sidenote text */
   transition: color 0.2s ease-in-out; /* Smooth color transition on hover */
 }
 

@@ -2,9 +2,10 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCollection, getEntry } from "astro:content";
 import { generateSlug } from "../../utils/slugify";
+import Remark42Comments from "../../components/Remark42Comments.astro";
 
 export async function getStaticPaths() {
-  const blogEntries = await getCollection("blog", ({data}) => {
+  const blogEntries = await getCollection("blog", ({ data }) => {
     // Filter out drafts for path generation in production
     return import.meta.env.PROD ? data.draft !== true : true;
   });
@@ -22,20 +23,29 @@ const frontmatter = entry.data;
 // Variables for the series link
 const seriesName = frontmatter.series;
 let seriesLinkPath = null;
-if (seriesName && typeof seriesName === 'string') {
+if (seriesName && typeof seriesName === "string") {
   const seriesSlug = generateSlug(seriesName);
   seriesLinkPath = `/series/${seriesSlug}/`;
 }
 
-const postTags = (frontmatter.tags && Array.isArray(frontmatter.tags) && frontmatter.tags.length > 0)
-  ? frontmatter.tags.map(tag => {
-      const tagName = tag.trim(); // Trim whitespace from tag name
-      return {
-        name: tagName, // Original name for display
-        href: `/tags/${generateSlug(tagName)}/` // Link to the tag page
-      };
-    }).filter(tag => tag.name) // Ensure no empty tags after trimming
-  : [];
+const postTags =
+  frontmatter.tags &&
+  Array.isArray(frontmatter.tags) &&
+  frontmatter.tags.length > 0
+    ? frontmatter.tags
+        .map((tag) => {
+          const tagName = tag.trim(); // Trim whitespace from tag name
+          return {
+            name: tagName, // Original name for display
+            href: `/tags/${generateSlug(tagName)}/`, // Link to the tag page
+          };
+        })
+        .filter((tag) => tag.name) // Ensure no empty tags after trimming
+    : [];
+const postUrlForComments = new URL(
+  Astro.url.pathname,
+  Astro.site || "http://localhost:4321"
+).href;
 ---
 
 <BaseLayout title={frontmatter.title} description={frontmatter.description}>
@@ -53,11 +63,19 @@ const postTags = (frontmatter.tags && Array.isArray(frontmatter.tags) && frontma
           }
         </time>
         by {frontmatter.author}
-        {seriesName && seriesLinkPath && (
-          <span class="series-meta-inline">
-            &bull; In series: <a href={seriesLinkPath} aria-label={`Read all posts in the series: ${seriesName}`}>{seriesName}</a>
-          </span>
-        )}
+        {
+          seriesName && seriesLinkPath && (
+            <span class="series-meta-inline">
+              &bull; In series:{" "}
+              <a
+                href={seriesLinkPath}
+                aria-label={`Read all posts in the series: ${seriesName}`}
+              >
+                {seriesName}
+              </a>
+            </span>
+          )
+        }
       </p>
     </header>
     <div class="post-content">
@@ -65,30 +83,48 @@ const postTags = (frontmatter.tags && Array.isArray(frontmatter.tags) && frontma
     </div>
 
     {/* Consolidated Tags and Series Footer */}
-    {(postTags.length > 0 || (seriesLinkPath && seriesName)) && (
-      <footer class="post-meta-footer">
-        {seriesLinkPath && seriesName && (
-          <div class="meta-item series-meta-item">
-            <p class="series-statement"> {/* Changed to p for semantic block content */}
-              This post is part of <a href={seriesLinkPath} aria-label={`View all posts in the "${seriesName}" series`}>{seriesName}</a>.
-            </p>
-          </div>
-        )}
+    {
+      (postTags.length > 0 || (seriesLinkPath && seriesName)) && (
+        <footer class="post-meta-footer">
+          {seriesLinkPath && seriesName && (
+            <div class="meta-item series-meta-item">
+              <p class="series-statement">
+                {" "}
+                {/* Changed to p for semantic block content */}
+                This post is part of{" "}
+                <a
+                  href={seriesLinkPath}
+                  aria-label={`View all posts in the "${seriesName}" series`}
+                >
+                  {seriesName}
+                </a>
+                .
+              </p>
+            </div>
+          )}
 
-        {postTags.length > 0 && (
-          <div class="meta-item tags-meta-item">
-            <span class="meta-label">TAGS</span>
-            <ul class="tags-list-style">
-              {postTags.map(tag => (
-                <li>
-                  <a href={tag.href}>#{tag.name}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </footer>
-    )}
+          {postTags.length > 0 && (
+            <div class="meta-item tags-meta-item">
+              <span class="meta-label">TAGS</span>
+              <ul class="tags-list-style">
+                {postTags.map((tag) => (
+                  <li>
+                    <a href={tag.href}>#{tag.name}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </footer>
+      )
+    }
+
+    <Remark42Comments
+      pageUrl={postUrlForComments}
+      pageTitle={frontmatter.title}
+      theme="light"
+      {/* Or "dark", or pass dynamically based on site theme */}
+    />
   </article>
 </BaseLayout>
 
@@ -140,7 +176,6 @@ const postTags = (frontmatter.tags && Array.isArray(frontmatter.tags) && frontma
     color: var(--color-meta);
   }
 
-
   .post-meta-footer {
     margin-top: 3.5rem; /* Space above the entire meta footer */
     padding-top: 1.5rem; /* Space below the border-top */
@@ -166,7 +201,8 @@ const postTags = (frontmatter.tags && Array.isArray(frontmatter.tags) && frontma
     letter-spacing: 0.075em; /* Kinfolk-style letter spacing */
   }
 
-  .tags-list-style { /* For the list of tags */
+  .tags-list-style {
+    /* For the list of tags */
     list-style: none;
     padding: 0;
     margin: 0;
@@ -190,9 +226,12 @@ const postTags = (frontmatter.tags && Array.isArray(frontmatter.tags) && frontma
     color: var(--color-text);
   }
 
-  .series-statement { /* For the "This post is part of..." line */
+  .series-statement {
+    /* For the "This post is part of..." line */
     margin: 0; /* Remove default p margin */
-    color: var(--color-text); /* Or var(--color-meta) if you want it more subdued */
+    color: var(
+      --color-text
+    ); /* Or var(--color-meta) if you want it more subdued */
     line-height: 1.6;
     font-size: 0.9rem; /* Match base size of section */
   }
@@ -210,8 +249,8 @@ const postTags = (frontmatter.tags && Array.isArray(frontmatter.tags) && frontma
 
   .post-content :global(blockquote) {
     font-family: var(--font-serif); /* Keep Lora, or switch to sans-serif */
-    font-style: italic;           /* Keep or remove italic */
-    color: var(--color-meta);      /* Or var(--color-text) */
+    font-style: italic; /* Keep or remove italic */
+    color: var(--color-meta); /* Or var(--color-text) */
 
     border: none; /* Remove the side border if using large quotes */
     padding: 1em 2em;
@@ -232,7 +271,7 @@ const postTags = (frontmatter.tags && Array.isArray(frontmatter.tags) && frontma
 
   .post-content :global(blockquote::before) {
     content: "“"; /* Opening smart quote */
-    top: 0.2em;   /* Adjust vertical position */
+    top: 0.2em; /* Adjust vertical position */
     left: -0.1em; /* Adjust horizontal position */
   }
 
