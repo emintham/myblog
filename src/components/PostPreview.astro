@@ -1,0 +1,42 @@
+---
+// src/components/PostPreview.astro
+// This component acts as a switcher to render the correct preview type.
+
+import BlogPostPreviewRegular from "./BlogPostPreviewRegular.astro";
+import FleetingThoughtPreview from "./FleetingThoughtPreview.astro";
+
+// Define the expected shape of the 'post' prop.
+// This should match the structure of your collection entries.
+// You might want to create a more formal TypeScript interface/type for your posts
+// in a central types file (e.g., src/types.ts) and import it here.
+interface Props {
+  post: {
+    slug: string;
+    body: string; // Or the relevant type for your rendered content
+    data: {
+      title: string;
+      pubDate: Date;
+      description?: string;
+      author: string;
+      tags?: string[];
+      series?: string;
+      draft?: boolean;
+      postType?: "fleeting" | "standard"; // Matches your content config
+      // Add any other fields from your post frontmatter
+    };
+    // Add other top-level fields from your collection entry if any (e.g., render function)
+  };
+}
+
+const { post } = Astro.props;
+
+const postType = post.data.postType || "standard"; // Default to 'standard' if not specified
+---
+
+{
+  postType === "fleeting" ? (
+    <FleetingThoughtPreview post={post} />
+  ) : (
+    <BlogPostPreviewRegular post={post} />
+  )
+}
