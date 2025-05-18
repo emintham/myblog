@@ -53,8 +53,8 @@ your identity. Some you planted with care, others sprouted from seeds scattered
 by circumstance, their origins perhaps long faded from memory. Convictions,
 assumptions or traits that were beneficial or protective during our younger years
 may cease to serve our growth, becoming encumbrances in adulthood. Identifying
-too strongly and holding too tightly onto these preconceived notions, memes[^2],
-and ideas, create an inflexible ego, manifesting as mental blockers, limiting
+too strongly with, and holding too tightly onto, these preconceived notions, memes[^2],
+and ideas, creates an inflexible ego, manifesting as mental blockers, limiting
 your growth and reducing your potential.
 
 Habits, like unwelcome guests, often overstay their welcome, proving far more
