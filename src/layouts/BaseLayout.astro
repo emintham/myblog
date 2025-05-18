@@ -55,31 +55,44 @@ const TEMPLATE_AUTHOR_NAME = "Emin Tham + Gemini 2.5 Pro";
     </footer>
     <style>
       main {
-        min-height: calc(100vh - 180px); /* Adjust based on nav/footer height */
+        min-height: calc(
+          100vh - 150px
+        ); /* Adjust based on your actual nav/footer height if changed */
+        /* Adding some bottom padding to main to ensure content doesn't sit directly on footer */
+        padding-bottom: 3rem;
       }
+
       footer {
         text-align: center;
-        padding: 2.5rem 1rem 2.5rem; /* Increased padding slightly */
+        padding: 3rem 1rem 3rem; /* Increased top/bottom padding for more breathing room */
         font-size: 0.85rem;
         color: var(--color-meta);
-        font-family: var(--font-sans); /* Open Sans for footer text */
-        border-top: 1px solid var(--color-border-subtle); /* Adds a nice separator */
-        margin-top: 4rem; /* More space above the footer */
+        font-family: var(--font-sans);
+        /* border-top: 1px solid var(--color-border-subtle); */ /* REMOVED BORDER for a cleaner look */
+        margin-top: 0; /* Removed margin-top as main has padding-bottom now */
+        /* Optionally, if you still want a very subtle separation without a full border: */
+        /* box-shadow: 0 -2px 10px -5px rgba(0,0,0,0.03); */ /* Very subtle top shadow */
       }
 
       footer p {
-        margin: 0.4em 0; /* A little space between lines in the footer */
+        margin: 0.5em 0; /* Slightly increased space between lines in the footer */
+        line-height: 1.6; /* Improved line height for readability */
       }
 
       footer a {
-        color: var(--color-accent); /* Use accent color for links */
+        color: var(--color-accent);
         text-decoration: none;
         transition: color 0.2s ease-in-out;
       }
 
       footer a:hover {
         text-decoration: underline;
-        color: var(--color-text); /* Or slightly darken accent */
+        color: var(--color-text);
+      }
+
+      .attribution {
+        margin-top: 1em; /* More space above attribution line */
+        font-size: 0.8rem; /* Slightly smaller attribution */
       }
     </style>
   </body>

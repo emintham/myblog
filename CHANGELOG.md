@@ -12,3 +12,4 @@
 
 ## May 17
 - Add Remark42 commenting system.
+- Style changes.

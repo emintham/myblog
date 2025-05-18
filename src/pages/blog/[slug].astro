@@ -133,20 +133,29 @@ const postUrlForComments = new URL(
     /* Styles for single post layout */
   }
   .post-header {
-    text-align: left; /* Or center for a more formal Kinfolk feel */
-    margin-bottom: 3rem;
+    text-align: center;
+    margin-bottom: 2.5rem;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid #eee; /* Very subtle */
+    /* Consider removing or softening this border if you want an even cleaner look */
+    /* border-bottom: 1px solid #eee; */ /* Very subtle - Original */
+    /* Option: Softer border or remove completely */
+    border-bottom: 1px solid var(--color-border-subtle); /* Keeping this for header separation, but could be removed */
   }
   .post-header h1 {
     font-size: 2.8rem; /* Larger for post title */
     margin-bottom: 0.5rem;
     line-height: 1.2;
+    font-family: var(
+      --font-display-title
+    ); /* Using Spectral for post titles for a more editorial feel */
+    font-weight: 700; /* Or 400 for a lighter feel */
   }
   .post-header .meta {
     font-family: var(--font-sans);
     font-size: 0.9rem;
     color: var(--color-meta);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .post-content {
@@ -157,68 +166,66 @@ const postUrlForComments = new URL(
   .post-content h2 {
     margin-top: 2.5em;
     margin-bottom: 1em;
-    /* font-weight: normal; /* Lighter headings in body */
+    font-family: var(--font-display-title); /* Consistent heading font */
+    font-weight: 700; /* Or 400 */
   }
   .post-content img {
-    /* Minimal images, but style them well if used */
     max-width: 100%;
     height: auto;
-    margin: 2em 0;
-    border-radius: 4px; /* Subtle rounding */
+    margin: 2.5em 0; /* Increased margin */
+    border-radius: 0px; /* Kinfolk often uses sharp edges for images, or very subtle rounding */
     display: block;
   }
   .post-content blockquote {
-    border-left: 3px solid var(--color-accent);
+    /* This will be overridden by the :global(blockquote) style below if you prefer that one.
+       If you want a simpler blockquote without the large quote marks for some contexts,
+       you might use a different class or adjust the :global one. */
+    border-left: 2px solid var(--color-accent); /* Thinner, more subtle border */
     padding-left: 1.5em;
-    margin-left: 0;
-    margin-right: 0;
+    margin: 2em 0; /* Adjusted margin */
     font-style: italic;
-    color: var(--color-meta);
+    color: var(--color-text); /* Slightly darker for better readability */
   }
 
   .post-meta-footer {
-    margin-top: 3.5rem; /* Space above the entire meta footer */
-    padding-top: 1.5rem; /* Space below the border-top */
-    border-top: 1px solid var(--color-border-subtle); /* Single border for the whole section */
-    font-family: var(--font-sans); /* Open Sans */
-    font-size: 0.9rem; /* Base size for this section */
+    margin-top: 4rem; /* Increased space above the entire meta footer */
+    padding-top: 2rem; /* Increased space - was 1.5rem */
+    /* border-top: 1px solid var(--color-border-subtle); */ /* REMOVED BORDER for a cleaner look */
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
   }
 
   .meta-item {
-    margin-bottom: 1.25rem; /* Space between "Tags" block and "Series" block if both appear */
+    margin-bottom: 1rem; /* Increased space between "Series" and "Tags" block */
   }
   .meta-item:last-child {
     margin-bottom: 0;
   }
 
   .meta-label {
-    display: block; /* Label on its own line */
-    font-weight: 600;
-    color: var(--color-meta); /* Softer color for the label */
-    margin-bottom: 0.6em;
-    font-size: 0.8rem; /* Smaller label text */
+    display: block;
+    font-weight: 600; /* Kept for clarity */
+    color: var(--color-meta);
+    margin-bottom: 0.8em; /* Slightly more space below label */
+    font-size: 0.8rem;
     text-transform: uppercase;
-    letter-spacing: 0.075em; /* Kinfolk-style letter spacing */
+    letter-spacing: 0.075em;
   }
 
   .tags-list-style {
-    /* For the list of tags */
     list-style: none;
     padding: 0;
     margin: 0;
-    display: flex; /* Tags flow inline */
-    flex-wrap: wrap; /* Allow wrapping */
-    gap: 0.3em 0.8em; /* Vertical and horizontal gap between tags */
-  }
-
-  .tags-list-style li {
-    /* Individual list item styling if needed beyond gap */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em 1em; /* Slightly increased gap for better breathing room */
   }
 
   .tags-list-style a {
     color: var(--color-accent);
     text-decoration: none;
-    font-size: 0.9rem; /* Match base size of section */
+    font-size: 0.9rem;
+    padding: 0.25em 0; /* Add a little vertical padding for touch targets / visual */
   }
 
   .tags-list-style a:hover {
@@ -227,19 +234,19 @@ const postUrlForComments = new URL(
   }
 
   .series-statement {
-    /* For the "This post is part of..." line */
-    margin: 0; /* Remove default p margin */
-    color: var(
-      --color-text
-    ); /* Or var(--color-meta) if you want it more subdued */
-    line-height: 1.6;
-    font-size: 0.9rem; /* Match base size of section */
+    margin: 0;
+    color: var(--color-text);
+    line-height: 1.7; /* Increased line-height for readability */
+    font-size: 0.95rem; /* Slightly larger for emphasis */
+    text-align: center; /* Kinfolk often uses left-align for text blocks */
+    /* Consider centering if it's a short statement and fits the overall page design */
+    /* max-width: 65ch; */ /* Optional: constrain line length for readability */
   }
 
   .series-statement a {
     color: var(--color-accent);
     text-decoration: none;
-    font-weight: 600; /* Make series name stand out */
+    font-weight: 600;
   }
 
   .series-statement a:hover {
@@ -247,44 +254,59 @@ const postUrlForComments = new URL(
     color: var(--color-text);
   }
 
+  /* Kinfolk-inspired Blockquote with large decorative quotes */
   .post-content :global(blockquote) {
-    font-family: var(--font-serif); /* Keep Lora, or switch to sans-serif */
-    font-style: italic; /* Keep or remove italic */
-    color: var(--color-meta); /* Or var(--color-text) */
-
-    border: none; /* Remove the side border if using large quotes */
-    padding: 1em 2em;
-    margin: 2.5em auto; /* Center the blockquote if it's narrower */
-    max-width: 55ch;
-    position: relative; /* Needed for positioning pseudo-elements */
-    text-align: center; /* Optional: center short quotes */
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--color-text); /* Darker for better readability */
+    border: none;
+    padding: 1em 0em; /* Reduced side padding, rely on text-align and max-width */
+    margin: 3em auto; /* Increased vertical margin, auto for horizontal centering */
+    max-width: 50ch; /* Constrain width for readability and aesthetic */
+    position: relative;
+    text-align: center; /* Center the text of the blockquote */
+    line-height: 1.7;
   }
 
   .post-content :global(blockquote::before),
   .post-content :global(blockquote::after) {
     font-family: var(--font-serif); /* Or a specific display serif */
-    font-size: 4em; /* Large quote marks */
-    color: var(--color-border-subtle); /* Light grey for quote marks */
+    font-size: 4.5em; /* Slightly larger quote marks */
+    color: var(--color-border-subtle); /* Very light grey for quote marks */
     position: absolute;
     line-height: 0;
   }
 
   .post-content :global(blockquote::before) {
-    content: "“"; /* Opening smart quote */
-    top: 0.2em; /* Adjust vertical position */
-    left: -0.1em; /* Adjust horizontal position */
+    content: "“";
+    top: 0.25em; /* Adjust for visual centering with new font size */
+    left: -0.25em; /* Adjust to bring it slightly outside the text flow */
   }
 
   .post-content :global(blockquote::after) {
-    content: "”"; /* Closing smart quote */
-    bottom: 0.1em; /* Adjust vertical position */
-    right: -0.1em; /* Adjust horizontal position */
+    content: "”";
+    bottom: 0.15em; /* Adjust for visual centering */
+    right: -0.25em; /* Adjust to bring it slightly outside the text flow */
   }
 
   .post-content :global(blockquote p) {
     margin-bottom: 0.75em;
+    font-size: 1.05rem; /* Slightly larger text within blockquotes */
   }
   .post-content :global(blockquote p:last-child) {
     margin-bottom: 0;
+  }
+
+  /* Inline series link in post header meta */
+  .series-meta-inline {
+    font-family: var(--font-sans); /* Ensure consistency */
+  }
+  .series-meta-inline a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  .series-meta-inline a:hover {
+    text-decoration: underline;
+    color: var(--color-text);
   }
 </style>
