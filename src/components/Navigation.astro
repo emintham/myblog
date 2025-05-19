@@ -1,8 +1,10 @@
 ---
+// src/components/Navigation.astro
 import { SITE_TITLE } from "../siteConfig.ts";
 
 const navLinks = [
   { href: "/", label: "Home" },
+  { href: "/book-notes", label: "Book Notes" }, // Added Book Notes link
   { href: "/tags", label: "Tags" },
   { href: "/series", label: "Series" },
 ];
@@ -17,7 +19,17 @@ const navLinks = [
       {
         navLinks.map((link) => (
           <li>
-            <a href={link.href}>{link.label}</a>
+            <a
+              href={link.href}
+              class:list={{
+                "is-active":
+                  Astro.url.pathname === link.href ||
+                  (link.href !== "/" &&
+                    Astro.url.pathname.startsWith(link.href + "/")),
+              }}
+            >
+              {link.label}
+            </a>
           </li>
         ))
       }
@@ -28,8 +40,8 @@ const navLinks = [
 <style>
   nav {
     padding: 1.5rem 0;
-    border-bottom: 1px solid #e0e0e0;
-    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border-subtle, #e0e0e0); /* Added fallback for var */
+    margin-bottom: 1rem; /* Or adjust as per BaseLayout needs */
   }
 
   .nav-container {
@@ -61,21 +73,17 @@ const navLinks = [
   }
 
   .nav-links {
-    /* This is the ul */
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
-    justify-content: space-between; /* This is the key change for distribution */
-    width: 100%; /* Makes the ul span the full width of .nav-container */
-    flex-wrap: wrap; /* Allows links to wrap on very small screens if necessary */
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
   }
 
   .nav-links li {
-    /* Horizontal margins are no longer needed on li for spacing,
-       as justify-content: space-between handles it.
-       You might want text-align if link text varies a lot in length. */
-    text-align: center; /* Ensures text within each link item is centered if items have different widths */
+    text-align: center;
   }
 
   .nav-links li a {
@@ -85,31 +93,32 @@ const navLinks = [
     letter-spacing: 0.05em;
     color: var(--color-meta);
     text-decoration: none;
-    padding: 0.5rem 0.1rem; /* Vertical padding, minimal horizontal as space-between handles it */
-    /* Increase horizontal padding if you want larger clickable areas for each link */
-    display: inline-block; /* Ensures padding is applied correctly */
+    padding: 0.5rem 0.1rem;
+    display: inline-block;
     transition: color 0.2s ease-in-out;
+    border-bottom: 2px solid transparent; /* For active state indication */
   }
 
   .nav-links li a:hover,
   .nav-links li a.is-active {
+    /* Style for active link */
     color: var(--color-text);
+    border-bottom-color: var(--color-accent); /* Or var(--color-text) */
   }
 
   /* Responsive adjustments */
   @media (max-width: 480px) {
     .blog-title a {
-      font-size: 1.5rem;
+      font-size: 1.8rem; /* Adjusted for better fit */
     }
     .nav-links {
-      /* On very small screens, you might prefer them not to be space-between
-         if they get too far apart or if wrapping makes space-between look odd.
-         Could revert to justify-content: center or space-around. */
-      /* justify-content: space-around; /* Example for smaller screens */
+      /* Consider justify-content: space-around or center for very small screens if space-between is too sparse */
+      justify-content: space-around;
     }
     .nav-links li a {
-      font-size: 0.85rem; /* Slightly smaller font for links */
-      padding: 0.5rem 0.25rem; /* Adjust padding for small screens */
+      font-size: 0.8rem; /* Slightly smaller font for links */
+      padding: 0.5rem 0.2rem; /* Adjust padding for small screens */
+      letter-spacing: 0.04em;
     }
   }
 </style>

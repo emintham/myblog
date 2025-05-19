@@ -1,0 +1,171 @@
+---
+// src/pages/book-tags/[tag].astro
+// Displays all book notes associated with a specific book tag.
+
+// Layout and Astro content helpers
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+// Component imports
+import PostPreview from "../../components/PostPreview.astro"; // The switcher component
+
+// Utilities
+import { generateSlug } from "../../utils/slugify.ts"; // To match slugs if necessary
+
+// Generates static paths for each unique book tag
+export async function getStaticPaths() {
+  const allBlogEntries = await getCollection("blog", ({ data }) => {
+    // Consider only published book notes for generating tag pages
+    return (
+      (import.meta.env.PROD ? data.draft !== true : true) &&
+      data.postType === "bookNote"
+    );
+  });
+
+  const uniqueBookTags = new Set<string>();
+  allBlogEntries.forEach((entry) => {
+    if (entry.data.bookTags && Array.isArray(entry.data.bookTags)) {
+      entry.data.bookTags.forEach((tag) => {
+        if (typeof tag === "string" && tag.trim() !== "") {
+          uniqueBookTags.add(tag.trim());
+        }
+      });
+    }
+  });
+
+  return Array.from(uniqueBookTags).map((tag) => {
+    return {
+      params: { tag: generateSlug(tag) }, // Use the slugified version of the tag for the URL
+      props: { originalTag: tag }, // Pass the original tag name for display and filtering
+    };
+  });
+}
+
+const { tag: tagSlug } = Astro.params; // The slugified tag from the URL
+const { originalTag } = Astro.props; // The original tag name passed from getStaticPaths
+
+// Fetch all published book notes again to filter by the current tag
+const allPublishedBookNotes = await getCollection("blog", ({ data }) => {
+  return (
+    (import.meta.env.PROD ? data.draft !== true : true) &&
+    data.postType === "bookNote"
+  );
+});
+
+// Filter book notes that include the current originalTag in their bookTags array
+const taggedBookNotes = allPublishedBookNotes.filter((entry) => {
+  return (
+    entry.data.bookTags &&
+    Array.isArray(entry.data.bookTags) &&
+    entry.data.bookTags.some(
+      (bt) => typeof bt === "string" && bt.trim() === originalTag
+    )
+  );
+});
+
+// Sort the filtered book notes by publication date, newest first.
+taggedBookNotes.sort(
+  (a, b) =>
+    new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf()
+);
+
+const pageTitle = `Book Notes Tagged: ${originalTag}`;
+const pageDescription = `A collection of book notes tagged with "${originalTag}".`;
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section class="page-container">
+    <header class="page-header">
+      <nav class="breadcrumb-nav" aria-label="breadcrumb">
+        <a href="/book-notes/">Book Notes</a> /
+        <span>{originalTag}</span>
+      </nav>
+      <h1 class="page-detail-header-title">
+        Book Tagged: <span class="tag-highlight">{originalTag}</span>
+      </h1>
+    </header>
+
+    <div class="post-list">
+      {
+        taggedBookNotes.length > 0 ? (
+          taggedBookNotes.map((bookNote) => (
+            // The PostPreview switcher will automatically use BookNotePreview for these
+            <PostPreview post={bookNote} />
+          ))
+        ) : (
+          <p class="empty-state-message">
+            No book notes found with the tag "{originalTag}".
+          </p>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Styles for the book tag detail page */
+  .page-container {
+    /* Max-width and centering will be handled by .content-wrapper in BaseLayout */
+  }
+
+  .page-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem; /* Space below header content */
+    border-bottom: 1px solid var(--color-border-subtle); /* Separator line */
+    text-align: left; /* Align header content to the left for a more traditional blog feel */
+  }
+
+  /* Optional breadcrumb styling */
+  /*
+  .breadcrumb-nav {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--color-meta);
+    margin-bottom: 0.75rem;
+  }
+  .breadcrumb-nav a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  .breadcrumb-nav a:hover {
+    text-decoration: underline;
+  }
+  */
+
+  .page-detail-header-title {
+    font-family: var(--font-sans); /* Or --font-display-title if preferred */
+    font-size: 2.2rem; /* Adjust size as needed */
+    font-weight: 700;
+    color: var(--color-text);
+    margin-top: 0;
+    margin-bottom: 0.25rem; /* Small space below title */
+    line-height: 1.3;
+  }
+  .tag-highlight {
+    color: var(--color-accent); /* Highlight the tag name */
+    /* font-style: italic; */ /* Optional italicization */
+  }
+
+  /* Optional meta text styling */
+  /*
+  .page-detail-meta {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--color-meta);
+    margin-top: 0.5rem;
+  }
+  */
+
+  .post-list {
+    /* Container for the list of previews */
+  }
+
+  .empty-state-message {
+    text-align: center;
+    font-family: var(--font-serif);
+    color: var(--color-meta);
+    margin-top: 3rem;
+    padding: 1rem;
+    font-size: 1.1rem;
+  }
+</style>

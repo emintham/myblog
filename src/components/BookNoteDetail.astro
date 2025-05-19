@@ -1,0 +1,293 @@
+---
+// src/components/BookNoteDetail.astro
+// Component to display the full content of a "bookNote" type post.
+
+// Astro content helpers
+import { getEntry } from "astro:content";
+
+// Utility imports
+import { generateSlug } from "../utils/slugify";
+
+// Component imports
+import Remark42Comments from "./Remark42Comments.astro";
+import BookQuotesSection from "./BookQuotesSection.astro"; // Import the new quotes section component
+
+// Define the expected shape of the 'entry' prop.
+interface Props {
+  entry: {
+    data: {
+      title: string; // Title of the review/note
+      pubDate: Date;
+      author: string; // Author of the review/note
+      bookTitle?: string;
+      bookAuthor?: string; // Author of the book
+      bookCover?: { src: string; alt: string };
+      quotesRef?: string; // Reference to the YAML/JSON file in bookQuotes
+      bookTags?: string[];
+      // ... any other relevant fields from your schema
+    };
+    render: () => Promise<{ Content: any }>; // Ensure Content is part of the render result type
+    slug: string; // The slug of the current blog post
+  };
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render(); // Render the main Markdown content
+const frontmatter = entry.data;
+
+// Fetch the quotes if quotesRef is provided
+let fetchedQuotes = []; // Default to an empty array
+if (frontmatter.quotesRef) {
+  try {
+    const bookQuotesData = await getEntry("bookQuotes", frontmatter.quotesRef);
+    if (
+      bookQuotesData &&
+      bookQuotesData.data &&
+      Array.isArray(bookQuotesData.data.quotes)
+    ) {
+      fetchedQuotes = bookQuotesData.data.quotes;
+    } else {
+      console.warn(
+        `Quotes data for ref "${frontmatter.quotesRef}" is not in the expected format or is empty.`
+      );
+    }
+  } catch (e) {
+    console.error(
+      `Error fetching quotes for ref "${frontmatter.quotesRef}":`,
+      e
+    );
+    // Optionally, display an error message to the user in the template
+  }
+}
+
+// Construct the URL for the comments component
+const pageUrlForComments = new URL(
+  `/blog/${entry.slug}/`, // Assumes book notes are under /blog/ path
+  Astro.site || "http://localhost:4321" // Fallback for local dev
+).href;
+---
+
+<article class="book-note-detail">
+  <header class="book-note-header">
+    <h1>{frontmatter.title}</h1>
+
+    <p class="meta">
+      Published on <time datetime={frontmatter.pubDate.toISOString()}>
+        {
+          new Date(frontmatter.pubDate).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        }
+      </time>
+      by {frontmatter.author}
+    </p>
+  </header>
+
+  {
+    frontmatter.bookTitle && (
+      <div class="book-info">
+        <h2 class="book-title">{frontmatter.bookTitle}</h2>
+        {frontmatter.bookAuthor && (
+          <p class="book-author">by {frontmatter.bookAuthor}</p>
+        )}
+      </div>
+    )
+  }
+  {
+    frontmatter.bookCover && (
+      <div class="book-cover-image-container">
+        <img
+          src={frontmatter.bookCover.src}
+          alt={frontmatter.bookCover.alt}
+          class="book-cover-image"
+        />
+      </div>
+    )
+  }
+
+  <div class="book-note-content prose">
+    <Content />
+  </div>
+
+  <BookQuotesSection
+    quotes={fetchedQuotes}
+    bookAuthor={frontmatter.bookAuthor}
+  />
+
+  {
+    frontmatter.bookTags && frontmatter.bookTags.length > 0 && (
+      <footer class="book-tags-footer">
+        <span class="book-tags-label">Book Tags:</span>
+        <ul class="book-tags-list">
+          {frontmatter.bookTags.map((tag) => (
+            <li>
+              <a
+                href={`/book-tags/${generateSlug(tag)}/`}
+                class="book-tag-item"
+              >
+                #{tag}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </footer>
+    )
+  }
+
+  <div class="comments-section">
+    <Remark42Comments
+      pageUrl={pageUrlForComments}
+      pageTitle={frontmatter.title}
+      theme="light"
+    />
+  </div>
+</article>
+
+<style>
+  /* General styling for the book note detail page structure */
+  .book-note-detail {
+    font-family: var(--font-serif);
+    line-height: 1.7;
+  }
+
+  .book-note-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .book-note-header h1 {
+    font-family: var(--font-display-title);
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+    color: var(--color-text);
+  }
+
+  .book-info {
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+    border-left: 2px solid var(--color-accent);
+  }
+
+  .book-title {
+    font-family: var(--font-sans);
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-top: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .book-author {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--color-meta);
+    margin-bottom: 0;
+  }
+
+  .book-note-header .meta {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--color-meta);
+    margin-top: 1.5rem;
+  }
+
+  .book-cover-image-container {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  .book-cover-image {
+    max-width: 250px;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .book-note-content {
+    /* Main review/summary content */
+    margin-bottom: 3rem;
+  }
+  /* Basic prose styling for Markdown content.
+     Consider using a global .prose class or Tailwind Typography if you need more. */
+  .prose :global(h2),
+  .prose :global(h3) {
+    font-family: var(--font-sans);
+    margin-top: 2.5em;
+    margin-bottom: 1em;
+  }
+  .prose :global(p) {
+    margin-bottom: 1.5em;
+  }
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin-bottom: 1.5em;
+    padding-left: 1.5em;
+  }
+  .prose :global(blockquote) {
+    border-left: 3px solid var(--color-accent);
+    padding-left: 1.5em;
+    margin-left: 0;
+    margin-right: 0;
+    font-style: italic;
+    color: var(--color-meta);
+  }
+
+  /* Book Tags Footer */
+  .book-tags-footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border-subtle);
+    font-family: var(--font-sans);
+  }
+  .book-tags-label {
+    font-size: 0.8rem;
+    color: var(--color-meta);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 0.5em;
+    font-weight: 600;
+  }
+  .book-tags-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.5em 0 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em 0.8em;
+  }
+  .book-tags-list li .book-tag-item {
+    font-size: 0.9rem;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  /* Comments Section Styling */
+  .comments-section {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  /* --- Mobile Adjustments for BookNoteDetail structure --- */
+  @media (max-width: 768px) {
+    .book-note-header h1 {
+      font-size: 2.2rem;
+    }
+    .book-title {
+      font-size: 1.6rem;
+    }
+    .book-cover-image {
+      max-width: 200px;
+    }
+    .comments-section {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+    }
+  }
+</style>
