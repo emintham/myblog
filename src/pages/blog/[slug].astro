@@ -1,9 +1,18 @@
 ---
+// src/pages/blog/[slug].astro
+
+// Layout and Astro content helpers
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getCollection, getEntry } from "astro:content";
-import { generateSlug } from "../../utils/slugify";
+import { getCollection } from "astro:content";
+
+// Component imports
+import BookNoteDetail from "../../components/BookNoteDetail.astro";
 import Remark42Comments from "../../components/Remark42Comments.astro";
 
+// Utilities
+import { generateSlug } from "../../utils/slugify.ts"; // Your existing slugify utility
+
+// Generates static paths for all non-draft blog entries
 export async function getStaticPaths() {
   const blogEntries = await getCollection("blog", ({ data }) => {
     // Filter out drafts for path generation in production
@@ -15,188 +24,273 @@ export async function getStaticPaths() {
   }));
 }
 
+// Get the current post entry from props
 const { entry } = Astro.props;
-const { Content, remarkPluginFrontmatter } = await entry.render();
-const frontmatter = entry.data;
-// remarkPluginFrontmatter contains data from the Markdown frontmatter after rendering
+const frontmatter = entry.data; // Convenience variable for frontmatter
 
-// Variables for the series link
-const seriesName = frontmatter.series;
-let seriesLinkPath = null;
-if (seriesName && typeof seriesName === "string") {
-  const seriesSlug = generateSlug(seriesName);
-  seriesLinkPath = `/series/${seriesSlug}/`;
+// Conditionally render content for standard/fleeting posts
+// For book notes, entry.render() is called within BookNoteDetail.astro
+let ContentComponent = null;
+if (frontmatter.postType !== "bookNote") {
+  const { Content } = await entry.render();
+  ContentComponent = Content;
 }
 
-const postTags =
-  frontmatter.tags &&
-  Array.isArray(frontmatter.tags) &&
-  frontmatter.tags.length > 0
-    ? frontmatter.tags
-        .map((tag) => {
-          const tagName = tag.trim(); // Trim whitespace from tag name
-          return {
-            name: tagName, // Original name for display
-            href: `/tags/${generateSlug(tagName)}/`, // Link to the tag page
-          };
-        })
-        .filter((tag) => tag.name) // Ensure no empty tags after trimming
-    : [];
+// --- Variables for standard post header/footer (series, tags) ---
+// These are only prepared if not a bookNote, as bookNotes handle their own specific tags/meta.
+let seriesLinkPath = null;
+let postTags = [];
+
+if (frontmatter.postType !== "bookNote") {
+  if (frontmatter.series && typeof frontmatter.series === "string") {
+    const seriesSlug = generateSlug(frontmatter.series);
+    seriesLinkPath = `/series/${seriesSlug}/`;
+  }
+
+  if (
+    frontmatter.tags &&
+    Array.isArray(frontmatter.tags) &&
+    frontmatter.tags.length > 0
+  ) {
+    postTags = frontmatter.tags
+      .map((tag) => {
+        const tagName = String(tag).trim(); // Ensure tag is a string before trimming
+        return {
+          name: tagName,
+          href: `/tags/${generateSlug(tagName)}/`,
+        };
+      })
+      .filter((tag) => tag.name); // Ensure no empty tags after trimming
+  }
+}
+
+// URL for comments, used by Remark42
 const postUrlForComments = new URL(
   Astro.url.pathname,
-  Astro.site || "http://localhost:4321"
+  Astro.site || "http://localhost:4321" // Fallback for local dev if Astro.site is not set
 ).href;
 ---
 
 <BaseLayout title={frontmatter.title} description={frontmatter.description}>
-  <article class="blog-post">
-    <header class="post-header">
-      <h1>{frontmatter.title}</h1>
-      <p class="meta">
-        Published on <time datetime={frontmatter.pubDate.toISOString()}>
-          {
-            new Date(frontmatter.pubDate).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })
-          }
-        </time>
-        by {frontmatter.author}
-        {
-          seriesName && seriesLinkPath && (
-            <span class="series-meta-inline">
-              &bull; In series:{" "}
-              <a
-                href={seriesLinkPath}
-                aria-label={`Read all posts in the series: ${seriesName}`}
-              >
-                {seriesName}
-              </a>
-            </span>
-          )
-        }
-      </p>
-    </header>
-    <div class="post-content">
-      <Content />
-    </div>
-
-    {/* Consolidated Tags and Series Footer */}
-    {
-      (postTags.length > 0 || (seriesLinkPath && seriesName)) && (
-        <footer class="post-meta-footer">
-          {seriesLinkPath && seriesName && (
-            <div class="meta-item series-meta-item">
-              <p class="series-statement">
-                {" "}
-                {/* Changed to p for semantic block content */}
-                This post is part of{" "}
+  {
+    frontmatter.postType === "bookNote" ? (
+      // Render the dedicated component for Book Notes
+      <BookNoteDetail entry={entry} />
+    ) : (
+      // --- Standard and Fleeting Post Layout ---
+      <article class="blog-post">
+        <header class="post-header">
+          <h1>{frontmatter.title}</h1>
+          <p class="meta">
+            Published on{" "}
+            <time datetime={frontmatter.pubDate.toISOString()}>
+              {new Date(frontmatter.pubDate).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </time>
+            by {frontmatter.author}
+            {frontmatter.series && seriesLinkPath && (
+              <span class="series-meta-inline">
+                &bull; In series:{" "}
                 <a
                   href={seriesLinkPath}
-                  aria-label={`View all posts in the "${seriesName}" series`}
+                  aria-label={`Read all posts in the series: ${frontmatter.series}`}
                 >
-                  {seriesName}
+                  {frontmatter.series}
                 </a>
-                .
-              </p>
-            </div>
+              </span>
+            )}
+          </p>
+        </header>
+
+        {ContentComponent && (
+          <div class="post-content prose">
+            {" "}
+            {/* Added .prose for potential global content styling */}
+            <ContentComponent />
+          </div>
+        )}
+
+        {/* Footer with Series and Tags - Not shown for Fleeting Thoughts */}
+        {frontmatter.postType !== "fleeting" &&
+          (postTags.length > 0 || (seriesLinkPath && frontmatter.series)) && (
+            <footer class="post-meta-footer">
+              {seriesLinkPath && frontmatter.series && (
+                <div class="meta-item series-meta-item">
+                  <p class="series-statement">
+                    This post is part of{" "}
+                    <a
+                      href={seriesLinkPath}
+                      aria-label={`View all posts in the "${frontmatter.series}" series`}
+                    >
+                      {frontmatter.series}
+                    </a>
+                    .
+                  </p>
+                </div>
+              )}
+              {postTags.length > 0 && (
+                <div class="meta-item tags-meta-item">
+                  <span class="meta-label">TAGS</span>
+                  <ul class="tags-list-style">
+                    {postTags.map((tag) => (
+                      <li>
+                        <a href={tag.href}>#{tag.name}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </footer>
           )}
 
-          {postTags.length > 0 && (
-            <div class="meta-item tags-meta-item">
-              <span class="meta-label">TAGS</span>
-              <ul class="tags-list-style">
-                {postTags.map((tag) => (
-                  <li>
-                    <a href={tag.href}>#{tag.name}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </footer>
-      )
-    }
-
-    <Remark42Comments
-      pageUrl={postUrlForComments}
-      pageTitle={frontmatter.title}
-      theme="light"
-      {/* Or "dark", or pass dynamically based on site theme */}
-    />
-  </article>
+        {/* Comments - Not shown for Fleeting Thoughts */}
+        {frontmatter.postType !== "fleeting" && (
+          <Remark42Comments
+            pageUrl={postUrlForComments}
+            pageTitle={frontmatter.title}
+            theme="light"
+          />
+        )}
+      </article>
+    )
+  }
 </BaseLayout>
 
+{
+  /* Styles for standard/fleeting posts. BookNoteDetail has its own scoped styles. */
+}
 <style>
   .blog-post {
-    /* Styles for single post layout */
+    /* Basic structure for a standard blog post article */
   }
+
   .post-header {
-    text-align: center;
-    margin-bottom: 2.5rem;
+    text-align: center; /* Centered for a clean, modern look, even if Kinfolk prefers left-aligned */
+    margin-bottom: 2.5rem; /* Adjusted from 3rem for a slightly tighter feel */
     padding-bottom: 1.5rem;
-    /* Consider removing or softening this border if you want an even cleaner look */
-    /* border-bottom: 1px solid #eee; */ /* Very subtle - Original */
-    /* Option: Softer border or remove completely */
-    border-bottom: 1px solid var(--color-border-subtle); /* Keeping this for header separation, but could be removed */
+    border-bottom: 1px solid var(--color-border-subtle);
   }
+
   .post-header h1 {
-    font-size: 2.8rem; /* Larger for post title */
+    font-family: var(--font-display-title);
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.25; /* Slightly increased for better readability of larger titles */
     margin-bottom: 0.5rem;
-    line-height: 1.2;
-    font-family: var(
-      --font-display-title
-    ); /* Using Spectral for post titles for a more editorial feel */
-    font-weight: 700; /* Or 400 for a lighter feel */
+    color: var(--color-text);
   }
+
   .post-header .meta {
     font-family: var(--font-sans);
     font-size: 0.9rem;
     color: var(--color-meta);
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
+    margin-top: 0.75rem; /* Was 1.5rem, adjusted for balance */
+    /* margin-bottom: 0.5rem; Removed, spacing handled by header margin */
+  }
+
+  .series-meta-inline a {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+  }
+  .series-meta-inline a:hover {
+    text-decoration: underline;
+    color: var(--color-text);
   }
 
   .post-content {
-    /* Typography here will be largely inherited from global.css */
+    /* Typography largely inherited from global.css and .prose (if you add global .prose styles) */
+    /* Ensure enough top margin if the first element is not an H2 with its own margin */
+    padding-top: 0.5rem;
   }
 
-  /* Deeper styling for elements within .post-content if needed */
-  .post-content h2 {
+  /* Global styling for elements within Markdown content, if not handled by a typography plugin */
+  /* Consider moving these to global.css if they apply to all .prose content */
+  .post-content :global(h2) {
+    font-family: var(
+      --font-sans
+    ); /* Changed from --font-display-title for better hierarchy */
+    font-size: 1.8rem; /* Adjusted size */
+    font-weight: 600; /* Adjusted weight */
     margin-top: 2.5em;
     margin-bottom: 1em;
-    font-family: var(--font-display-title); /* Consistent heading font */
-    font-weight: 700; /* Or 400 */
+    line-height: 1.3;
   }
-  .post-content img {
-    max-width: 100%;
-    height: auto;
-    margin: 2.5em 0; /* Increased margin */
-    border-radius: 0px; /* Kinfolk often uses sharp edges for images, or very subtle rounding */
-    display: block;
-  }
-  .post-content blockquote {
-    /* This will be overridden by the :global(blockquote) style below if you prefer that one.
-       If you want a simpler blockquote without the large quote marks for some contexts,
-       you might use a different class or adjust the :global one. */
-    border-left: 2px solid var(--color-accent); /* Thinner, more subtle border */
-    padding-left: 1.5em;
-    margin: 2em 0; /* Adjusted margin */
-    font-style: italic;
-    color: var(--color-text); /* Slightly darker for better readability */
+  .post-content :global(h3) {
+    font-family: var(--font-sans);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 2em;
+    margin-bottom: 0.8em;
+    line-height: 1.4;
   }
 
+  .post-content :global(img) {
+    max-width: 100%;
+    height: auto;
+    margin: 2.5em auto; /* Centering block images */
+    border-radius: 2px; /* Softer rounding than 0px */
+    display: block;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow for images */
+  }
+
+  /* Using the Kinfolk-inspired blockquote from previous iterations */
+  .post-content :global(blockquote) {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--color-text);
+    border: none;
+    padding: 1em 0em;
+    margin: 3em auto;
+    max-width: 50ch;
+    position: relative;
+    text-align: center;
+    line-height: 1.7;
+  }
+
+  .post-content :global(blockquote::before),
+  .post-content :global(blockquote::after) {
+    font-family: var(--font-serif);
+    font-size: 4.5em;
+    color: var(--color-border-subtle);
+    position: absolute;
+    line-height: 0;
+  }
+
+  .post-content :global(blockquote::before) {
+    content: "“";
+    top: 0.25em;
+    left: -0.25em;
+  }
+
+  .post-content :global(blockquote::after) {
+    content: "”";
+    bottom: 0.15em;
+    right: -0.25em;
+  }
+
+  .post-content :global(blockquote p) {
+    margin-bottom: 0.75em;
+    font-size: 1.05rem;
+  }
+  .post-content :global(blockquote p:last-child) {
+    margin-bottom: 0;
+  }
+
+  /* Post Meta Footer (Tags and Series) */
   .post-meta-footer {
-    margin-top: 4rem; /* Increased space above the entire meta footer */
-    padding-top: 2rem; /* Increased space - was 1.5rem */
-    /* border-top: 1px solid var(--color-border-subtle); */ /* REMOVED BORDER for a cleaner look */
+    margin-top: 3.5rem; /* Was 4rem */
+    padding-top: 1.5rem; /* Was 2rem */
     font-family: var(--font-sans);
     font-size: 0.9rem;
+    /* border-top: 1px solid var(--color-border-subtle); Re-added for separation if desired, or keep removed */
   }
 
   .meta-item {
-    margin-bottom: 1rem; /* Increased space between "Series" and "Tags" block */
+    margin-bottom: 1.5rem; /* Was 2rem / 1rem */
   }
   .meta-item:last-child {
     margin-bottom: 0;
@@ -204,9 +298,9 @@ const postUrlForComments = new URL(
 
   .meta-label {
     display: block;
-    font-weight: 600; /* Kept for clarity */
+    font-weight: 600;
     color: var(--color-meta);
-    margin-bottom: 0.8em; /* Slightly more space below label */
+    margin-bottom: 0.7em; /* Was 0.8em */
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.075em;
@@ -218,16 +312,16 @@ const postUrlForComments = new URL(
     margin: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5em 1em; /* Slightly increased gap for better breathing room */
+    gap: 0.4em 0.9em; /* Adjusted gap */
   }
 
   .tags-list-style a {
     color: var(--color-accent);
     text-decoration: none;
     font-size: 0.9rem;
-    padding: 0.25em 0; /* Add a little vertical padding for touch targets / visual */
+    padding: 0.2em 0; /* Adjusted padding */
+    transition: color 0.2s ease-in-out;
   }
-
   .tags-list-style a:hover {
     text-decoration: underline;
     color: var(--color-text);
@@ -236,76 +330,17 @@ const postUrlForComments = new URL(
   .series-statement {
     margin: 0;
     color: var(--color-text);
-    line-height: 1.7; /* Increased line-height for readability */
-    font-size: 0.95rem; /* Slightly larger for emphasis */
-    text-align: center; /* Kinfolk often uses left-align for text blocks */
-    /* Consider centering if it's a short statement and fits the overall page design */
-    /* max-width: 65ch; */ /* Optional: constrain line length for readability */
+    line-height: 1.65; /* Was 1.7 */
+    font-size: 0.9rem; /* Was 0.95rem */
+    text-align: left; /* Changed from center for consistency with other elements */
   }
-
   .series-statement a {
     color: var(--color-accent);
     text-decoration: none;
     font-weight: 600;
+    transition: color 0.2s ease-in-out;
   }
-
   .series-statement a:hover {
-    text-decoration: underline;
-    color: var(--color-text);
-  }
-
-  /* Kinfolk-inspired Blockquote with large decorative quotes */
-  .post-content :global(blockquote) {
-    font-family: var(--font-serif);
-    font-style: italic;
-    color: var(--color-text); /* Darker for better readability */
-    border: none;
-    padding: 1em 0em; /* Reduced side padding, rely on text-align and max-width */
-    margin: 3em auto; /* Increased vertical margin, auto for horizontal centering */
-    max-width: 50ch; /* Constrain width for readability and aesthetic */
-    position: relative;
-    text-align: center; /* Center the text of the blockquote */
-    line-height: 1.7;
-  }
-
-  .post-content :global(blockquote::before),
-  .post-content :global(blockquote::after) {
-    font-family: var(--font-serif); /* Or a specific display serif */
-    font-size: 4.5em; /* Slightly larger quote marks */
-    color: var(--color-border-subtle); /* Very light grey for quote marks */
-    position: absolute;
-    line-height: 0;
-  }
-
-  .post-content :global(blockquote::before) {
-    content: "“";
-    top: 0.25em; /* Adjust for visual centering with new font size */
-    left: -0.25em; /* Adjust to bring it slightly outside the text flow */
-  }
-
-  .post-content :global(blockquote::after) {
-    content: "”";
-    bottom: 0.15em; /* Adjust for visual centering */
-    right: -0.25em; /* Adjust to bring it slightly outside the text flow */
-  }
-
-  .post-content :global(blockquote p) {
-    margin-bottom: 0.75em;
-    font-size: 1.05rem; /* Slightly larger text within blockquotes */
-  }
-  .post-content :global(blockquote p:last-child) {
-    margin-bottom: 0;
-  }
-
-  /* Inline series link in post header meta */
-  .series-meta-inline {
-    font-family: var(--font-sans); /* Ensure consistency */
-  }
-  .series-meta-inline a {
-    color: var(--color-accent);
-    text-decoration: none;
-  }
-  .series-meta-inline a:hover {
     text-decoration: underline;
     color: var(--color-text);
   }

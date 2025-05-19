@@ -1,0 +1,290 @@
+---
+// src/pages/quote-tags/[tag].astro
+// Displays all individual quotes associated with a specific quote tag,
+// along with context from the book they belong to.
+
+// Layout and Astro content helpers
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, getEntry } // getEntry is needed to fetch related blog posts
+from 'astro:content';
+
+// Utilities
+import { generateSlug } from '../../utils/slugify.ts';
+
+interface Quote {
+  text: string;
+  quoteAuthor?: string;
+  quoteSource?: string;
+  tags?: string[];
+}
+
+interface QuoteContextItem {
+  quote: Quote;
+  bookNote: { // Information from the parent blog post (book note)
+    slug: string;
+    data: {
+      title: string; // Title of the review/note
+      bookTitle?: string;
+      bookAuthor?: string;
+    };
+  };
+}
+
+// Generates static paths for each unique quote tag
+export async function getStaticPaths() {
+  const allBookQuotesEntries = await getCollection('bookQuotes');
+  const uniqueQuoteTags = new Set<string>();
+
+  allBookQuotesEntries.forEach(bookQuotesFile => {
+    if (bookQuotesFile.data.quotes && Array.isArray(bookQuotesFile.data.quotes)) {
+      bookQuotesFile.data.quotes.forEach((quote: Quote) => {
+        if (quote.tags && Array.isArray(quote.tags)) {
+          quote.tags.forEach(tag => {
+            if (typeof tag === 'string' && tag.trim() !== '') {
+              uniqueQuoteTags.add(tag.trim());
+            }
+          });
+        }
+      });
+    }
+  });
+
+  return Array.from(uniqueQuoteTags).map(tag => {
+    return {
+      params: { tag: generateSlug(tag) }, // Slugified tag for the URL
+      props: { originalTag: tag },      // Original tag name for display and filtering
+    };
+  });
+}
+
+const { tag: tagSlug } = Astro.params; // The slugified tag from the URL
+const { originalTag } = Astro.props; // The original tag name
+
+// Fetch all bookQuotes entries and then their corresponding blog entries (book notes)
+const allBookQuotesEntries = await getCollection('bookQuotes');
+const allBlogEntries = await getCollection('blog', ({data}) => data.postType === 'bookNote' && (import.meta.env.PROD ? data.draft !== true : true) );
+
+const taggedQuotesWithContext: QuoteContextItem[] = [];
+
+for (const bookQuotesFile of allBookQuotesEntries) {
+  if (bookQuotesFile.data.quotes && Array.isArray(bookQuotesFile.data.quotes)) {
+    const matchingQuotesInFile = bookQuotesFile.data.quotes.filter((quote: Quote) =>
+      quote.tags && Array.isArray(quote.tags) && quote.tags.some(qt => typeof qt === 'string' && qt.trim() === originalTag)
+    );
+
+    if (matchingQuotesInFile.length > 0) {
+      // Find the corresponding blog post (book note) for context
+      const relatedBookNote = allBlogEntries.find(
+        (blogEntry) => blogEntry.slug === bookQuotesFile.data.bookSlug || blogEntry.data.quotesRef === bookQuotesFile.id.replace(/\.(json|yaml|yml)$/, '')
+      );
+
+      if (relatedBookNote) {
+        matchingQuotesInFile.forEach((quote: Quote) => {
+          taggedQuotesWithContext.push({
+            quote,
+            bookNote: {
+              slug: relatedBookNote.slug,
+              data: {
+                title: relatedBookNote.data.title, // Title of the review/note
+                bookTitle: relatedBookNote.data.bookTitle,
+                bookAuthor: relatedBookNote.data.bookAuthor,
+              }
+            }
+          });
+        });
+      }
+    }
+  }
+}
+
+// Note: Sorting these quotes might be complex if you want to sort by book or original post date.
+// For now, they will appear grouped by book as processed.
+// If you need a specific sort order (e.g., by quote text, or by book note's pubDate),
+// you would implement that here. For example, to sort by book note's original title:
+// taggedQuotesWithContext.sort((a,b) => a.bookNote.data.title.localeCompare(b.bookNote.data.title));
+
+
+const pageTitle = `Quotes Tagged: ${originalTag}`;
+const pageDescription = `A collection of quotes tagged with "${originalTag}".`;
+---
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section class="page-container">
+    <header class="page-header">
+      <nav class="breadcrumb-nav" aria-label="breadcrumb">
+        <a href="/book-notes/">Book Notes</a> /
+        <span>{originalTag}</span>
+      </nav>
+      <h1 class="page-detail-header-title">Quotes Tagged: <span class="tag-highlight">{originalTag}</span></h1>
+    </header>
+
+    <div class="quotes-listing">
+      {taggedQuotesWithContext.length > 0 ? (
+        taggedQuotesWithContext.map(item => (
+          <div class="quote-entry">
+            <blockquote class="quote-text-standalone">
+              <p set:html={item.quote.text.replace(/\n/g, "<br />")} />
+              {(item.quote.quoteAuthor || item.quote.quoteSource) && (
+                <footer class="quote-attribution">
+                  {item.quote.quoteAuthor && (
+                    <span class="quote-author-standalone">
+                      &mdash; {item.quote.quoteAuthor}
+                      {item.quote.quoteSource && <span class="quote-source-separator-standalone">, </span>}
+                    </span>
+                  )}
+                  {item.quote.quoteSource && <cite class="quote-source-standalone">{item.quote.quoteSource}</cite>}
+                </footer>
+              )}
+            </blockquote>
+            <p class="quote-context-link">
+              From: <a href={`/blog/${item.bookNote.slug}/`}>
+                {item.bookNote.data.bookTitle ?
+                  <em>{item.bookNote.data.bookTitle}</em> :
+                  item.bookNote.data.title
+                }
+                {item.bookNote.data.bookAuthor && ` by ${item.bookNote.data.bookAuthor}`}
+              </a>
+            </p>
+            {item.quote.tags && item.quote.tags.filter(t => t !== originalTag).length > 0 && (
+              <div class="other-quote-tags">
+                Other tags for this quote:
+                {item.quote.tags.filter(t => t !== originalTag).map((tag, index, arr) => (
+                  <>
+                    <a href={`/quote-tags/${generateSlug(tag)}/`} class="quote-tag-item">{tag}</a>
+                    {index < arr.length - 1 && ', '}
+                  </>
+                ))}
+              </div>
+            )}
+          </div>
+        ))
+      ) : (
+        <p class="empty-state-message">No quotes found with the tag "{originalTag}".</p>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Styles for the quote tag detail page */
+  .page-container {
+    /* Max-width and centering handled by BaseLayout's .content-wrapper */
+  }
+
+  .page-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border-subtle);
+    text-align: left;
+  }
+
+  .page-detail-header-title {
+    font-family: var(--font-sans);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+  }
+  .tag-highlight {
+    color: var(--color-accent);
+  }
+
+  .quotes-listing {
+    /* Container for the list of individual quotes */
+  }
+
+  .quote-entry {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border-subtle); /* Separator between quotes */
+  }
+  .quote-entry:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .quote-text-standalone {
+    font-family: var(--font-serif);
+    font-size: 1.15rem; /* Slightly larger for emphasis */
+    font-style: italic;
+    color: var(--color-text);
+    margin: 0 0 0.75em 0; /* Margin below the quote text */
+    padding: 0.5em 0;
+    border-left: 3px solid var(--color-accent); /* Accent border for the quote */
+    padding-left: 1em;
+  }
+  .quote-text-standalone p {
+    margin: 0;
+  }
+
+  .quote-attribution {
+    font-family: var(--font-sans);
+    font-style: normal;
+    font-size: 0.9rem;
+    color: var(--color-meta);
+    text-align: right;
+    margin-top: 0.5em;
+  }
+  .quote-author-standalone {
+    font-weight: 500;
+  }
+  .quote-source-separator-standalone,
+  .quote-source-standalone {
+    /* Additional styling if needed */
+  }
+
+  .quote-context-link {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--color-meta);
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+  .quote-context-link a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  .quote-context-link a:hover {
+    text-decoration: underline;
+    color: var(--color-text);
+  }
+  .quote-context-link em { /* For book title */
+    font-style: italic;
+    font-weight: 500; /* Slightly bolder */
+  }
+
+  .other-quote-tags {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--color-meta);
+    margin-top: 0.75em;
+  }
+  .other-quote-tag-item {
+    /* Style if needed, e.g., background, padding for tag-like appearance */
+    /* background-color: #f0f0f0; */
+    /* padding: 0.1em 0.4em; */
+    /* border-radius: 3px; */
+  }
+
+
+  .empty-state-message {
+    text-align: center;
+    font-family: var(--font-serif);
+    color: var(--color-meta);
+    margin-top: 3rem;
+    padding: 1rem;
+    font-size: 1.1rem;
+  }
+
+  /* Mobile Adjustments */
+  @media (max-width: 768px) {
+    .page-detail-header-title {
+      font-size: 1.8rem;
+    }
+    .quote-text-standalone {
+      font-size: 1.05rem;
+    }
+  }
+</style>
+

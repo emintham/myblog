@@ -1,0 +1,115 @@
+---
+// src/pages/book-notes.astro
+// Page to list all "bookNote" type posts.
+
+// Layout and Astro content helpers
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+// Component imports
+import PostPreview from "../components/PostPreview.astro"; // The switcher component
+
+// Fetch all entries from the 'blog' collection
+const allBlogEntries = await getCollection("blog", ({ data }) => {
+  // In production, filter out drafts. In development, show all.
+  return import.meta.env.PROD ? data.draft !== true : true;
+});
+
+// Filter for entries that are specifically 'bookNote' type
+const bookNoteEntries = allBlogEntries.filter(
+  (entry) => entry.data.postType === "bookNote"
+);
+
+// Sort book notes by publication date, newest first.
+bookNoteEntries.sort(
+  (a, b) =>
+    new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf()
+);
+
+const pageTitle = "Book Notes";
+const pageDescription =
+  "A collection of notes, summaries, and reflections on books read.";
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section class="page-container">
+    {/* Using a generic container class */}
+    <header class="page-header">
+      <h1 class="section-title">{pageTitle}</h1>
+      {/* You can add an introductory paragraph here if desired */}
+      {
+        /* <p class="page-intro-text">
+        Welcome to my collection of book notes. Here you'll find summaries, insights, and memorable quotes from the books I've explored.
+      </p> */
+      }
+    </header>
+
+    <div class="post-list">
+      {/* A wrapper for the list of book note previews */}
+      {
+        bookNoteEntries.length > 0 ? (
+          bookNoteEntries.map((bookNote) => (
+            // The PostPreview switcher will automatically use BookNotePreview for these
+            <PostPreview post={bookNote} />
+          ))
+        ) : (
+          <p class="empty-state-message">
+            No book notes published yet. Check back soon!
+          </p>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Styles for the book notes listing page */
+  .page-container {
+    /* Max-width and centering will be handled by .content-wrapper in BaseLayout if <slot /> is inside it,
+       or you can apply var(--content-max-width) and margin: auto here if needed. */
+  }
+
+  .page-header {
+    margin-bottom: 2.5rem; /* Space below the header */
+    text-align: center; /* Center the page title and optional intro text */
+  }
+
+  .section-title {
+    /* This style is likely already in your global.css or can be copied/adapted */
+    font-family: var(--font-sans);
+    font-size: 1.3rem; /* Or your preferred size for section titles */
+    text-transform: uppercase;
+    letter-spacing: 0.075em; /* Kinfolk-style letter spacing */
+    color: var(--color-meta);
+    margin-top: 0; /* Adjust if BaseLayout provides top padding */
+    margin-bottom: 1rem; /* Space below the title if there's no intro text */
+    font-weight: 600; /* Slightly bolder for section titles */
+  }
+
+  /* Optional: Styling for an introductory paragraph if you add one */
+  /*
+  .page-intro-text {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    color: var(--color-text);
+    max-width: 65ch;
+    margin: 0 auto 2rem auto;
+    line-height: 1.7;
+  }
+  */
+
+  .post-list {
+    /* Styles for the container holding the list of previews */
+    /* The previews themselves (.post-preview or .book-note-preview) will have their own bottom margins */
+  }
+
+  .empty-state-message {
+    /* This style is likely already in your global.css or can be copied/adapted */
+    text-align: center;
+    font-family: var(--font-serif);
+    color: var(--color-meta);
+    margin-top: 3rem;
+    padding: 1rem;
+    font-size: 1.1rem;
+  }
+</style>

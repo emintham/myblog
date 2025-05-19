@@ -1,0 +1,13 @@
+bookSlug: "{{BOOK_SLUG}}" # Matches the slug of the .md file
+quotes:
+  - text: "This is an example quote from the book. Remember to replace it!"
+    # quoteAuthor: "{{BOOK_AUTHOR}}" # Optional: Uncomment and set if different from the book's main author
+    # quoteSource: "Chapter 1, Page 10" # Optional: E.g., "As cited by X", "Interview Y"
+    tags:
+      - "example-tag"
+      - "theme-inspiration"
+  - text: "Another placeholder quote to illustrate the format."
+    # quoteAuthor: "A Character"
+    # quoteSource: "Dialogue"
+    tags:
+      - "placeholder"

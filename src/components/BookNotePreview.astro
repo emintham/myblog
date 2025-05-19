@@ -1,0 +1,233 @@
+---
+// src/components/BookNotePreview.astro
+// Displays a preview card for book notes in lists.
+
+interface Props {
+  post: {
+    slug: string;
+    data: {
+      title: string; // Title of the review/note
+      pubDate: Date;
+      description?: string; // Description of the review/note
+      author: string; // Author of the review/note
+      postType?: string;
+
+      // Book note specific fields
+      bookTitle?: string;
+      bookAuthor?: string;
+      bookCover?: { src: string; alt: string };
+      // We might not display quotes or bookTags in the preview,
+      // but they are part of the data structure.
+    };
+  };
+}
+
+const { post } = Astro.props;
+const frontmatter = post.data;
+
+// Determine the link for the preview.
+// Fleeting thoughts don't have a separate page, so their titles in previews are not links.
+// Book notes and standard posts link to their detail page.
+const isLink = frontmatter.postType !== "fleeting";
+const href = isLink ? `/blog/${post.slug}/` : null;
+---
+
+<article class="book-note-preview post-preview">
+  {/* Re-use .post-preview for consistent spacing if desired */}
+  <div class="preview-grid">
+    {
+      frontmatter.bookCover && (
+        <div class="cover-container">
+          {isLink ? (
+            <a
+              href={href}
+              aria-label={`Read notes on ${frontmatter.bookTitle || frontmatter.title}`}
+            >
+              <img
+                src={frontmatter.bookCover.src}
+                alt={frontmatter.bookCover.alt}
+                class="cover-image"
+              />
+            </a>
+          ) : (
+            <img
+              src={frontmatter.bookCover.src}
+              alt={frontmatter.bookCover.alt}
+              class="cover-image"
+            />
+          )}
+        </div>
+      )
+    }
+    <div class="info-container">
+      {
+        isLink ? (
+          <h3>
+            <a href={href}>{frontmatter.title}</a>
+          </h3>
+        ) : (
+          <h3>{frontmatter.title}</h3>
+        )
+      }
+
+      {
+        frontmatter.bookTitle && (
+          <p class="book-title-author">
+            {frontmatter.bookTitle} by{" "}
+            {frontmatter.bookAuthor || "Unknown Author"}
+          </p>
+        )
+      }
+
+      <p class="meta">
+        <time datetime={frontmatter.pubDate.toISOString()}>
+          {
+            new Date(frontmatter.pubDate).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
+          }
+        </time>
+        &bull; by {frontmatter.author}
+      </p>
+
+      {
+        frontmatter.description && (
+          <p class="description">{frontmatter.description}</p>
+        )
+      }
+
+      {
+        isLink && (
+          <a href={href} class="read-more">
+            Read Notes &rarr;
+          </a>
+        )
+      }
+    </div>
+  </div>
+</article>
+
+<style>
+  /* General preview styling, can inherit from .post-preview from other components if global enough */
+  .post-preview {
+    /* Assuming this class is defined globally or in the page using this component */
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+  .post-preview:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .book-note-preview .preview-grid {
+    display: grid;
+    grid-template-columns: auto 1fr; /* Cover auto, info takes rest */
+    gap: 1.5rem; /* Space between cover and info */
+    align-items: start; /* Align items to the top */
+  }
+
+  .book-note-preview .cover-container {
+    width: 100px; /* Adjust width as desired */
+    flex-shrink: 0;
+  }
+
+  .book-note-preview .cover-image {
+    width: 100%;
+    height: auto;
+    border-radius: 3px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+    transition: transform 0.2s ease-in-out;
+  }
+  .book-note-preview .cover-container a:hover .cover-image {
+    transform: scale(1.03);
+  }
+
+  .book-note-preview .info-container {
+    /* Takes remaining space */
+  }
+
+  .book-note-preview h3 {
+    /* Title of the review/note */
+    font-family: var(--font-display-title); /* Or var(--font-sans) */
+    font-size: 1.6rem; /* Adjust size for preview */
+    font-weight: 600; /* Or 700 */
+    line-height: 1.3;
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+    color: var(--color-text);
+  }
+  .book-note-preview h3 a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .book-note-preview h3 a:hover {
+    color: var(--color-accent);
+  }
+
+  .book-note-preview .book-title-author {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text); /* Or var(--color-meta) for more subtlety */
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .book-note-preview .meta {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--color-meta);
+    margin-bottom: 0.75rem;
+  }
+
+  .book-note-preview .description {
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(
+      --color-text
+    ); /* Or var(--color-meta) for a more faded preview */
+    margin-bottom: 1rem;
+    /* Limit lines for preview if desired */
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Show 3 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .book-note-preview .read-more {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-accent);
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 0.25rem;
+  }
+  .book-note-preview .read-more:hover {
+    color: var(--color-text);
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 600px) {
+    .book-note-preview .preview-grid {
+      grid-template-columns: 1fr; /* Stack cover and info */
+      gap: 1rem;
+    }
+    .book-note-preview .cover-container {
+      width: 120px; /* Or a percentage, or max-width */
+      margin: 0 auto 1rem auto; /* Center the cover when stacked */
+    }
+    .book-note-preview .info-container {
+      text-align: center; /* Center text when stacked */
+    }
+    .book-note-preview .description {
+      -webkit-line-clamp: 2; /* Show fewer lines on mobile */
+    }
+  }
+</style>

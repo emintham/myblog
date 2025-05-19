@@ -18,3 +18,7 @@
 ## May 18
 
 - Added support for shorter posts "fleeting".
+
+## May 19
+
+- Added support for book notes, quotes.

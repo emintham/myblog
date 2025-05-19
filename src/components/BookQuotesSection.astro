@@ -1,0 +1,180 @@
+---
+// src/components/BookQuotesSection.astro
+// Renders the collapsible section for displaying book quotes.
+import { generateSlug } from "../utils/slugify";
+
+interface Quote {
+  text: string;
+  quoteAuthor?: string;
+  quoteSource?: string;
+  tags?: string[];
+}
+
+interface Props {
+  quotes: Quote[];
+  bookAuthor?: string; // Main author of the book, for comparison
+}
+
+const { quotes, bookAuthor } = Astro.props;
+---
+
+{
+  quotes && quotes.length > 0 && (
+    <section class="quotes-section">
+      <details class="collapsible-quotes" open>
+        {" "}
+        {/* Default to open */}
+        <summary class="quotes-summary">Memorable Quotes</summary>
+        <ul class="quotes-list">
+          {quotes.map((quote) => (
+            <li class="quote-item">
+              <blockquote class="quote-text">
+                <p set:html={quote.text.replace(/\n/g, "<br />")} />{" "}
+                {/* Preserve line breaks in quote text */}
+                {(quote.quoteAuthor ||
+                  quote.quoteSource ||
+                  (quote.tags && quote.tags.length > 0)) && (
+                  <footer class="quote-meta">
+                    {quote.quoteAuthor && quote.quoteAuthor !== bookAuthor && (
+                      <span class="quote-author">
+                        &mdash; {quote.quoteAuthor}
+                        {quote.quoteSource && (
+                          <span class="quote-source-separator">, </span>
+                        )}
+                      </span>
+                    )}
+                    {quote.quoteSource && (
+                      <cite class="quote-source">{quote.quoteSource}</cite>
+                    )}
+
+                    {quote.tags && quote.tags.length > 0 && (
+                      <div class="quote-tags">
+                        <span class="quote-tags-label">Tags:</span>
+                        {quote.tags.map((tag, index) => (
+                          <>
+                            <a href={`/quote-tags/${generateSlug(tag)}/`} class="quote-tag-item">{tag}</a>
+                            {index < quote.tags.length - 1 && ", "}
+                          </>
+                        ))}
+                      </div>
+                    )}
+                  </footer>
+                )}
+              </blockquote>
+            </li>
+          ))}
+        </ul>
+      </details>
+    </section>
+  )
+}
+
+<style>
+  /* Quotes Section Styling */
+  .quotes-section {
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .collapsible-quotes summary.quotes-summary {
+    font-family: var(--font-sans);
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    list-style-position: inside;
+    outline: none;
+  }
+  .collapsible-quotes summary.quotes-summary:hover {
+    color: var(--color-accent);
+  }
+  .collapsible-quotes summary.quotes-summary::marker {
+    content: "";
+  }
+  .collapsible-quotes summary.quotes-summary::before {
+    content: "+";
+    display: inline-block;
+    margin-right: 0.5em;
+    font-weight: normal;
+    color: var(--color-accent);
+    transition: transform 0.2s ease-in-out;
+  }
+  .collapsible-quotes[open] summary.quotes-summary::before {
+    content: "–";
+    transform: rotate(0deg);
+  }
+
+  .quotes-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1rem;
+  }
+
+  .quote-item {
+    margin-bottom: 2.5rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--color-border-subtle);
+  }
+  .quote-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .quote-text {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--color-text);
+    margin: 0;
+    padding: 0.5em 0;
+    position: relative;
+  }
+  .quote-text p {
+    margin-bottom: 0.5em;
+  }
+  .quote-text p:last-child {
+    margin-bottom: 0;
+  }
+
+  .quote-meta {
+    font-family: var(--font-sans);
+    font-style: normal;
+    font-size: 0.85rem;
+    color: var(--color-meta);
+    text-align: right;
+    margin-top: 0.75em;
+  }
+  .quote-author {
+    font-weight: 500;
+  }
+  .quote-source-separator {
+    /* Styles for separator if needed */
+  }
+  .quote-source {
+    /* Styles for quote source if needed */
+  }
+  .quote-tags {
+    margin-top: 0.5em;
+    font-size: 0.8rem;
+    text-align: right;
+  }
+  .quote-tags-label {
+    font-weight: 600;
+    margin-right: 0.3em;
+  }
+  .quote-tag-item {
+    /* Style for individual quote tags if needed */
+  }
+
+  /* Mobile Adjustments */
+  @media (max-width: 768px) {
+    .collapsible-quotes summary.quotes-summary {
+      font-size: 1.15rem;
+    }
+    .quote-text {
+      font-size: 1rem;
+    }
+  }
+</style>
