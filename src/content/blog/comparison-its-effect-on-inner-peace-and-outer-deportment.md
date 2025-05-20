@@ -10,7 +10,7 @@ Dear Jay,
 To compare is human; to compare wisely, freedom. We covet that we do not own and
 take for granted the ones we do.
 
-Comparison and competition  are tools. They are one of the means we
+Comparison and competition are tools. They are one of the means we
 measure ourselves, in some limited aspect, against reality. This measurement
 carries an implied standard linked to a *value*. In other words, in any comparison,
 there is an assumed positive or desired property and its inverse, negative or
@@ -25,7 +25,7 @@ these might prove to be values you don't truly subscribe to, or worse, values
 that actively hinder your flourishing. This tendency to get caught in prevailing
 comparisons is especially potent when we are young and forging our own sense of
 self, a time when the values we adopt feel like bedrock, even if they are
-borrowed and shifts under our feet.
+borrowed and can shift under our feet.
 
 As you grow up and build your identity, it is human nature to want to acquire
 and identify with as many "positive" virtues and qualities as you can. Indeed,
@@ -65,12 +65,12 @@ regarded as the most recommended way of shedding mental and behavioural habits
 in modern times. While therapy (with the right therapist) excels at unearthing
 deeply rooted mental shortcuts, early adoption of mindfulness, self-awareness, and
 meditation can help you identify and uproot these habits before they take hold.
-Moreover, they do not require an external party to help you and requires no
+Moreover, they do not require an external party to help you and require no
 lengthy search process for the right fit.
 
 There are, however, other benefits to comparison. By comparing ourselves
 against the past, we can have a better sense of progress and achievement. We
-often look at a mountaintop in the distance, salivating at the prospective elation at scaling
+often look at a mountaintop in the distance, yearning for the prospective elation at scaling
 its summit, all while losing sight of the fact that we are already on a
 significant peak, the journey to which held its own vistas and trials, now
 perhaps taken for granted. Care, however, needs to be used in special cases.
@@ -166,7 +166,12 @@ leverage those favours and have it translate to tangible benefits will likely
 benefit everyone in the long run[^8]. Give freely, but make sure they remember—
 and without being a jerk about it.
 
-[^1]: Wisdom lies in knowing "how", "why", and "when" to compare.
+[^selfish]: Sometimes, the right answer is to do what you believe in strongly
+        and not care too much about what your loved ones think. Far too often,
+        we make decisions based on what we *think* our loved ones want
+        instead of what they actually want or what *we* want. Identifying your
+        core principles and convictions will help you make the choice that
+        you can live with, even if it may cause the ire of your loved ones.
 [^2]: I'm told by my friendly [editor](https://deepmind.google/technologies/gemini/pro/) that using it this way (in the Dawkins sense) is rather niche. In case it isn't clear, this is synonymous with "cultural scripts" or "prevailing ideas".
 [^3]: The book [Supersurvivors](https://leekravetz.com/supersurvivors) by Lee Kravetz offers stories of people who have experienced this and thrived. If this resonates with you, I suggest availing yourself of this resource.
 [^4]: A contest, I might add, where the chief prize is often merely indigestion!
@@ -174,10 +179,3 @@ and without being a jerk about it.
 [^6]: You may perhaps be interested in reminding yourself of Aesop's fable of the North Wind and the Sun.
 [^7]: Utilitarianism is, of course, a value you may or not may ascribe to but we will leave that aside for the moment.
 [^8]: See Adam Grant's [Give and Take](https://adamgrant.net/book/give-and-take/) for a more extended elaboration of this.
-[^selfish]: Sometimes, the right answer is to do what you believe in strongly
-        and not care too much about what your loved ones think. Far too often,
-        we make decisions based on what we *think* what our loved ones want
-        instead of what they actually want or what *we* want. Identifying your
-        core principles and convictions will help you make the choice that
-        you can live with, even if it may cause the ire of your loved ones.
-
