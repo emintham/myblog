@@ -10,9 +10,9 @@ Dear Jay,
 To compare is human; to compare wisely, freedom. We covet that we do not own and
 take for granted the ones we do.
 
-Comparison and competition, in essence, are tools. They are one of the means we
+Comparison and competition  are tools. They are one of the means we
 measure ourselves, in some limited aspect, against reality. This measurement
-carries an implied standard linked to a value. In other words, in any comparison,
+carries an implied standard linked to a *value*. In other words, in any comparison,
 there is an assumed positive or desired property and its inverse, negative or
 undesirable quality. Ranking ourselves among peers through such measurement isn't
 inherently harmful, it is the uncritical adoption and rigid attachment to the
@@ -25,20 +25,22 @@ these might prove to be values you don't truly subscribe to, or worse, values
 that actively hinder your flourishing. This tendency to get caught in prevailing
 comparisons is especially potent when we are young and forging our own sense of
 self, a time when the values we adopt feel like bedrock, even if they are
-borrowed.
+borrowed and shifts under our feet.
 
 As you grow up and build your identity, it is human nature to want to acquire
 and identify with as many "positive" virtues and qualities as you can. Indeed,
 much of growing up is picking and choosing the qualities that resonate most
-with us, shaping the story we tell about ourselves. During childhood, we adopt
-or, more accurately, borrow most of our principles from our parents. As
+with us, shaping the story we tell about ourselves, forming the edifice of our
+identity. During childhood, we adopt or, more accurately, borrow most of our
+principles from our parents. As
 teenagers, we absorb some more values from our peers, often quite unintentionally,
 and question (or reject) some of our parents' values. We become more aware of
 these values upon entering adulthood and start being a bit more mindful of our
 choices, sometimes picking up our parents' values anew. Furthermore, throughout
 your life, the social milieu may change, thrusting new values upon you,
 challenging and sending your existing values into obsolescence. The deeply
-ingrained early frameworks you possess, whether borrowed or absorbed, will test
+ingrained early frameworks you possess, whether borrowed or absorbed, will either
+be a protective bastion or a tyrannical bastille. It will test
 you constantly, pushing you, reminding you; the constant feeling that something
 feels wrong or painful, like an ulcer beneath your skin, but you can't quite
 articulate what the issue is— until you reflect, introspect and find out what
@@ -51,7 +53,7 @@ that these principles are not just cards in a deck; they are often more like
 deep-rooted weeds, or dead trees with roots spread far and wide in the earth of
 your identity. Some you planted with care, others sprouted from seeds scattered
 by circumstance, their origins perhaps long faded from memory. Convictions,
-assumptions or traits that were beneficial or protective during our younger years
+assumptions, traits, and behaviours that were beneficial or protective during our younger years
 may cease to serve our growth, becoming encumbrances in adulthood. Identifying
 too strongly with, and holding too tightly onto, these preconceived notions, memes[^2],
 and ideas, creates an inflexible ego, manifesting as mental blockers, limiting
@@ -61,18 +63,18 @@ Habits, like unwelcome guests, often overstay their welcome, proving far more
 stubborn to usher out than they were to let in the door. Therapy is widely
 regarded as the most recommended way of shedding mental and behavioural habits
 in modern times. While therapy (with the right therapist) excels at unearthing
-deeply rooted mental shortcuts, I believe it would be far more beneficial to
-learn mindfulness/meditation and practice it early and often to avoid picking
-up these unwanted traits and behaviours in the first place. Not only does this
-serve as prevention, it also reduces a reliance on an external party. 
+deeply rooted mental shortcuts, early adoption of mindfulness, self-awareness, and
+meditation can help you identify and uproot these habits before they take hold.
+Moreover, they do not require an external party to help you and requires no
+lengthy search process for the right fit.
 
 There are, however, other benefits to comparison. By comparing ourselves
 against the past, we can have a better sense of progress and achievement. We
-often look at a mountaintop in the distance, imagining the elation at scaling
+often look at a mountaintop in the distance, salivating at the prospective elation at scaling
 its summit, all while losing sight of the fact that we are already on a
 significant peak, the journey to which held its own vistas and trials, now
 perhaps taken for granted. Care, however, needs to be used in special cases.
-Merging past victories too strongly with one's identity can be a source of
+Ensconcing one's identity within past victories can be a source of
 pain— especially if one is no longer able to perform at the same level. The
 pain and disappointment from such a letdown can be very difficult for people
 to handle, especially those who used to operate at an elite level[^3].
@@ -84,8 +86,8 @@ seeds, compare notes on growing, share her knowledge with her growing buddies.
 Having such a community in your life to be able to share your hobbies and
 passion with can alleviate some of the loneliness of trekking your own course.
 There is a term from Chinese progression fantasy 道友 (translation: partner
-along the Path or fellow traveler.), that captures this very well. I hope you'll
-find your own community in life.
+along the Path or fellow traveler.), that captures this idea of a kindred spirit
+very well. I hope you'll find your own community in life.
 
 Apart from the effects of comparison on ourselves, we should also consider the
 effect of comparison on others. You have a competitive streak, a desire to
@@ -128,7 +130,7 @@ ill-informed; in that case, you can politely and gently point them to the right
 information in private. Alternatively, they could be intentionally trying to
 spread misinformation or sway a narrative; in this case, you'll probably want
 to weigh the impact of this misinformation on the audience against offending
-this person. Is it worth the risk to you (and the people you care about) to
+this person. Is it worth the risk to you (and the people you care about)[^selfish] to
 point this out? Or, it may be the case that it was just an honest mistake, a
 misspoken word, terminology, idiom— it happens very frequently in day-to-day
 conversations. If the mistake is inconsequential, and the meaning is understood,
@@ -172,4 +174,10 @@ and without being a jerk about it.
 [^6]: You may perhaps be interested in reminding yourself of Aesop's fable of the North Wind and the Sun.
 [^7]: Utilitarianism is, of course, a value you may or not may ascribe to but we will leave that aside for the moment.
 [^8]: See Adam Grant's [Give and Take](https://adamgrant.net/book/give-and-take/) for a more extended elaboration of this.
+[^selfish]: Sometimes, the right answer is to do what you believe in strongly
+        and not care too much about what your loved ones think. Far too often,
+        we make decisions based on what we *think* what our loved ones want
+        instead of what they actually want or what *we* want. Identifying your
+        core principles and convictions will help you make the choice that
+        you can live with, even if it may cause the ire of your loved ones.
 
