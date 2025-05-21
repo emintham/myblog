@@ -55,7 +55,7 @@ your identity. Some you planted with care, others sprouted from seeds scattered
 by circumstance, their origins perhaps long faded from memory. Convictions,
 assumptions, traits, and behaviours that were beneficial or protective during our younger years
 may cease to serve our growth, becoming encumbrances in adulthood. Identifying
-too strongly with, and holding too tightly onto, these preconceived notions, memes[^2],
+too strongly with, and holding too tightly onto, these preconceived notions, memes [^2],
 and ideas, creates an inflexible ego, manifesting as mental blockers, limiting
 your growth and reducing your potential.
 
@@ -77,7 +77,7 @@ perhaps taken for granted. Care, however, needs to be used in special cases.
 Ensconcing one's identity within past victories can be a source of
 pain— especially if one is no longer able to perform at the same level. The
 pain and disappointment from such a letdown can be very difficult for people
-to handle, especially those who used to operate at an elite level[^3].
+to handle, especially those who used to operate at an elite level [^3].
 
 On the other hand, there are also times when comparison can be used as a means
 of sharing. Comparing collections from your hobbies for example. Your mother's
@@ -85,14 +85,13 @@ passion for gardening affords her joy when she can share her collection, trade
 seeds, compare notes on growing, share her knowledge with her growing buddies.
 Having such a community in your life to be able to share your hobbies and
 passion with can alleviate some of the loneliness of trekking your own course.
-There is a term from Chinese progression fantasy 道友 (translation: partner
-along the Path or fellow traveler.), that captures this idea of a kindred spirit
+There is a term from Chinese progression fantasy 道友 [^daoyou] that captures this idea of a kindred spirit
 very well. I hope you'll find your own community in life.
 
 Apart from the effects of comparison on ourselves, we should also consider the
 effect of comparison on others. You have a competitive streak, a desire to
 outperform others at every turn— even ridiculous comparisons like the amount of
-food ingested[^4]! Being competitive can be beneficial, it allows you to
+food ingested [^4]! Being competitive can be beneficial, it allows you to
 constantly improve yourself. However, constant reminders of how you are better
 than others rarely cultivates genuine connection or respect. Many will ingratiate
 themselves only as long as it benefits them and will abandon you when it appears
@@ -130,7 +129,7 @@ ill-informed; in that case, you can politely and gently point them to the right
 information in private. Alternatively, they could be intentionally trying to
 spread misinformation or sway a narrative; in this case, you'll probably want
 to weigh the impact of this misinformation on the audience against offending
-this person. Is it worth the risk to you (and the people you care about)[^selfish] to
+this person. Is it worth the risk to you (and the people you care about) [^selfish] to
 point this out? Or, it may be the case that it was just an honest mistake, a
 misspoken word, terminology, idiom— it happens very frequently in day-to-day
 conversations. If the mistake is inconsequential, and the meaning is understood,
@@ -141,7 +140,7 @@ conscious consideration. Again, mindfulness will help here. Not all idioms and
 sayings are wise in every situation but in these cases, "praise in public,
 criticize in private", and in the latter, do so sparingly. I share here
 with you an interesting excerpt from the excellent Autobiography of Benjamin
-Franklin[^5] that illustrates this point. Franklin’s transformation, from a
+Franklin [^5] that illustrates this point. Franklin’s transformation, from a
 "positive arguer" to a "humble inquirer" is a testament to the strength found
 in intellectual modesty and the art of gentle persuasiveness [^6].
 
@@ -152,7 +151,7 @@ going to the extreme. It is beneficial and advantageous in many cases to market
 and promote yourself. Care and judgement must be taken to not overdo it or
 diminish the contributions of others. In life, only you can be your best
 advocate. If you create the most innovative invention in the world but no one
-knows about it, it is not useful to anyone[^7]. Practically speaking, talking
+knows about it, it is not useful to anyone [^7]. Practically speaking, talking
 about your accomplishments or creations in a matter-of-fact way or framing it
 as a net benefit to others is more palatable. You can also very gently remind
 others of how you helped them by framing it as a follow-up question. "Hey,
@@ -163,7 +162,7 @@ and priorities are naturally foremost in their minds. While it can be magnanimou
 to simply treat help rendered as charity, it is not the wisest course of action
 when working in a group. Your energy and resources are limited; being able to
 leverage those favours and have it translate to tangible benefits will likely
-benefit everyone in the long run[^8]. Give freely, but make sure they remember—
+benefit everyone in the long run [^8]. Give freely, but make sure they remember—
 and without being a jerk about it.
 
 [^selfish]: Sometimes, the right answer is to do what you believe in strongly
@@ -179,3 +178,4 @@ and without being a jerk about it.
 [^6]: You may perhaps be interested in reminding yourself of Aesop's fable of the North Wind and the Sun.
 [^7]: Utilitarianism is, of course, a value you may or not may ascribe to but we will leave that aside for the moment.
 [^8]: See Adam Grant's [Give and Take](https://adamgrant.net/book/give-and-take/) for a more extended elaboration of this.
+[^daoyou]: translation: partner along the Path or fellow traveler.
