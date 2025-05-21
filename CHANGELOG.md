@@ -22,3 +22,8 @@
 ## May 19
 
 - Added support for book notes, quotes.
+
+## May 21
+
+- Script to process images for CLS.
+- Using `srcset` for images, custom component.

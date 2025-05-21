@@ -1,0 +1,124 @@
+---
+// src/components/ResponsiveImage.astro
+// Generates a <picture> element for responsive images with WebP and JPG fallbacks.
+
+interface Props {
+  imageName: string;
+  alt: string;
+  basePath?: string;
+  widths?: number[];
+  originalImageWidth?: number; // NEW: Actual width of the original source image
+  sizesAttr?: string;
+  imgClass?: string;
+  loading?: "lazy" | "eager";
+  decoding?: "async" | "auto" | "sync";
+  defaultWidth?: number; // A preferred width for the fallback <img> src
+}
+
+const {
+  imageName,
+  alt,
+  basePath = "/images/processed/",
+  widths: requestedWidths = [480, 800, 1200, 1600, 1920],
+  originalImageWidth, // Will be undefined if not passed
+  sizesAttr = "100vw",
+  imgClass,
+  loading = "lazy",
+  decoding = "async",
+  defaultWidth, // User's preferred default width
+} = Astro.props;
+
+// Determine the effective widths to generate sources for
+let effectiveWidths: number[] = [];
+
+if (originalImageWidth) {
+  // Start with requested widths that are less than or equal to the original
+  effectiveWidths = requestedWidths.filter((w) => w <= originalImageWidth);
+  // Add the original width itself if it's not already included and is a valid number
+  if (!effectiveWidths.includes(originalImageWidth)) {
+    effectiveWidths.push(originalImageWidth);
+  }
+} else {
+  // If originalImageWidth is not known, use all requested widths
+  // (process-images.mjs would have skipped generating sizes larger than original anyway)
+  effectiveWidths = [...requestedWidths];
+}
+
+// If effectiveWidths is still empty (e.g., originalImageWidth was very small and all requestedWidths were larger),
+// or if originalImageWidth was not provided and requestedWidths was empty.
+if (effectiveWidths.length === 0) {
+  if (originalImageWidth) {
+    effectiveWidths = [originalImageWidth]; // Use only the original width
+  } else if (requestedWidths.length > 0) {
+    // Fallback to the smallest requested width if originalWidth is unknown
+    effectiveWidths = [[...requestedWidths].sort((a, b) => a - b)[0]];
+  } else {
+    effectiveWidths = [800]; // Absolute fallback
+  }
+}
+
+// Remove duplicates and sort in descending order for media query generation
+effectiveWidths = [...new Set(effectiveWidths)].sort((a, b) => b - a);
+
+const smallestEffectiveWidth =
+  effectiveWidths[effectiveWidths.length - 1] || effectiveWidths[0] || 480; // Fallback for smallest
+
+// Determine the src for the fallback <img> tag
+let finalDefaultWidth = defaultWidth; // Start with user's preference
+// If user's preferred defaultWidth is not provided, or not available in effectiveWidths, select a sensible one.
+if (!finalDefaultWidth || !effectiveWidths.includes(finalDefaultWidth)) {
+  // Try a common medium size if available, else the largest effective, else smallest effective
+  if (effectiveWidths.includes(800)) {
+    finalDefaultWidth = 800;
+  } else if (effectiveWidths.length > 0) {
+    finalDefaultWidth = effectiveWidths[0]; // Largest available
+  } else {
+    finalDefaultWidth = smallestEffectiveWidth; // Smallest available
+  }
+}
+// Ensure finalDefaultWidth is actually one of the generated widths, or the smallest if not.
+if (!effectiveWidths.includes(finalDefaultWidth)) {
+  finalDefaultWidth = smallestEffectiveWidth;
+}
+
+const fallbackSrc = `${basePath}${imageName}-${finalDefaultWidth}w.jpg`;
+---
+
+<picture>
+  {
+    effectiveWidths.map((width, index) => {
+      // The next smaller width in our sorted (descending) list. If current is smallest, nextSmallerWidth is 0.
+      const nextSmallerWidth = effectiveWidths[index + 1] || 0;
+      // Media query: applies if viewport is wider than the next smaller image size.
+      // For the smallest image in the set (where nextSmallerWidth is 0), it applies from min-width: 1px.
+      const mediaQuery = `(min-width: ${nextSmallerWidth + 1}px)`;
+
+      return (
+        <>
+          <source
+            srcset={`${basePath}${imageName}-${width}w.webp`}
+            type="image/webp"
+            media={mediaQuery}
+            {...(sizesAttr ? { sizes: sizesAttr } : {})}
+          />
+          <source
+            srcset={`${basePath}${imageName}-${width}w.jpg`}
+            type="image/jpeg"
+            media={mediaQuery}
+            {...(sizesAttr ? { sizes: sizesAttr } : {})}
+          />
+        </>
+      );
+    })
+  }
+  {/* Fallback <img> tag */}
+  <img
+    src={fallbackSrc}
+    alt={alt}
+    class={imgClass}
+    loading={loading}
+    decoding={decoding}
+    {...sizesAttr ? { sizes: sizesAttr } : {}}
+    draggable="false"
+  />
+</picture>

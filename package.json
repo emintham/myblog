@@ -10,6 +10,7 @@
     "astro": "astro",
     "clear-posts": "node scripts/clear-posts.mjs",
     "new-post": "node scripts/new-post.mjs",
+    "img": "node scripts/process-images.mjs",
     "export-posts": "node scripts/export-posts.mjs",
     "import-posts": "node scripts/import-posts.mjs",
     "format": "prettier --write . --plugin prettier-plugin-astro",
@@ -19,7 +20,9 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.3.1",
-    "astro": "^5.7.11"
+    "astro": "^5.7.11",
+    "glob": "^11.0.2",
+    "sharp": "^0.34.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
