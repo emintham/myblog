@@ -14,8 +14,9 @@ bookTags:
   - "reference"
   - "education"
 bookCover:
-  src: "/images/writing-to-learn.jpg"
+  imageName: "writing-to-learn"
   alt: "Cover of Writing to Learn by William Zinsser"
+  originalWidth: 1693
 quotesRef: "notes-on-writing-to-learn-quotes"
 ---
 
