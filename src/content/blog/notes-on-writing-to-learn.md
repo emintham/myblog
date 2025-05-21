@@ -1,7 +1,7 @@
 ---
 title: "Notes on Writing to Learn"
 pubDate: 2025-05-20
-description: "A book about writing as thinking and reasoning"
+description: "In this reflection on William Zinsser's \"Writing to Learn\", I connect his core idea of writing as thinking to my own lifelong writing journey. It's my take on his concepts, including some critiques on some ideas that I feel were not well thought out."
 tags: ["writing"]
 draft: false
 postType: "bookNote"
