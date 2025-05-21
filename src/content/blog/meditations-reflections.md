@@ -12,8 +12,9 @@ postType: "bookNote"
 bookTitle: "Meditations"
 bookAuthor: "Marcus Aurelius"
 bookCover:
-  src: "/images/meditations.jpg" # Example path - replace with your actual image path
+  imageName: "meditations"
   alt: "Book cover of Meditations by Marcus Aurelius"
+  originalWidth: 976
 bookTags: ["philosophy", "stoicism", "non-fiction", "ancient-rome", "ethics"]
 
 # Reference to the quotes file

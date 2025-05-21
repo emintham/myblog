@@ -52,7 +52,12 @@ const { quotes, bookAuthor } = Astro.props;
                         <span class="quote-tags-label">Tags:</span>
                         {quote.tags.map((tag, index) => (
                           <>
-                            <a href={`/quote-tags/${generateSlug(tag)}/`} class="quote-tag-item">{tag}</a>
+                            <a
+                              href={`/quote-tags/${generateSlug(tag)}/`}
+                              class="quote-tag-item"
+                            >
+                              {tag}
+                            </a>
                             {index < quote.tags.length - 1 && ", "}
                           </>
                         ))}

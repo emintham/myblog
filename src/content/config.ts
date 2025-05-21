@@ -11,13 +11,10 @@ const quoteSchema = z.object({
 });
 
 // New DATA collection for book quotes
-// Each entry in this collection will be a JSON or YAML file
-// named, for example, after the book's slug (e.g., "name-of-the-wind.json")
-// and will contain an array of quotes for that book.
 const bookQuotesCollection = defineCollection({
-  type: "data", // This is a data collection, not content
+  type: "data",
   schema: z.object({
-    bookSlug: z.string(), // To clearly link this set of quotes to a book
+    bookSlug: z.string(),
     quotes: z.array(quoteSchema),
   }),
 });
@@ -40,17 +37,17 @@ const blogCollection = defineCollection({
 
     // --- Fields specific to Book Notes ---
     bookTitle: z.string().optional(),
-    bookAuthor: z.string().optional(), // Author of the book itself
+    bookAuthor: z.string().optional(),
     bookCover: z
       .object({
-        src: z.string(),
+        // Store the base name of the image (e.g., "meditations-cover")
+        // The image processing script will create versions like "meditations-cover-800w.webp"
+        // in the /public/images/processed/ directory.
+        imageName: z.string(),
         alt: z.string(),
+        originalWidth: z.number().optional(),
       })
       .optional(),
-    // Reference to the quotes file in the 'bookQuotes' data collection.
-    // This would typically match the filename (without extension) of the quotes JSON/YAML file.
-    // For example, if your book note slug is "my-amazing-book", you might have a
-    // src/content/bookQuotes/my-amazing-book.json file.
     quotesRef: z.string().optional(),
     bookTags: z.array(z.string()).optional(),
   }),
@@ -58,5 +55,5 @@ const blogCollection = defineCollection({
 
 export const collections = {
   blog: blogCollection,
-  bookQuotes: bookQuotesCollection, // Add the new data collection
+  bookQuotes: bookQuotesCollection,
 };

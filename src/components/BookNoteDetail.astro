@@ -1,42 +1,34 @@
 ---
 // src/components/BookNoteDetail.astro
-// Component to display the full content of a "bookNote" type post.
-
-// Astro content helpers
 import { getEntry } from "astro:content";
+// import { generateSlug } from '../../utils/slugify'; // Only needed if linking bookTags
 
-// Utility imports
-import { generateSlug } from "../utils/slugify";
-
-// Component imports
 import Remark42Comments from "./Remark42Comments.astro";
-import BookQuotesSection from "./BookQuotesSection.astro"; // Import the new quotes section component
+import BookQuotesSection from "./BookQuotesSection.astro";
+import ResponsiveImage from "./ResponsiveImage.astro";
 
-// Define the expected shape of the 'entry' prop.
 interface Props {
   entry: {
     data: {
-      title: string; // Title of the review/note
+      title: string;
       pubDate: Date;
-      author: string; // Author of the review/note
+      author: string;
       bookTitle?: string;
-      bookAuthor?: string; // Author of the book
-      bookCover?: { src: string; alt: string };
-      quotesRef?: string; // Reference to the YAML/JSON file in bookQuotes
+      bookAuthor?: string;
+      bookCover?: { imageName: string; alt: string; originalWidth?: number }; // Schema includes originalWidth
+      quotesRef?: string;
       bookTags?: string[];
-      // ... any other relevant fields from your schema
     };
-    render: () => Promise<{ Content: any }>; // Ensure Content is part of the render result type
-    slug: string; // The slug of the current blog post
+    render: () => Promise<{ Content: any }>;
+    slug: string;
   };
 }
 
 const { entry } = Astro.props;
-const { Content } = await entry.render(); // Render the main Markdown content
+const { Content } = await entry.render();
 const frontmatter = entry.data;
 
-// Fetch the quotes if quotesRef is provided
-let fetchedQuotes = []; // Default to an empty array
+let fetchedQuotes = [];
 if (frontmatter.quotesRef) {
   try {
     const bookQuotesData = await getEntry("bookQuotes", frontmatter.quotesRef);
@@ -56,20 +48,36 @@ if (frontmatter.quotesRef) {
       `Error fetching quotes for ref "${frontmatter.quotesRef}":`,
       e
     );
-    // Optionally, display an error message to the user in the template
   }
 }
 
-// Construct the URL for the comments component
 const pageUrlForComments = new URL(
-  `/blog/${entry.slug}/`, // Assumes book notes are under /blog/ path
-  Astro.site || "http://localhost:4321" // Fallback for local dev
+  `/blog/${entry.slug}/`,
+  Astro.site || "http://localhost:4321"
 ).href;
+
+// Define widths used by your image processing script for the detail view
+const detailImageWidths = [480, 800, 1200]; // Example, adjust to match your process-images.mjs
+// Determine a sensible default width for the fallback <img> src in detail view
+const detailDefaultWidth = detailImageWidths.includes(800)
+  ? 800
+  : detailImageWidths[1] || detailImageWidths[0];
 ---
 
 <article class="book-note-detail">
   <header class="book-note-header">
     <h1>{frontmatter.title}</h1>
+
+    {
+      frontmatter.bookTitle && (
+        <div class="book-info">
+          <h2 class="book-title">{frontmatter.bookTitle}</h2>
+          {frontmatter.bookAuthor && (
+            <p class="book-author">by {frontmatter.bookAuthor}</p>
+          )}
+        </div>
+      )
+    }
 
     <p class="meta">
       Published on <time datetime={frontmatter.pubDate.toISOString()}>
@@ -83,29 +91,23 @@ const pageUrlForComments = new URL(
       </time>
       by {frontmatter.author}
     </p>
-  </header>
 
-  {
-    frontmatter.bookTitle && (
-      <div class="book-info">
-        <h2 class="book-title">{frontmatter.bookTitle}</h2>
-        {frontmatter.bookAuthor && (
-          <p class="book-author">by {frontmatter.bookAuthor}</p>
-        )}
-      </div>
-    )
-  }
-  {
-    frontmatter.bookCover && (
-      <div class="book-cover-image-container">
-        <img
-          src={frontmatter.bookCover.src}
-          alt={frontmatter.bookCover.alt}
-          class="book-cover-image"
-        />
-      </div>
-    )
-  }
+    {
+      frontmatter.bookCover && frontmatter.bookCover.imageName && (
+        <div class="book-cover-image-container">
+          <ResponsiveImage
+            imageName={frontmatter.bookCover.imageName}
+            alt={frontmatter.bookCover.alt}
+            widths={detailImageWidths}
+            originalImageWidth={frontmatter.bookCover.originalWidth}
+            sizesAttr="(max-width: 600px) 90vw, (max-width: 768px) 50vw, 250px"
+            imgClass="book-cover-image"
+            defaultWidth={detailDefaultWidth}
+          />
+        </div>
+      )
+    }
+  </header>
 
   <div class="book-note-content prose">
     <Content />
@@ -123,12 +125,7 @@ const pageUrlForComments = new URL(
         <ul class="book-tags-list">
           {frontmatter.bookTags.map((tag) => (
             <li>
-              <a
-                href={`/book-tags/${generateSlug(tag)}/`}
-                class="book-tag-item"
-              >
-                #{tag}
-              </a>
+              <span class="book-tag-item">#{tag}</span>
             </li>
           ))}
         </ul>
@@ -146,19 +143,17 @@ const pageUrlForComments = new URL(
 </article>
 
 <style>
-  /* General styling for the book note detail page structure */
+  /* Styles remain largely the same */
   .book-note-detail {
     font-family: var(--font-serif);
     line-height: 1.7;
   }
-
   .book-note-header {
-    text-align: center;
+    text-align: left;
     margin-bottom: 3rem;
     padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--color-border-subtle);
   }
-
   .book-note-header h1 {
     font-family: var(--font-display-title);
     font-size: 2.6rem;
@@ -167,13 +162,11 @@ const pageUrlForComments = new URL(
     margin-bottom: 0.75rem;
     color: var(--color-text);
   }
-
   .book-info {
     margin-bottom: 1rem;
     padding-left: 0.5rem;
     border-left: 2px solid var(--color-accent);
   }
-
   .book-title {
     font-family: var(--font-sans);
     font-size: 1.8rem;
@@ -182,39 +175,35 @@ const pageUrlForComments = new URL(
     margin-top: 0.5rem;
     margin-bottom: 0.25rem;
   }
-
   .book-author {
     font-family: var(--font-sans);
     font-size: 1rem;
     color: var(--color-meta);
     margin-bottom: 0;
   }
-
   .book-note-header .meta {
     font-family: var(--font-sans);
     font-size: 0.9rem;
     color: var(--color-meta);
     margin-top: 1.5rem;
   }
-
   .book-cover-image-container {
     margin-top: 2rem;
     margin-bottom: 1rem;
     text-align: center;
   }
-  .book-cover-image {
+  :global(.book-cover-image) {
     max-width: 250px;
     height: auto;
     border-radius: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
   }
-
   .book-note-content {
-    /* Main review/summary content */
     margin-bottom: 3rem;
   }
-  /* Basic prose styling for Markdown content.
-     Consider using a global .prose class or Tailwind Typography if you need more. */
   .prose :global(h2),
   .prose :global(h3) {
     font-family: var(--font-sans);
@@ -237,8 +226,6 @@ const pageUrlForComments = new URL(
     font-style: italic;
     color: var(--color-meta);
   }
-
-  /* Book Tags Footer */
   .book-tags-footer {
     margin-top: 3rem;
     padding-top: 1.5rem;
@@ -266,15 +253,11 @@ const pageUrlForComments = new URL(
     color: var(--color-accent);
     text-decoration: none;
   }
-
-  /* Comments Section Styling */
   .comments-section {
     margin-top: 4rem;
     padding-top: 2rem;
     border-top: 1px solid var(--color-border-subtle);
   }
-
-  /* --- Mobile Adjustments for BookNoteDetail structure --- */
   @media (max-width: 768px) {
     .book-note-header h1 {
       font-size: 2.2rem;
@@ -282,7 +265,7 @@ const pageUrlForComments = new URL(
     .book-title {
       font-size: 1.6rem;
     }
-    .book-cover-image {
+    :global(.book-cover-image) {
       max-width: 200px;
     }
     .comments-section {
