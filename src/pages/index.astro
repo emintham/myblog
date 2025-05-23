@@ -5,7 +5,7 @@ import { getCollection } from "astro:content";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../siteConfig.ts";
 
 const allPosts = await getCollection("blog", ({ data }) => {
-  return data.draft !== true; // Filter out drafts if you add a draft field
+  return import.meta.env.PROD ? data.draft !== true : true;
 });
 // Sort posts by date, newest first
 const sortedPosts = allPosts.sort(
