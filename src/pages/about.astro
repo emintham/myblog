@@ -1,0 +1,67 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const pageTitle = "About Me"; // This will be styled like "Latest Writings"
+const pageIntroText =
+  "A little more about this space, its purpose, and the voice behind it."; // A brief intro text below the title
+---
+
+<BaseLayout title={pageTitle} description={pageIntroText}>
+  <section class="about-page-container">
+    <h1 class="section-title">{pageTitle}</h1>
+
+    <p class="page-intro-text">{pageIntroText}</p>
+
+    <div class="prose-content-area">
+      {/* For the main body of the about page */}
+      <p>
+        Hi, I'm Emin. I am an aspiring writer and a curious learner. This blog
+        is both a public second brain and a blog where I share my thoughts,
+        ideas, writings, and reflections on various topics that interest me.
+      </p>
+      <p>
+        More boringly, I write code for a living for an employer who prefers
+        to remain anonymous. I am primarily a backend engineer with a strong
+        interest in algorithms.
+      </p>
+      <p>Thank you for spending a moment here.</p>
+
+      {
+        /* Optional:
+      <h2 class="subsection-heading-style">Contact</h2>
+      <p>
+        If you'd like to get in touch, you can reach out via [mention email if comfortable, or a professional social media link].
+      </p>
+      */
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Container for the main prose of the about page */
+  .prose-content-area {
+    /* Typography (font-family, font-size, line-height, color)
+       will largely be inherited from 'body' styles in global.css */
+  }
+
+  .prose-content-area p {
+    /* These will also inherit from global 'p' styles. */
+    max-width: 65ch; /* Optimal line length for readability */
+    margin-left: auto; /* Center the prose block if narrower than content-wrapper */
+    margin-right: auto; /* Center the prose block */
+    margin-bottom: 1.5em;
+  }
+
+  /* Optional styling for H2 if you add subsections */
+  .subsection-heading-style {
+    /* This is an H2 */
+    font-family: var(--font-sans);
+    font-size: 1.8rem;
+    color: var(--color-text);
+    max-width: 65ch; /* Align with prose */
+    margin: 3em auto 1em auto; /* Centering and vertical spacing */
+    padding-bottom: 0.5em;
+    /* border-bottom: 1px solid #f0f0f0; /* Lighter border for subsections - optional */
+  }
+</style>
