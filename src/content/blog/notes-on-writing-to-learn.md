@@ -82,7 +82,7 @@ until I read《陈鲁豫——心相约》by [Chen Luyu](https://en.m.wikipedia.
 a prominent Chinese journalist and talk show host, that I realized that *grilling*
 someone in an interview could be entertaining and fun. Another "rule" broken yet again.
 Interviews became my forte during composition classes from then on. In essence, the interview format allowed
-me to introduce *characters* into what was conventionally a dry and informational format.
+me to introduce *characters* into what was conventionally a staid format.
 
 Given my love of reading (mostly fiction at that point) and writing, I naturally
 thought that fiction writing would be something I could do well. I was wrong.
@@ -106,7 +106,7 @@ I disagree with that assertion, as my personal experience has amply illustrated.
 To be more precise, I believe explanatory writing can be written in an exploratory
 way. One does not preclude the other. Zinsser seems to conflate the result (the *explanatory* article)
 with the process (the *exploratory* writing). Funnily enough, Chapter 12 "World of
-Music" covers this exactly.
+Music" covers this nuance exactly.
 
 > “[T]he mystery that lies at the heart of the creative process, not just in music but in writing, painting, sculpture and every other art, as well as in mathematics, the sciences and the humanities. The mathematician, the scientist and the philosopher, thinking and writing their way toward the center of a problem, are no less immersed than the composer, the artist and the writer in an act of commitment that they can never recover or even explain. What finally impels them all is not the work they achieve, but the work of achieving it.”
 
@@ -116,18 +116,16 @@ comes down to a few factors: (1) the default processing mode of the writer, whet
 top-down (starting with a clear structure or outline and key points) or bottom-up [^bottoms-up]
 (discovering the structure through the process of writing and drafting) [^plan-pants],
 and (2) how well the writer knows the topic they are writing about, with the latter being the
-more influential factor. The more familiar they are with the topic, the more
-likely they are to be able to write it in a top-down, explanatory way. The
+more influential factor. Greater expertise often facilitates a top-down, explanatory approach. The
 information is organized in their mind and they can, relatively speaking, easily present a logical
 flow of the information. A likely wrinkle is that an author may be writing
 for a different audience than the usual one they are used to, which may require
 them to *explore* and explain the information to the new audience in the right way.
 
 Ultimately, this book was a worthwhile read despite the flaws mentioned above.
-To me, a good *non-fiction* book is like a Hydra on Mount TBR. Cutting off one head
-sprouts more good books from its references. I have already added several
-books to my reading list from the references in this book-- books I would probably
-never have picked up otherwise.
+To me, a good *non-fiction* book is like a Hydra on Mount TBR: slicing one off
+the list often leads to more good books from its references. I have duly added several
+to my reading list-- books I would have overlooked otherwise.
 
 [^plan-pants]: More commonly known as ["planning" vs "pantsing"](https://blog.nanowrimo.org/post/1308206994/the-great-debate-are-you-a-planner-or-a-pantser) in writing circles.
 [^chinese-learning]: A fact I'm ever grateful to my parents for since it allowed me to meet my wife. She wasn't part of the class, but without being able to speak Chinese, I would likely not be able to grow as close to her as I have.
