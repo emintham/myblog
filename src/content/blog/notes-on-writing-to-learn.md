@@ -51,9 +51,7 @@ I have been writing for a long time. One of my first memories, ever, is of writi
 a short story. It was about a rabbit and a
 bomb-- indubitable frontiers of knowledge for a three year old. The exact plot
 of the story is lost to time, but I do remember the satisfaction of creating it
-ex nihilo.
-
-As I grew older, and was forced to learn Chinese [^chinese-learning],
+ex nihilo. As I grew older, and was forced to learn Chinese [^chinese-learning],
 Chinese composition became a requirement for class and was, unfortunately, not something I was
 readily able to transfer my English writing skills to. My mother enrolled me into a Chinese essay writing
 class during the period of Grades 3-5 (roughly) and while it helped, I never did
