@@ -47,8 +47,9 @@ Finally, regarding the central thesis of "writing = thinking/reasoning", that is
 the exact topic I was working on. This was a recent realization for me, and I have
 been developing the post as a meditation on the topic.
 
-I have been writing for a long time. One of my first memories, ever, is of writing
-a short story. It was about a rabbit and a
+Zinsser's point about strong models in particular prompted a reflection on
+my own writing journey. I have been writing for a long time. In fact, one of my
+first memories, ever, is of writing a short story. It was about a rabbit and a
 bomb-- indubitable frontiers of knowledge for a three year old. The exact plot
 of the story is lost to time, but I do remember the satisfaction of creating it
 ex nihilo. As I grew older, and was forced to learn Chinese [^chinese-learning],
