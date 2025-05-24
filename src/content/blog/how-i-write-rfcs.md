@@ -20,6 +20,13 @@ me evaluate ideas in a more robust way by challenging my assumptions and
 helping with surfacing issues I missed. I am sharing this approach to invite
 discussion and feedback as I am always looking for ways to improve myself.
 
+**Important**: When I say "AI assistant" in this post, I am referring in particular
+to thinking models that are similar to or more powerful than [Gemini 2.5 Pro](https://gemini.google.com).
+You will likely not get the same results with a less capable assistant. I have
+not done experiments to see if the AI's achievement in coding benchmarks
+translates to better design thinking. If anyone has done such experiments,
+please let me know in the comments below.
+
 ## The Process
 
 ### Ponder the Problem Independently
