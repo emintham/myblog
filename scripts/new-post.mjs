@@ -82,10 +82,6 @@ async function getBookNoteDetails(rl, slug) {
     rl,
     "Enter Book Cover Image Path (e.g., /images/covers/book.jpg, optional): "
   );
-  let bookCoverAltValue = "";
-  if (bookCoverSrc.trim()) {
-    bookCoverAltValue = await question(rl, "Enter Book Cover Alt Text: ");
-  }
 
   const bookTagsInput = await question(
     rl,
@@ -118,7 +114,7 @@ async function getBookNoteDetails(rl, slug) {
   if (bookCoverSrc.trim()) {
     frontmatter.bookCover = {
       src: bookCoverSrc.trim().replace(/"/g, '\\"'),
-      alt: bookCoverAltValue.replace(/"/g, '\\"'),
+      alt: "Cover of " + bookTitleValue,
     };
   }
 
