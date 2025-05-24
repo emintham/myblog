@@ -27,3 +27,11 @@
 
 - Script to process images for CLS.
 - Using `srcset` for images, custom component.
+
+## May 22
+
+- Filter out draft posts in the index for PROD.
+
+## May 23
+
+- Generate alt text for book cover.
