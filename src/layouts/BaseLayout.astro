@@ -1,6 +1,7 @@
 ---
 import Navigation from "../components/Navigation.astro";
-import "../styles/global.css"; // Or move styles here with <style is:global>
+import "../styles/global.css";
+import "../styles/sidenotes.css";
 import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR_NAME } from "../siteConfig.ts";
 
 const { title = SITE_TITLE, description = SITE_DESCRIPTION } = Astro.props;
@@ -55,28 +56,24 @@ const TEMPLATE_AUTHOR_NAME = "Emin Tham + Gemini 2.5 Pro";
     </footer>
     <style>
       main {
-        min-height: calc(
-          100vh - 150px
-        ); /* Adjust based on your actual nav/footer height if changed */
-        /* Adding some bottom padding to main to ensure content doesn't sit directly on footer */
+        min-height: calc(100vh - 150px);
         padding-bottom: 3rem;
       }
 
       footer {
         text-align: center;
-        padding: 0rem 1rem 3rem; /* Increased bottom padding for more breathing room */
+        padding: 0rem 1rem 3rem;
         font-size: 0.85rem;
         color: var(--color-meta);
         font-family: var(--font-sans);
-        /* border-top: 1px solid var(--color-border-subtle); */ /* REMOVED BORDER for a cleaner look */
-        margin-top: 0; /* Removed margin-top as main has padding-bottom now */
-        /* Optionally, if you still want a very subtle separation without a full border: */
-        /* box-shadow: 0 -2px 10px -5px rgba(0,0,0,0.03); */ /* Very subtle top shadow */
+        /* border-top: 1px solid var(--color-border-subtle); */
+        margin-top: 0;
+        /* box-shadow: 0 -2px 10px -5px rgba(0,0,0,0.03); */
       }
 
       footer p {
-        margin: 0.5em 0; /* Slightly increased space between lines in the footer */
-        line-height: 1.6; /* Improved line height for readability */
+        margin: 0.5em 0;
+        line-height: 1.6;
       }
 
       footer a {
@@ -91,8 +88,8 @@ const TEMPLATE_AUTHOR_NAME = "Emin Tham + Gemini 2.5 Pro";
       }
 
       .attribution {
-        margin-top: 1em; /* More space above attribution line */
-        font-size: 0.8rem; /* Slightly smaller attribution */
+        margin-top: 1em;
+        font-size: 0.8rem;
       }
     </style>
   </body>

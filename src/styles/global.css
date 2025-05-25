@@ -1,3 +1,7 @@
+/*
+  Main global stylesheet.
+  Defines :root variables, base element styles, and common utility classes.
+*/
 :root {
   --font-serif: "Lora", serif;
   --font-sans: "Montserrat", sans-serif;
@@ -10,6 +14,7 @@
   --color-meta: #777777; /* For dates, subtle info */
   --color-border-subtle: #eeeeee;
   --color-note-paper: #fbfaf9; /* Example: extremely close to page background */
+  --color-code-background: #f4f4f4; /* For <pre> blocks */
 
   --content-max-width: 720px; /* Adjust for optimal line length */
 }
@@ -75,7 +80,7 @@ a:focus {
 
 /* Minimalist styling for code blocks if needed */
 pre {
-  background-color: #f4f4f4;
+  background-color: var(--color-code-background);
   padding: 1em;
   overflow-x: auto;
   border-radius: 4px;
@@ -192,111 +197,64 @@ pre {
   padding: 1rem;
 }
 
-/* src/styles/global.css or your specific layout's style */
+/* == Common Post Preview Styles == */
+.post-preview {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
 
-/* Style for the superscript reference numbers in text */
-sup[id^="fnref-"] a {
+.post-preview:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.preview-title { /* Applied to h2 or h3 in previews */
+  font-family: var(--font-display-title);
+  font-weight: 700; /* Base weight, can be adjusted per component if truly needed */
+  line-height: 1.3;
+  margin-top: 0;
+  color: var(--color-text);
+}
+
+.preview-title a {
+  color: var(--color-text);
   text-decoration: none;
+}
+
+.preview-title a:hover {
   color: var(--color-accent);
-  font-weight: normal; /* Or bold if you prefer */
-  font-size: 0.75em; /* Slightly smaller than normal text */
-  vertical-align: super;
-  line-height: 0; /* Prevents affecting line height of main text */
-  padding: 0 0.1em;
 }
 
-.sidenote {
-  display: none; /* Hidden by default, shown by media query */
-  position: absolute; /* Positioned by JavaScript */
-  width: 180px; /* Adjust as needed */
-  padding: 0.75em 1em;
-  font-family: var(--font-sans); /* Or --font-serif, try what looks best */
-  font-size: 0.8rem; /* Smaller than main text */
-  line-height: 1.5;
-  color: var(--color-meta); /* Subtler text color */
-  background-color: transparent; /* Or a very light background like var(--color-background) */
-  /* border-left: 2px solid var(--color-border-subtle); /* Optional separator */
-  z-index: 10; /* Ensure it's above other content if necessary */
+.meta { /* Common class for meta text (date, author) */
+  font-family: var(--font-sans);
+  font-size: 0.85rem; /* Standardized size */
+  color: var(--color-meta);
+  margin-bottom: 1rem; /* Standardized margin */
 }
 
-.sidenote p {
-  margin: 0 0 0.5em 0; /* Spacing for paragraphs within a sidenote */
+.preview-text-content p { /* For paragraphs within preview content areas */
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--color-text);
+  margin-bottom: 1em;
 }
-.sidenote p:last-child {
+
+.preview-text-content p:last-child {
   margin-bottom: 0;
 }
 
-/* Hides the original footnote list at the bottom when sidenotes are active (on wider screens) */
-section.footnotes.sidenotes-transformed {
-  display: none;
+.read-more { /* Common class for read-more links */
+  font-family: var(--font-sans);
+  font-size: 0.8rem; /* Base size, can be fine-tuned in component if needed */
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-accent);
+  text-decoration: none;
+  display: inline-block;
+  /* margin-top can be specific to the component */
 }
 
-/* Media Query for Sidenotes (Desktop) */
-@media (min-width: 1100px) {
-  /* Adjust breakpoint as needed based on your --content-max-width */
-  .sidenote {
-    display: block; /* Show sidenotes */
-  }
-  /* The original footnote section at the bottom remains hidden due to .sidenotes-transformed */
-}
-
-/* Styles for Original Footnotes (Mobile/Fallback) */
-@media (max-width: 1099px) {
-  section.footnotes.sidenotes-transformed {
-    display: block !important; /* Ensure original footnotes are visible */
-  }
-  .sidenote {
-    display: none !important; /* Ensure JS-created sidenotes are hidden */
-  }
-
-  /* Optional: Style the default footnote list nicely for mobile */
-  section.footnotes {
-    margin-top: 3rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--color-border-subtle);
-    font-size: 0.9rem;
-    color: var(--color-meta);
-  }
-  section.footnotes .footnotes-list {
-    padding-left: 1.5rem;
-  }
-  section.footnotes .footnote-item p {
-    margin-bottom: 0.5em;
-    line-height: 1.5;
-  }
-  .footnote-backref {
-    text-decoration: none;
-    margin-left: 0.25em;
-  }
-}
-
-.sidenote-number {
-  font-weight: 600; /* Make the number slightly bolder */
-  margin-right: 0.4em; /* Space between number and text */
-  color: var(
-    --color-text
-  ); /* Or keep it var(--color-meta) like the rest of the sidenote */
-}
-
-.sidenote a {
-  color: var(
-    --color-accent
-  ); /* Use your site's main accent color for the link */
-  text-decoration: none; /* No underline by default, consistent with other links */
-  font-weight: 600; /* Make link text slightly bolder than surrounding sidenote text */
-  transition: color 0.2s ease-in-out; /* Smooth color transition on hover */
-}
-
-.sidenote a:hover {
-  text-decoration: underline; /* Underline on hover for clear interaction feedback */
-  /* Optional: Slightly change color on hover if desired */
-  /* color: var(--color-text); */
-}
-
-/* Ensure paragraphs within sidenotes have their default margins if not already set */
-.sidenote p {
-  margin: 0 0 0.5em 0;
-}
-.sidenote p:last-child {
-  margin-bottom: 0;
+.read-more:hover {
+  color: var(--color-text);
 }
