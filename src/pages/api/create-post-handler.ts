@@ -27,6 +27,8 @@ export const POST: APIRoute = async ({ request }) => {
 
     const title = data.title;
     const slug = generateSlug(title || 'untitled');
+    console.log("[API create-post-handler] Input title:", title); // <--- ADD THIS
+    console.log("[API create-post-handler] Generated slug:", slug); // <--- ADD THIS
     const filename = `${slug}.md`;
     const projectRoot = process.cwd();
     const filePath = path.join(projectRoot, 'src', 'content', 'blog', filename);
@@ -93,7 +95,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     await fs.writeFile(filePath, content);
 
-    return new Response(JSON.stringify({ message: 'Post created successfully!', filename: filename, path: `/blog/${slug}` }), {
+    return new Response(JSON.stringify({ message: 'Post created successfully!', filename: filename, path: `/blog/${slug}`, newSlug: slug}), {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     });

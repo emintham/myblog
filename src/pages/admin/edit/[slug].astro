@@ -1,9 +1,9 @@
 ---
-export const prerender = false; // This page is dynamic and for dev mode only
+export const prerender = false; // This page is dynamic and server-rendered in dev mode
 
 // src/pages/admin/edit/[slug].astro
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import PostForm from '../../../components/admin/PostForm.astro'; // Reusable form
+import PostForm from '../../../components/admin/PostForm.tsx'; // Import the React form component
 import { SITE_TITLE } from '../../../siteConfig';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -11,71 +11,81 @@ import matter from 'gray-matter'; // For parsing frontmatter
 
 // --- DEV Mode Check & Data Fetching ---
 if (import.meta.env.PROD) {
-  // In a real app, you might redirect or show a custom 404
-  return new Response(null, { status: 404, statusText: 'Not Found' });
+  return new Response(null, { status: 404, statusText: 'Not Found (Admin Only)' });
 }
 
 const { slug } = Astro.params;
-let postToEdit: Record<string, any> | null = null;
+let postToEdit: Record<string, any> | null = null; // Will conform to PostFormProps['postData']
 let errorMessage: string | null = null;
-let originalFileDetails = { path: '', extension: '.md' }; // Store original file details
 
 if (!slug) {
-  errorMessage = "No post slug provided for editing.";
-  // Potentially redirect or return a 400/404 response earlier
+  errorMessage = "Error: No post slug was provided in the URL.";
+  Astro.response.status = 400; // Bad Request
 } else {
   const projectRoot = process.cwd();
   const contentDir = path.join(projectRoot, 'src', 'content', 'blog');
 
+  // Try common Markdown extensions
   const potentialFilenames = [`${slug}.md`, `${slug}.mdx`];
   let fileFound = false;
+  let foundFilePath = '';
+  let foundFileExtension = '';
 
   for (const filename of potentialFilenames) {
     const filePath = path.join(contentDir, filename);
     try {
       const fileContentString = await fs.readFile(filePath, 'utf-8');
-      const { data: frontmatterData, content: bodyContent } = matter(fileContentString);
+      const { data: frontmatterData, content: bodyContentString } = matter(fileContentString);
 
-      originalFileDetails.path = filePath;
-      originalFileDetails.extension = path.extname(filePath);
+      foundFilePath = filePath;
+      foundFileExtension = path.extname(filePath);
 
+      // Prepare data for PostForm.tsx (aligning with its PostData interface)
       postToEdit = {
-        originalSlug: slug, // Keep for reference, in case title/slug changes
-        originalFilePath: filePath, // Pass to form/API for update logic
-        originalExtension: originalFileDetails.extension,
+        originalSlug: slug, // Current slug from URL
+        originalFilePath: foundFilePath,
+        originalExtension: foundFileExtension,
+        // Spread frontmatter data
         ...frontmatterData,
-        bodyContent: bodyContent.trim(), // Send trimmed body to form
+        // Add bodyContent
+        bodyContent: bodyContentString.trim(),
       };
-      // Ensure pubDate is in 'YYYY-MM-DD' for the input[type="date"]
+
+      // Ensure pubDate is a string in YYYY-MM-DD for the form input
+      // PostForm.tsx's formatDateForInput will handle this if it's a Date object or valid string
       if (postToEdit.pubDate && postToEdit.pubDate instanceof Date) {
         postToEdit.pubDate = postToEdit.pubDate.toISOString().split('T')[0];
       } else if (typeof postToEdit.pubDate === 'string') {
-        // Attempt to re-format if it's a string but not YYYY-MM-DD
         try {
-            postToEdit.pubDate = new Date(postToEdit.pubDate).toISOString().split('T')[0];
-        } catch(e) { /* ignore if already in correct format or invalid */ }
+          // Re-parse and format to ensure YYYY-MM-DD
+          postToEdit.pubDate = new Date(postToEdit.pubDate).toISOString().split('T')[0];
+        } catch (dateError) {
+          console.warn(`Could not parse pubDate string: ${postToEdit.pubDate}`, dateError);
+          // Let PostForm.tsx handle it with its default if parsing fails
+        }
       }
 
       fileFound = true;
       break;
     } catch (e) {
-      // File not found at this path, loop will try next or eventually set error
+      // File not found at this path, or error reading/parsing
+      // console.debug(`File not found or error for ${filePath}:`, e.message);
     }
   }
 
   if (!fileFound) {
-    errorMessage = `Post with slug "${slug}" not found.`;
-    // Set a 404 status for the Astro response if post not found
-    Astro.response.status = 404;
+    errorMessage = `Error: Post with slug "${slug}" not found in src/content/blog/.`;
+    Astro.response.status = 404; // Not Found
   }
 }
 
-const pageTitle = `Edit Post: ${postToEdit?.title || slug} (DEV) - ${SITE_TITLE}`;
+const pageTitleDisplay = postToEdit?.title || slug || "Post";
+const pageTitle = `Edit Post: ${pageTitleDisplay} (DEV) - ${SITE_TITLE}`;
 ---
 
 <BaseLayout title={pageTitle}>
   <div class="page-detail-header" style="margin-bottom: 1.5rem;">
-    <h1>Edit Post: {postToEdit?.title ? `"${postToEdit.title}"` : `"${slug}"`}</h1>
+    <h1>Edit Post: {postToEdit?.title ? `"${postToEdit.title}"` : (slug ? `"${slug}"` : "Unknown")}</h1>
   </div>
 
   {errorMessage && !postToEdit && (
@@ -86,17 +96,22 @@ const pageTitle = `Edit Post: ${postToEdit?.title || slug} (DEV) - ${SITE_TITLE}
   )}
 
   {postToEdit && !errorMessage && (
-    <form id="editPostForm" class="post-form">
-      {/* Hidden fields to pass original slug and path for update logic */}
+    <form id="editPostForm" class="post-form"> {/* Ensure .post-form class matches your global form styles */}
+      {/* Hidden fields to pass original identifiers for the update logic */}
       <input type="hidden" name="originalSlug" value={postToEdit.originalSlug} />
       <input type="hidden" name="originalFilePath" value={postToEdit.originalFilePath} />
       <input type="hidden" name="originalExtension" value={postToEdit.originalExtension} />
 
-      <PostForm postData={postToEdit} /> {/* Pass fetched data to the form */}
+      {/* Use the React PostForm component, passing the fetched data.
+          The `key` prop ensures React re-initializes the component if the slug (and thus postData) changes,
+          e.g., if we had direct navigation between edit pages (less common in this setup). */}
+      <PostForm client:load postData={postToEdit} key={postToEdit.originalSlug} />
+
       <button type="submit" class="button-primary" style="margin-top: 1rem;">Update Post</button>
     </form>
   )}
 
+  {/* Feedback area for API response */}
   <div id="formFeedback" style="margin-top: 1.5rem; padding: 1rem; border-radius: 4px; display: none;">
     <p id="feedbackMessage"></p>
     <a id="viewPostLink" href="#" style="display:none; margin-top: 0.5rem;" class="button-edit">View Post</a>
@@ -109,7 +124,7 @@ const pageTitle = `Edit Post: ${postToEdit?.title || slug} (DEV) - ${SITE_TITLE}
   const formFeedback = document.getElementById('formFeedback') as HTMLDivElement | null;
   const feedbackMessage = document.getElementById('feedbackMessage') as HTMLParagraphElement | null;
   const viewPostLink = document.getElementById('viewPostLink') as HTMLAnchorElement | null;
-  const pageTitleElement = document.querySelector('h1'); // To update page title if post title changes
+  const pageTitleElement = document.querySelector('h1'); // For updating the H1 if title/slug changes
 
   if (form) {
     form.addEventListener('submit', async (e) => {
@@ -126,24 +141,24 @@ const pageTitle = `Edit Post: ${postToEdit?.title || slug} (DEV) - ${SITE_TITLE}
       const formData = new FormData(form);
       const data: Record<string, any> = {};
       formData.forEach((value, key) => { data[key] = value; });
-      data.draft = formData.has('draft'); // Convert checkbox
+      data.draft = formData.has('draft');
 
-      // Reconstruct bookCover object
-      if (data.bookCoverImageName !== undefined || data.bookCoverAlt !== undefined) { // Check existence of keys
+      // Reconstruct bookCover object for the API
+      if (formData.has('bookCoverImageName') || formData.has('bookCoverAlt')) {
         data.bookCover = {
-            imageName: data.bookCoverImageName || '',
-            alt: data.bookCoverAlt || ''
+            imageName: formData.get('bookCoverImageName') as string || '',
+            alt: formData.get('bookCoverAlt') as string || ''
         };
-        // originalWidth would be handled here if it were an input
-        delete data.bookCoverImageName;
-        delete data.bookCoverAlt;
       }
+      // Remove flat properties if they were added and API expects only the object
+      delete data.bookCoverImageName;
+      delete data.bookCoverAlt;
 
       try {
-        const response = await fetch('/api/update-post-handler', { // New API endpoint
-          method: 'POST', // Using POST, but PUT could also be appropriate
+        const response = await fetch('/api/update-post-handler', {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data), // originalSlug, originalFilePath, originalExtension are sent
+          body: JSON.stringify(data), // originalSlug, originalFilePath, originalExtension are sent from hidden inputs
         });
 
         const result = await response.json();
@@ -153,32 +168,44 @@ const pageTitle = `Edit Post: ${postToEdit?.title || slug} (DEV) - ${SITE_TITLE}
             if (response.ok) {
                 formFeedback.style.backgroundColor = 'var(--color-note-paper)';
                 formFeedback.style.border = '1px solid var(--color-accent)';
+
+                const newTitleFromForm = formData.get('title') as string;
+
                 if (result.path && viewPostLink) {
-                    viewPostLink.href = result.path;
+                    viewPostLink.href = result.path; // Link to the potentially new slug's path
                     viewPostLink.style.display = 'inline-block';
                 }
-                // If title changed, update the H1 and originalSlug hidden input for subsequent saves
-                const newTitle = formData.get('title') as string;
-                if (pageTitleElement && newTitle !== document.querySelector('#title')?.getAttribute('value')) { // Compare with initial value if needed
-                    pageTitleElement.textContent = `Edit Post: "${newTitle}"`;
+                if (pageTitleElement && newTitleFromForm) {
+                    pageTitleElement.textContent = `Edit Post: "${newTitleFromForm}"`;
                 }
+
+                // Update hidden fields if slug/path changed, so subsequent saves use the new identifiers
                 if (result.newSlug && form.elements.namedItem('originalSlug')) {
                   (form.elements.namedItem('originalSlug') as HTMLInputElement).value = result.newSlug;
                 }
                 if (result.newFilePath && form.elements.namedItem('originalFilePath')) {
                   (form.elements.namedItem('originalFilePath') as HTMLInputElement).value = result.newFilePath;
                 }
-                 if (result.newExtension && form.elements.namedItem('originalExtension')) {
+                if (result.newExtension && form.elements.namedItem('originalExtension')) {
                   (form.elements.namedItem('originalExtension') as HTMLInputElement).value = result.newExtension;
                 }
+                // Update the browser URL if the slug changed, without a full page reload
+                if (result.newSlug && result.newSlug !== (formData.get('originalSlug') as string)) {
+                    const newUrl = `/admin/edit/${result.newSlug}/`;
+                    history.pushState({ path: newUrl }, '', newUrl);
+                     // Update the key on PostForm to force re-render with new originalSlug from its props if needed,
+                     // but PostForm's useEffect on postData might already handle it if we update its prop.
+                     // Forcing a re-key might be cleaner if navigation within edit pages happens.
+                     // For now, updating hidden inputs is the main goal.
+                }
 
-            } else {
+            } else { // API returned an error
                 formFeedback.style.backgroundColor = '#ffdddd';
                 formFeedback.style.border = '1px solid red';
             }
         }
-      } catch (error) {
-        console.error('Network or other error:', error);
+      } catch (error) { // Network error
+        console.error('Network or other error during update:', error);
         if (feedbackMessage && formFeedback) {
             feedbackMessage.textContent = 'Network error or failed to connect to the API.';
             formFeedback.style.backgroundColor = '#ffdddd';
@@ -198,5 +225,7 @@ const pageTitle = `Edit Post: ${postToEdit?.title || slug} (DEV) - ${SITE_TITLE}
   }
 </script>
 <style>
-/* Add any page-specific styles if needed */
+  /* Page-specific styles can go here if needed.
+     Form styles are expected from global.css via .post-form
+     and PostForm.tsx specific styles if any (e.g. via CSS modules) */
 </style>
