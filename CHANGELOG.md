@@ -35,3 +35,7 @@
 ## May 23
 
 - Generate alt text for book cover.
+
+## May 25
+
+- Jules cleaned up CSS and some components.
