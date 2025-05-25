@@ -1,3 +1,7 @@
+/*
+  Main global stylesheet.
+  Defines :root variables, base element styles, and common utility classes.
+*/
 :root {
   --font-serif: "Lora", serif;
   --font-sans: "Montserrat", sans-serif;
@@ -192,8 +196,6 @@ pre {
   margin-top: 2rem;
   padding: 1rem;
 }
-
-/* src/styles/global.css or your specific layout's style */
 
 /* == Common Post Preview Styles == */
 .post-preview {

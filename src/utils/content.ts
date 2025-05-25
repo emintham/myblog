@@ -2,13 +2,11 @@
 
 interface PostData {
   description?: string;
-  // Add other potential frontmatter fields if needed for broader utility
 }
 
 interface Post {
   data: PostData;
-  body?: string; // Assuming body might not always be present or relevant
-  // Add other post fields if needed
+  body?: string;
 }
 
 /**

@@ -1,4 +1,5 @@
-/* Styles for Sidenotes and Footnotes Behavior */
+/* src/styles/sidenotes.css */
+/* Contains all styles related to the functionality and appearance of sidenotes and their fallback to traditional footnotes. */
 
 /* Style for the superscript reference numbers in text */
 sup[id^="fnref-"] a {
@@ -95,6 +96,4 @@ section.footnotes.sidenotes-transformed {
 
 .sidenote a:hover {
   text-decoration: underline; /* Underline on hover for clear interaction feedback */
-  /* Optional: Slightly change color on hover if desired */
-  /* color: var(--color-text); */
 }

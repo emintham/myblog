@@ -1,7 +1,7 @@
 ---
 // src/components/BlogPostPreviewRegular.astro
-import PostMeta from "./PostMeta.astro"; // Import the new component
-import { extractPreviewContent } from "../../src/utils/content"; // Import the utility function
+import PostMeta from "./PostMeta.astro";
+import { extractPreviewContent } from "../../src/utils/content";
 const { post } = Astro.props;
 
 const contentToDisplay = extractPreviewContent(post);
@@ -18,21 +18,17 @@ const contentToDisplay = extractPreviewContent(post);
 
 <style>
   /* Styles for REGULAR post previews */
-  /* .post-preview, .post-preview:last-child, .meta, .read-more, .read-more:hover, 
-     .preview-title, .preview-title a, .preview-title a:hover, 
-     .preview-text-content p, .preview-text-content p:last-child are now in global.css */
 
   .post-preview .preview-title { /* h2 */
     font-size: 1.9rem;
     margin-bottom: 0.35rem;
   }
 
-  .preview-content { /* This specific class is still used for margin */
+  .preview-content {
     margin-bottom: 1rem; 
-    /* font-size and line-height for p tags are in .preview-text-content p */
   }
 
-  .read-more { /* Specific margin for this component */
+  .read-more {
     margin-top: 1.2rem;
   }
 
@@ -41,13 +37,11 @@ const contentToDisplay = extractPreviewContent(post);
     .post-preview .preview-title { /* h2 */
       font-size: 1.6rem;
     }
-    /* Add any other mobile specific styles for regular previews if needed */
   }
 
   @media (max-width: 480px) {
     .post-preview .preview-title { /* h2 */
       font-size: 1.4rem;
     }
-    /* Add any other mobile specific styles for regular previews if needed */
   }
 </style>
