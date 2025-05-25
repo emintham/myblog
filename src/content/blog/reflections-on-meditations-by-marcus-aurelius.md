@@ -1,24 +1,25 @@
 ---
 title: "Reflections on Meditations by Marcus Aurelius"
 pubDate: 2025-05-20
-description: "Key insights and personal takeaways from the Stoic classic, Meditations."
-author: "Your Name" # Or use the default from siteConfig.ts
-tags: ["philosophy", "stoicism", "classics", "reading-notes"]
-series: "Philosophical Musings" # Optional
-draft: false # Set to true if you don't want it published immediately
+author: "Your Name"
 postType: "bookNote"
-
-# Book-specific details
+description: "Key insights and personal takeaways from the Stoic classic, Meditations."
+tags:
+  - "philosophy"
+  - "stoicism"
+  - "classics"
+  - "reading-notes"
+series: "Philosophical Musings"
+draft: false
 bookTitle: "Meditations"
 bookAuthor: "Marcus Aurelius"
-bookCover:
-  imageName: "meditations"
-  alt: "Book cover of Meditations by Marcus Aurelius"
-  originalWidth: 976
-bookTags: ["philosophy", "stoicism", "non-fiction", "ancient-rome", "ethics"]
-
-# Reference to the quotes file
 quotesRef: "meditations-quotes"
+bookTags:
+  - "philosophy"
+  - "stoicism"
+  - "non-fiction"
+  - "ancient-rome"
+  - "ethics"
 ---
 
 Marcus Aurelius' _Meditations_ offers a profound and surprisingly accessible window into the mind of a Roman emperor grappling with the challenges of leadership, mortality, and the pursuit of a virtuous life. Written as a series of personal notes and reflections, it wasn't intended for publication, which perhaps lends it an even greater sense of authenticity and raw insight.
