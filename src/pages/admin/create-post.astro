@@ -1,0 +1,230 @@
+---
+// src/pages/admin/create-post.astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE_TITLE, AUTHOR_NAME } from '../../siteConfig';
+
+// --- DEV Mode Check ---
+if (!import.meta.env.DEV) {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+
+const pageTitle = `Create New Post (DEV) - ${SITE_TITLE}`;
+const today = new Date().toISOString().split('T')[0];
+
+const postTypes = ["standard", "fleeting", "bookNote"];
+---
+
+<BaseLayout title={pageTitle}>
+  <div class="page-detail-header" style="margin-bottom: 1.5rem;">
+    <h1>Create New Post</h1>
+  </div>
+
+  <form id="createPostForm" class="post-form">
+    <fieldset>
+      <legend>Core Information</legend>
+      <div class="form-field"><label for="title">Title (Required)</label><input type="text" id="title" name="title" required /></div>
+      <div class="form-field"><label for="pubDate">Publication Date</label><input type="date" id="pubDate" name="pubDate" value={today} required /></div>
+      <div class="form-field"><label for="description">Description (Optional)</label><textarea id="description" name="description"></textarea></div>
+      <div class="form-field">
+        <label for="postType">Post Type</label>
+        <select id="postType" name="postType">
+          {postTypes.map(type => <option value={type} selected={type === "standard"}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>)}
+        </select>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Metadata</legend>
+      <div class="form-field"><label for="tags">Tags (Optional, comma-separated)</label><input type="text" id="tags" name="tags" placeholder="e.g., tech, philosophy, life" /></div>
+      <div class="form-field"><label for="series">Series (Optional)</label><input type="text" id="series" name="series" placeholder="e.g., My Learning Journey" /></div>
+      <div class="form-field"><label><input type="checkbox" id="draft" name="draft" checked />Mark as Draft</label></div>
+    </fieldset>
+
+    <fieldset id="bookNoteFields" class="book-note-fields" style="display: none;">
+      <legend>Book Note Details</legend>
+      <div class="form-field"><label for="bookTitle">Book Title</label><input type="text" id="bookTitle" name="bookTitle" /></div>
+      <div class="form-field"><label for="bookAuthor">Book Author</label><input type="text" id="bookAuthor" name="bookAuthor" /></div>
+      <div class="form-field"><label for="bookCoverImageName">Book Cover Image Name</label><input type="text" id="bookCoverImageName" name="bookCoverImageName" placeholder="e.g., meditations-cover" /></div>
+      <div class="form-field"><label for="bookCoverAlt">Book Cover Alt Text</label><input type="text" id="bookCoverAlt" name="bookCoverAlt" /></div>
+      <div class="form-field"><label for="quotesRef">Quotes Reference</label><input type="text" id="quotesRef" name="quotesRef" placeholder="e.g., meditations-quotes" /></div>
+      <div class="form-field"><label for="bookTags">Book Tags</label><input type="text" id="bookTags" name="bookTags" placeholder="e.g., stoicism, philosophy" /></div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Body Content</legend>
+        <div class="form-field">
+            <label for="bodyContent">Post Body (Markdown)</label>
+            <textarea id="bodyContent" name="bodyContent" rows="15" placeholder="Start writing your Markdown content here..."></textarea>
+        </div>
+    </fieldset>
+
+    <button type="submit" class="button-primary" style="margin-top: 1rem;">Generate Post Content</button>
+  </form>
+
+  <div id="generatedOutput" style="display: none; margin-top: 2.5rem;">
+    <div class="output-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+      <h2>Generated Post Content:</h2>
+      <button type="button" id="copyButton" class="button-edit">Copy Content</button>
+    </div>
+    <p><strong>Instructions:</strong></p>
+    <ol style="margin-bottom:1rem; padding-left: 1.5rem;">
+        <li>Determine a filename (e.g., <code>my-post.md</code> or <code>my-review.mdx</code>).</li>
+        <li>Create this new file inside <code>src/content/blog/</code>.</li>
+        <li>Copy the entire content below and paste it into your new file.</li>
+    </ol>
+    <pre><code id="outputCode"></code></pre>
+  </div>
+</BaseLayout>
+
+<script define:vars={{ AUTHOR_NAME }}>
+  const form = document.getElementById('createPostForm');
+  const postTypeSelect = document.getElementById('postType');
+  const bookNoteFields = document.getElementById('bookNoteFields');
+  const generatedOutput = document.getElementById('generatedOutput');
+  const outputCode = document.getElementById('outputCode');
+  const copyButton = document.getElementById('copyButton');
+
+  // Show/hide book note fields based on post type
+  postTypeSelect.addEventListener('change', (e) => {
+    bookNoteFields.style.display = e.target.value === 'bookNote' ? 'block' : 'none';
+  });
+  if (postTypeSelect.value === 'bookNote') { // Initial check on page load
+      bookNoteFields.style.display = 'block';
+  }
+
+  // Form submission logic
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    let generatedPostContent = '---\n';
+    generatedPostContent += `title: "${(data.title || "Untitled").replace(/"/g, '\\"')}"\n`; // Added fallback for title
+    generatedPostContent += `pubDate: ${data.pubDate}\n`;
+    generatedPostContent += `author: ${AUTHOR_NAME}\n`;
+    generatedPostContent += `postType: ${data.postType}\n`;
+
+    if (data.description) {
+      generatedPostContent += `description: "${data.description.replace(/\n/g, '\\n').replace(/"/g, '\\"')}"\n`;
+    }
+    if (data.tags) {
+      const tagsArray = data.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+      if (tagsArray.length > 0) {
+        generatedPostContent += `tags:\n${tagsArray.map(tag => `  - "${tag.replace(/"/g, '\\"')}"`).join('\n')}\n`;
+      }
+    }
+    if (data.series) {
+      generatedPostContent += `series: "${data.series.replace(/"/g, '\\"')}"\n`;
+    }
+    generatedPostContent += `draft: ${data.draft === 'on' ? true : false}\n`;
+
+    if (data.postType === 'bookNote') {
+      if (data.bookTitle) generatedPostContent += `bookTitle: "${data.bookTitle.replace(/"/g, '\\"')}"\n`;
+      if (data.bookAuthor) generatedPostContent += `bookAuthor: "${data.bookAuthor.replace(/"/g, '\\"')}"\n`;
+      if (data.bookCoverImageName && data.bookCoverAlt) {
+        generatedPostContent += `bookCover:\n`;
+        generatedPostContent += `  imageName: "${data.bookCoverImageName.replace(/"/g, '\\"')}"\n`;
+        generatedPostContent += `  alt: "${data.bookCoverAlt.replace(/"/g, '\\"')}"\n`;
+      } else if (data.bookCoverImageName || data.bookCoverAlt) {
+        console.warn("Both Book Cover Image Name and Alt Text are needed to include bookCover object.");
+      }
+      if (data.quotesRef) generatedPostContent += `quotesRef: "${data.quotesRef.replace(/"/g, '\\"')}"\n`;
+      if (data.bookTags) {
+        const bookTagsArray = data.bookTags.split(',').map(tag => tag.trim()).filter(tag => tag);
+        if (bookTagsArray.length > 0) {
+          generatedPostContent += `bookTags:\n${bookTagsArray.map(tag => `  - "${tag.replace(/"/g, '\\"')}"`).join('\n')}\n`;
+        }
+      }
+    }
+    generatedPostContent += '---\n\n';
+
+    const bodyInput = data.bodyContent.trim();
+    if (bodyInput) {
+        generatedPostContent += bodyInput;
+    } else if (data.postType !== 'fleeting') {
+        generatedPostContent += '## Introduction\n\nReplace this with your first paragraph.';
+    } else {
+        generatedPostContent += '';
+    }
+
+    outputCode.textContent = generatedPostContent;
+    generatedOutput.style.display = 'block';
+    generatedOutput.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // Event listener for the copy button
+  copyButton.addEventListener('click', () => {
+    const textToCopy = outputCode.textContent;
+    if (textToCopy && navigator.clipboard) {
+      navigator.clipboard.writeText(textToCopy)
+        .then(() => {
+          const originalButtonText = copyButton.textContent;
+          copyButton.textContent = 'Copied!';
+          copyButton.disabled = true;
+          setTimeout(() => {
+            copyButton.textContent = originalButtonText;
+            copyButton.disabled = false;
+          }, 2000);
+        })
+        .catch(err => {
+          console.error('Error copying text: ', err);
+          alert('Failed to copy content. Please try manually.');
+        });
+    } else if (!navigator.clipboard) {
+        alert('Clipboard API not available. Please copy manually when not on localhost.');
+    }
+  });
+</script>
+
+<style is:global>
+  .post-form fieldset {
+    border: 1px solid var(--color-border-subtle); padding: 1rem 1.5rem 1.5rem;
+    margin-bottom: 1.5rem; border-radius: 4px;
+  }
+  .post-form legend {
+    font-family: var(--font-sans); font-weight: 600; font-size: 1.1rem;
+    color: var(--color-accent); padding: 0 0.5em;
+  }
+  .form-field { margin-bottom: 1rem; }
+  .form-field:last-child { margin-bottom: 0; }
+  .form-field label {
+    display: block; margin-bottom: 0.35rem; font-weight: 500;
+    font-size: 0.9rem; color: var(--color-text); font-family: var(--font-sans);
+  }
+  .form-field input[type="text"],
+  .form-field input[type="date"],
+  .form-field select,
+  .form-field textarea {
+    width: 100%; padding: 0.6em 0.8em; border: 1px solid var(--color-border-subtle);
+    border-radius: 3px; font-family: var(--font-sans); font-size: 1rem;
+    background-color: var(--color-background); color: var(--color-text);
+    box-sizing: border-box;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+  .form-field input[type="text"]:focus,
+  .form-field input[type="date"]:focus,
+  .form-field select:focus,
+  .form-field textarea:focus {
+    outline: none; border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 25%, transparent);
+  }
+  .form-field textarea { min-height: 80px; line-height: 1.6; }
+  #bodyContent { min-height: 200px; }
+  .form-field input[type="checkbox"] { margin-right: 0.5rem; vertical-align: middle; }
+  .form-field label input[type="checkbox"] { width: auto; }
+
+  .book-note-fields { border-color: var(--color-accent); margin-top: 1.5rem; }
+  .book-note-fields legend { color: var(--color-accent); }
+
+  #generatedOutput {
+    background-color: color-mix(in srgb, var(--color-background) 95%, black);
+    padding: 1.5rem; border-radius: 4px; border: 1px solid var(--color-border-subtle);
+  }
+  #generatedOutput h2 { margin-top: 0; font-family: var(--font-sans); font-size: 1.5rem; }
+  #generatedOutput pre {
+    background-color: var(--color-background); padding: 1em; overflow-x: auto;
+    border: 1px solid var(--color-border-subtle); border-radius: 3px;
+    font-family: monospace; font-size: 0.9em; white-space: pre; line-height: 1.5;
+  }
+  /* Ensure button styles like .button-primary and .button-edit are in your global.css */
+</style>
