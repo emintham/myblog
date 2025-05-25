@@ -1,0 +1,94 @@
+---
+// src/pages/admin/manage-posts.astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { SITE_TITLE } from '../../siteConfig';
+
+if (!import.meta.env.DEV) {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+
+const posts = await getCollection('blog');
+posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const pageTitle = `Manage Posts (DEV) - ${SITE_TITLE}`;
+const pageDescription = "Create or edit blog posts. This page is available in development mode only.";
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <div class="page-detail-header">
+    <h1>Manage Posts</h1>
+  </div>
+
+  <div class="admin-actions" style="margin-bottom: 2rem; text-align: right;">
+    <a href="/admin/create-post" class="button-primary" role="button">Create New Post</a>
+  </div>
+
+  {posts.length === 0 ? (
+    <p class="empty-state-message">No posts found. Ready to create your first one?</p>
+  ) : (
+    <ul class="item-list-container admin-post-list">
+      {posts.map(post => (
+        <li class="list-item-entry">
+          <div style="flex-grow: 1; display: flex; flex-direction: column; margin-right: 1rem; justify-content: center;">
+            <div class="title-line" style="display: flex; align-items: baseline; margin-bottom: 0.2rem;">
+              {post.data.draft && (
+                <span class="status-draft-badge">
+                  Draft
+                </span>
+              )}
+              <a
+                href={`/blog/${post.slug}/`}
+                class="list-item-name"
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`View '${post.data.title}' live`}
+                style={post.data.draft ? "margin-left: 0.5em;" : ""} /* Add margin if draft badge is present */
+              >
+                {post.data.title}
+              </a>
+            </div>
+            <small class="post-meta-details" style="font-size: 0.85rem; margin-top: 0.1rem;">
+              {post.data.pubDate.toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' })} |
+              <span class="post-type-label">{post.data.postType || 'standard'}</span>
+            </small>
+          </div>
+          <a href={`#edit-${post.slug}`} class="button-edit" role="button">Edit</a>
+        </li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>
+
+<style is:global>
+  /* Styling for this admin page list */
+  .admin-post-list .list-item-entry {
+    align-items: center;
+    padding-top: 0.75rem; /* Adjusted padding */
+    padding-bottom: 0.75rem; /* Adjusted padding */
+  }
+
+  .admin-post-list .post-meta-details span {
+    margin-left: 0.75rem;
+  }
+  .admin-post-list .post-meta-details span:first-of-type { /* For the date */
+    margin-left: 0;
+  }
+  .admin-post-list .post-meta-details .post-type-label {
+    color: var(--color-meta);
+  }
+
+  /* New style for the draft badge next to the title */
+  .status-draft-badge {
+    background-color: var(--color-accent); /* Using accent color for a change, can revert to orange */
+    color: var(--color-background, #fff);
+    padding: 0.15em 0.4em; /* Adjusted padding */
+    border-radius: 3px;
+    font-size: 0.7rem; /* Made it a bit smaller */
+    font-weight: 600;
+    line-height: 1.2;
+    text-transform: uppercase;
+    white-space: nowrap;
+    /* margin-right: 0.5em; /* Moved to inline style on title for conditional spacing */
+  }
+</style>

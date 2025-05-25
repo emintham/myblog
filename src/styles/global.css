@@ -258,3 +258,44 @@ pre {
 .read-more:hover {
   color: var(--color-text);
 }
+
+/* Common Button Styles */
+.button-primary {
+  display: inline-block;
+  padding: 0.65em 1.3em;
+  background-color: var(--color-accent);
+  color: var(--color-background, #fff); /* Fallback for background color */
+  text-decoration: none;
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.9rem;
+  border: 1px solid var(--color-accent);
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+.button-primary:hover {
+  background-color: var(--color-text);
+  border-color: var(--color-text);
+  color: var(--color-background, #fff);
+}
+
+.button-edit { /* Style for edit buttons, e.g., on manage-posts page */
+  display: inline-block;
+  padding: 0.5em 1em;
+  background-color: transparent;
+  color: var(--color-accent);
+  text-decoration: none;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  white-space: nowrap; /* Prevents button text from wrapping */
+}
+.button-edit:hover {
+  background-color: var(--color-accent);
+  color: var(--color-background, #fff);
+  border-color: var(--color-accent);
+}
