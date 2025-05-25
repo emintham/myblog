@@ -1,7 +1,7 @@
 ---
 // src/pages/admin/create-post.astro
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { SITE_TITLE, AUTHOR_NAME } from '../../siteConfig';
+import { SITE_TITLE, AUTHOR_NAME } from '../../siteConfig'; // AUTHOR_NAME is used for define:vars
 
 // --- DEV Mode Check ---
 if (!import.meta.env.DEV) {
@@ -10,7 +10,6 @@ if (!import.meta.env.DEV) {
 
 const pageTitle = `Create New Post (DEV) - ${SITE_TITLE}`;
 const today = new Date().toISOString().split('T')[0];
-
 const postTypes = ["standard", "fleeting", "bookNote"];
 ---
 
@@ -19,6 +18,7 @@ const postTypes = ["standard", "fleeting", "bookNote"];
     <h1>Create New Post</h1>
   </div>
 
+  {/* Form HTML remains largely the same: include all fields as before */}
   <form id="createPostForm" class="post-form">
     <fieldset>
       <legend>Core Information</legend>
@@ -58,173 +58,100 @@ const postTypes = ["standard", "fleeting", "bookNote"];
         </div>
     </fieldset>
 
-    <button type="submit" class="button-primary" style="margin-top: 1rem;">Generate Post Content</button>
+    <button type="submit" class="button-primary" style="margin-top: 1rem;">Save New Post</button>
   </form>
 
-  <div id="generatedOutput" style="display: none; margin-top: 2.5rem;">
-    <div class="output-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-      <h2>Generated Post Content:</h2>
-      <button type="button" id="copyButton" class="button-edit">Copy Content</button>
-    </div>
-    <p><strong>Instructions:</strong></p>
-    <ol style="margin-bottom:1rem; padding-left: 1.5rem;">
-        <li>Determine a filename (e.g., <code>my-post.md</code> or <code>my-review.mdx</code>).</li>
-        <li>Create this new file inside <code>src/content/blog/</code>.</li>
-        <li>Copy the entire content below and paste it into your new file.</li>
-    </ol>
-    <pre><code id="outputCode"></code></pre>
+  {/* Feedback area for API response */}
+  <div id="formFeedback" style="margin-top: 1.5rem; padding: 1rem; border-radius: 4px; display: none;">
+    <p id="feedbackMessage"></p>
+    <a id="viewPostLink" href="#" style="display:none; margin-top: 0.5rem; display: inline-block;" class="button-edit">View Post</a>
   </div>
+
+  {/* Removed the old generatedOutput div and copy button */}
+
 </BaseLayout>
 
-<script define:vars={{ AUTHOR_NAME }}>
+<script define:vars={{ AUTHOR_NAME_PASSED: AUTHOR_NAME }}> // Pass AUTHOR_NAME if needed client-side, though API uses its own import
   const form = document.getElementById('createPostForm');
   const postTypeSelect = document.getElementById('postType');
   const bookNoteFields = document.getElementById('bookNoteFields');
-  const generatedOutput = document.getElementById('generatedOutput');
-  const outputCode = document.getElementById('outputCode');
-  const copyButton = document.getElementById('copyButton');
+  const formFeedback = document.getElementById('formFeedback');
+  const feedbackMessage = document.getElementById('feedbackMessage');
+  const viewPostLink = document.getElementById('viewPostLink');
 
-  // Show/hide book note fields based on post type
+  // Show/hide book note fields (same as before)
   postTypeSelect.addEventListener('change', (e) => {
     bookNoteFields.style.display = e.target.value === 'bookNote' ? 'block' : 'none';
   });
-  if (postTypeSelect.value === 'bookNote') { // Initial check on page load
+  if (postTypeSelect.value === 'bookNote') {
       bookNoteFields.style.display = 'block';
   }
 
-  // Form submission logic
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Saving...';
+    formFeedback.style.display = 'none';
+    viewPostLink.style.display = 'none';
+
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
+    // Convert checkbox 'on' to boolean for draft status
+    data.draft = formData.has('draft');
 
-    let generatedPostContent = '---\n';
-    generatedPostContent += `title: "${(data.title || "Untitled").replace(/"/g, '\\"')}"\n`; // Added fallback for title
-    generatedPostContent += `pubDate: ${data.pubDate}\n`;
-    generatedPostContent += `author: ${AUTHOR_NAME}\n`;
-    generatedPostContent += `postType: ${data.postType}\n`;
 
-    if (data.description) {
-      generatedPostContent += `description: "${data.description.replace(/\n/g, '\\n').replace(/"/g, '\\"')}"\n`;
-    }
-    if (data.tags) {
-      const tagsArray = data.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
-      if (tagsArray.length > 0) {
-        generatedPostContent += `tags:\n${tagsArray.map(tag => `  - "${tag.replace(/"/g, '\\"')}"`).join('\n')}\n`;
-      }
-    }
-    if (data.series) {
-      generatedPostContent += `series: "${data.series.replace(/"/g, '\\"')}"\n`;
-    }
-    generatedPostContent += `draft: ${data.draft === 'on' ? true : false}\n`;
+    try {
+      const response = await fetch('/api/create-post-handler', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
 
-    if (data.postType === 'bookNote') {
-      if (data.bookTitle) generatedPostContent += `bookTitle: "${data.bookTitle.replace(/"/g, '\\"')}"\n`;
-      if (data.bookAuthor) generatedPostContent += `bookAuthor: "${data.bookAuthor.replace(/"/g, '\\"')}"\n`;
-      if (data.bookCoverImageName && data.bookCoverAlt) {
-        generatedPostContent += `bookCover:\n`;
-        generatedPostContent += `  imageName: "${data.bookCoverImageName.replace(/"/g, '\\"')}"\n`;
-        generatedPostContent += `  alt: "${data.bookCoverAlt.replace(/"/g, '\\"')}"\n`;
-      } else if (data.bookCoverImageName || data.bookCoverAlt) {
-        console.warn("Both Book Cover Image Name and Alt Text are needed to include bookCover object.");
-      }
-      if (data.quotesRef) generatedPostContent += `quotesRef: "${data.quotesRef.replace(/"/g, '\\"')}"\n`;
-      if (data.bookTags) {
-        const bookTagsArray = data.bookTags.split(',').map(tag => tag.trim()).filter(tag => tag);
-        if (bookTagsArray.length > 0) {
-          generatedPostContent += `bookTags:\n${bookTagsArray.map(tag => `  - "${tag.replace(/"/g, '\\"')}"`).join('\n')}\n`;
+      const result = await response.json();
+
+      if (response.ok) {
+        feedbackMessage.textContent = result.message + ` (Filename: ${result.filename})`;
+        formFeedback.style.backgroundColor = 'var(--color-note-paper)'; // Or a success color
+        formFeedback.style.border = '1px solid var(--color-accent)';
+        if (result.path) {
+            viewPostLink.href = result.path;
+            viewPostLink.style.display = 'inline-block';
         }
+        form.reset(); // Optionally reset the form
+         // Re-set default draft state and postType after reset
+        document.getElementById('draft').checked = true;
+        postTypeSelect.value = 'standard';
+        bookNoteFields.style.display = 'none';
+
+
+      } else {
+        feedbackMessage.textContent = `Error: ${result.message || response.statusText}`;
+        formFeedback.style.backgroundColor = '#ffdddd'; // Error color
+        formFeedback.style.border = '1px solid red';
       }
-    }
-    generatedPostContent += '---\n\n';
-
-    const bodyInput = data.bodyContent.trim();
-    if (bodyInput) {
-        generatedPostContent += bodyInput;
-    } else if (data.postType !== 'fleeting') {
-        generatedPostContent += '## Introduction\n\nReplace this with your first paragraph.';
-    } else {
-        generatedPostContent += '';
-    }
-
-    outputCode.textContent = generatedPostContent;
-    generatedOutput.style.display = 'block';
-    generatedOutput.scrollIntoView({ behavior: 'smooth' });
-  });
-
-  // Event listener for the copy button
-  copyButton.addEventListener('click', () => {
-    const textToCopy = outputCode.textContent;
-    if (textToCopy && navigator.clipboard) {
-      navigator.clipboard.writeText(textToCopy)
-        .then(() => {
-          const originalButtonText = copyButton.textContent;
-          copyButton.textContent = 'Copied!';
-          copyButton.disabled = true;
-          setTimeout(() => {
-            copyButton.textContent = originalButtonText;
-            copyButton.disabled = false;
-          }, 2000);
-        })
-        .catch(err => {
-          console.error('Error copying text: ', err);
-          alert('Failed to copy content. Please try manually.');
-        });
-    } else if (!navigator.clipboard) {
-        alert('Clipboard API not available. Please copy manually when not on localhost.');
+    } catch (error) {
+      console.error('Network or other error:', error);
+      feedbackMessage.textContent = 'Network error or failed to connect to the API.';
+      formFeedback.style.backgroundColor = '#ffdddd';
+      formFeedback.style.border = '1px solid red';
+    } finally {
+      formFeedback.style.display = 'block';
+      submitButton.disabled = false;
+      submitButton.textContent = 'Save New Post';
+      formFeedback.scrollIntoView({ behavior: 'smooth' });
     }
   });
 </script>
 
+{/* Styles: form styles remain, button styles should be global */}
 <style is:global>
-  .post-form fieldset {
-    border: 1px solid var(--color-border-subtle); padding: 1rem 1.5rem 1.5rem;
-    margin-bottom: 1.5rem; border-radius: 4px;
+  /* ... (Keep your existing form and fieldset styles) ... */
+  /* Ensure .button-primary and .button-edit are in global.css */
+  /* Example feedback styling (add to your styles) */
+  #formFeedback {
+    /* Styles defined in script for dynamic background/border based on success/error */
   }
-  .post-form legend {
-    font-family: var(--font-sans); font-weight: 600; font-size: 1.1rem;
-    color: var(--color-accent); padding: 0 0.5em;
-  }
-  .form-field { margin-bottom: 1rem; }
-  .form-field:last-child { margin-bottom: 0; }
-  .form-field label {
-    display: block; margin-bottom: 0.35rem; font-weight: 500;
-    font-size: 0.9rem; color: var(--color-text); font-family: var(--font-sans);
-  }
-  .form-field input[type="text"],
-  .form-field input[type="date"],
-  .form-field select,
-  .form-field textarea {
-    width: 100%; padding: 0.6em 0.8em; border: 1px solid var(--color-border-subtle);
-    border-radius: 3px; font-family: var(--font-sans); font-size: 1rem;
-    background-color: var(--color-background); color: var(--color-text);
-    box-sizing: border-box;
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  }
-  .form-field input[type="text"]:focus,
-  .form-field input[type="date"]:focus,
-  .form-field select:focus,
-  .form-field textarea:focus {
-    outline: none; border-color: var(--color-accent);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 25%, transparent);
-  }
-  .form-field textarea { min-height: 80px; line-height: 1.6; }
-  #bodyContent { min-height: 200px; }
-  .form-field input[type="checkbox"] { margin-right: 0.5rem; vertical-align: middle; }
-  .form-field label input[type="checkbox"] { width: auto; }
-
-  .book-note-fields { border-color: var(--color-accent); margin-top: 1.5rem; }
-  .book-note-fields legend { color: var(--color-accent); }
-
-  #generatedOutput {
-    background-color: color-mix(in srgb, var(--color-background) 95%, black);
-    padding: 1.5rem; border-radius: 4px; border: 1px solid var(--color-border-subtle);
-  }
-  #generatedOutput h2 { margin-top: 0; font-family: var(--font-sans); font-size: 1.5rem; }
-  #generatedOutput pre {
-    background-color: var(--color-background); padding: 1em; overflow-x: auto;
-    border: 1px solid var(--color-border-subtle); border-radius: 3px;
-    font-family: monospace; font-size: 0.9em; white-space: pre; line-height: 1.5;
-  }
-  /* Ensure button styles like .button-primary and .button-edit are in your global.css */
 </style>
