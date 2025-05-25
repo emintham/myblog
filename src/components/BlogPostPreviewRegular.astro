@@ -1,34 +1,16 @@
 ---
 // src/components/BlogPostPreviewRegular.astro
+import PostMeta from "./PostMeta.astro"; // Import the new component
+import { extractPreviewContent } from "../../src/utils/content"; // Import the utility function
 const { post } = Astro.props;
 
-// Logic for first paragraph or description (remains the same for regular posts)
-const firstParagraphMatch = post.body.match(/<p>.*?<\/p>/s);
-let firstParagraph = post.data.description || "";
-if (!firstParagraph && firstParagraphMatch) {
-  firstParagraph = firstParagraphMatch[0];
-} else if (!firstParagraph && post.body) {
-  // Fallback for plain text body to get first paragraph
-  firstParagraph = post.body.split("\n\n")[0];
-}
-const contentToDisplay = firstParagraph;
+const contentToDisplay = extractPreviewContent(post);
 ---
 
 <article class="post-preview">
-  <h2><a href={`/blog/${post.slug}/`}>{post.data.title}</a></h2>
-  <p class="meta">
-    <time datetime={post.data.pubDate.toISOString()}>
-      {
-        new Date(post.data.pubDate).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
-      }
-    </time>
-    &bull; by {post.data.author}
-  </p>
-  <div class="preview-content">
+  <h2 class="preview-title"><a href={`/blog/${post.slug}/`}>{post.data.title}</a></h2>
+  <PostMeta pubDate={post.data.pubDate} author={post.data.author} />
+  <div class="preview-content preview-text-content">
     <Fragment set:html={contentToDisplay} />
   </div>
   <a href={`/blog/${post.slug}/`} class="read-more">Read More &rarr;</a>
@@ -36,84 +18,34 @@ const contentToDisplay = firstParagraph;
 
 <style>
   /* Styles for REGULAR post previews */
-  .post-preview {
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--color-border-subtle);
-  }
+  /* .post-preview, .post-preview:last-child, .meta, .read-more, .read-more:hover, 
+     .preview-title, .preview-title a, .preview-title a:hover, 
+     .preview-text-content p, .preview-text-content p:last-child are now in global.css */
 
-  .post-preview:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-  }
-
-  .post-preview h2 {
+  .post-preview .preview-title { /* h2 */
     font-size: 1.9rem;
-    font-family: var(--font-display-title);
-    font-weight: 700;
-    line-height: 1.3;
-    margin-top: 0;
     margin-bottom: 0.35rem;
-    color: var(--color-text);
   }
 
-  .post-preview h2 a {
-    color: var(--color-text);
-    text-decoration: none;
-  }
-  .post-preview h2 a:hover {
-    color: var(--color-accent);
+  .preview-content { /* This specific class is still used for margin */
+    margin-bottom: 1rem; 
+    /* font-size and line-height for p tags are in .preview-text-content p */
   }
 
-  .meta {
-    /* This class is used by both components, ensure it's consistently styled or scoped if needed */
-    font-family: var(--font-sans);
-    font-size: 0.85rem;
-    color: var(--color-meta);
-    margin-bottom: 1rem;
-  }
-
-  .preview-content {
-    /* Also used by both, ensure consistency or scope */
-    margin-bottom: 1rem;
-    font-size: 1rem;
-    line-height: 1.6;
-  }
-
-  .preview-content :global(p) {
-    font-size: 1rem;
-    line-height: 1.65;
-    color: var(--color-text);
-    margin-bottom: 1em;
-  }
-  .preview-content :global(p:last-child) {
-    margin-bottom: 0;
-  }
-
-  .read-more {
-    font-family: var(--font-sans);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: var(--color-accent);
-    text-decoration: none;
-    display: inline-block;
+  .read-more { /* Specific margin for this component */
     margin-top: 1.2rem;
-  }
-  .read-more:hover {
-    color: var(--color-text);
   }
 
   /* --- Mobile Adjustments for Regular Posts --- */
   @media (max-width: 768px) {
-    .post-preview h2 {
+    .post-preview .preview-title { /* h2 */
       font-size: 1.6rem;
     }
     /* Add any other mobile specific styles for regular previews if needed */
   }
 
   @media (max-width: 480px) {
-    .post-preview h2 {
+    .post-preview .preview-title { /* h2 */
       font-size: 1.4rem;
     }
     /* Add any other mobile specific styles for regular previews if needed */

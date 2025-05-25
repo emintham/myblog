@@ -1,0 +1,20 @@
+---
+// src/components/PreviewLinkWrapper.astro
+interface Props {
+  isLink: boolean;
+  href: string | null;
+  ariaLabel?: string;
+}
+
+const { isLink, href, ariaLabel } = Astro.props;
+---
+
+{
+  isLink && href ? (
+    <a href={href} aria-label={ariaLabel}>
+      <slot />
+    </a>
+  ) : (
+    <slot />
+  )
+}

@@ -1,0 +1,20 @@
+---
+// src/components/PostMeta.astro
+interface Props {
+  pubDate: Date;
+  author: string;
+}
+
+const { pubDate, author } = Astro.props;
+const formattedDate = new Date(pubDate).toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+
+<p class="meta">
+  <time datetime={pubDate.toISOString()}>{formattedDate}</time>
+  &bull; by {author}
+</p>
+<!-- This component relies on the .meta class being defined globally, e.g., in src/styles/global.css -->

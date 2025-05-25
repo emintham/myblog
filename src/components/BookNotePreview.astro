@@ -2,6 +2,8 @@
 // src/components/BookNotePreview.astro
 // Displays a preview card for book notes in lists.
 import ResponsiveImage from "./ResponsiveImage.astro"; // Import the ResponsiveImage component
+import PostMeta from "./PostMeta.astro"; // Import the new component
+import PreviewLinkWrapper from "./PreviewLinkWrapper.astro"; // Import the new wrapper
 
 interface Props {
   post: {
@@ -41,33 +43,22 @@ const previewDefaultWidth = previewImageWidths.includes(100)
     {
       frontmatter.bookCover && frontmatter.bookCover.imageName && (
         <div class="cover-container">
-          {isLink ? (
-            <a
-              href={href}
-              aria-label={`Read notes on ${frontmatter.bookTitle || frontmatter.title}`}
-            >
-              <ResponsiveImage
-                imageName={frontmatter.bookCover.imageName}
-                alt={frontmatter.bookCover.alt}
-                widths={previewImageWidths}
-                originalImageWidth={frontmatter.bookCover.originalWidth}
-                sizesAttr="(max-width: 480px) 25vw, 100px"
-                imgClass="cover-image"
-                defaultWidth={previewDefaultWidth}
-                loading="lazy"
-              />
-            </a>
-          ) : (
+          <PreviewLinkWrapper 
+            isLink={isLink} 
+            href={href} 
+            ariaLabel={`Read notes on ${frontmatter.bookTitle || frontmatter.title}`}
+          >
             <ResponsiveImage
               imageName={frontmatter.bookCover.imageName}
               alt={frontmatter.bookCover.alt}
               widths={previewImageWidths}
+              originalImageWidth={frontmatter.bookCover.originalWidth}
               sizesAttr="(max-width: 480px) 25vw, 100px"
               imgClass="cover-image"
               defaultWidth={previewDefaultWidth}
               loading="lazy"
             />
-          )}
+          </PreviewLinkWrapper>
         </div>
       )
     }
@@ -75,15 +66,11 @@ const previewDefaultWidth = previewImageWidths.includes(100)
       class="info-container"
       class:list={{ "no-cover": !frontmatter.bookCover?.imageName }}
     >
-      {
-        isLink ? (
-          <h3>
-            <a href={href}>{frontmatter.title}</a>
-          </h3>
-        ) : (
-          <h3>{frontmatter.title}</h3>
-        )
-      }
+      <h3 class="preview-title">
+        <PreviewLinkWrapper isLink={isLink} href={href}>
+          {frontmatter.title}
+        </PreviewLinkWrapper>
+      </h3>
 
       {
         frontmatter.bookTitle && (
@@ -94,18 +81,7 @@ const previewDefaultWidth = previewImageWidths.includes(100)
         )
       }
 
-      <p class="meta">
-        <time datetime={frontmatter.pubDate.toISOString()}>
-          {
-            new Date(frontmatter.pubDate).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })
-          }
-        </time>
-        &bull; by {frontmatter.author}
-      </p>
+      <PostMeta pubDate={frontmatter.pubDate} author={frontmatter.author} />
 
       {
         frontmatter.description && (
@@ -125,16 +101,8 @@ const previewDefaultWidth = previewImageWidths.includes(100)
 </article>
 
 <style>
-  /* General preview styling, can inherit from .post-preview from other components if global enough */
-  .post-preview {
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--color-border-subtle);
-  }
-  .post-preview:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-  }
+  /* General preview styling like .post-preview, .post-preview:last-child, .meta, .read-more, .read-more:hover,
+     .preview-title, .preview-title a, .preview-title a:hover are now in global.css */
 
   .book-note-preview .preview-grid {
     display: grid;
@@ -170,23 +138,13 @@ const previewDefaultWidth = previewImageWidths.includes(100)
     grid-column: 1 / -1;
   }
 
-  .book-note-preview h3 {
-    /* Title of the review/note */
-    font-family: var(--font-display-title);
-    font-size: 1.6rem;
-    font-weight: 600;
-    line-height: 1.3;
-    margin-top: 0;
-    margin-bottom: 0.25rem;
-    color: var(--color-text);
+  .book-note-preview .preview-title { /* h3 */
+    /* Shared .preview-title styles are in global.css */
+    font-size: 1.6rem; /* Specific font size */
+    font-weight: 600; /* Specific font weight */
+    margin-bottom: 0.25rem; /* Specific margin */
   }
-  .book-note-preview h3 a {
-    color: var(--color-text);
-    text-decoration: none;
-  }
-  .book-note-preview h3 a:hover {
-    color: var(--color-accent);
-  }
+  /* .preview-title a and a:hover are global */
 
   .book-note-preview .book-title-author {
     font-family: var(--font-sans);
@@ -198,10 +156,10 @@ const previewDefaultWidth = previewImageWidths.includes(100)
   }
 
   .book-note-preview .meta {
-    font-family: var(--font-sans);
-    font-size: 0.8rem;
-    color: var(--color-meta);
-    margin-bottom: 0.75rem;
+    /* Inherits from global .meta. Specific font-size/margin can be tweaked here if needed,
+       but we standardized it to 0.85rem and 1rem margin-bottom in global.css.
+       Original was: font-size: 0.8rem; margin-bottom: 0.75rem; */
+    /* No specific styles needed here if global is accepted */
   }
 
   .book-note-preview .description {
@@ -219,18 +177,11 @@ const previewDefaultWidth = previewImageWidths.includes(100)
   }
 
   .book-note-preview .read-more {
-    font-family: var(--font-sans);
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: var(--color-accent);
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 0.25rem;
+    /* Inherits from global .read-more. */
+    font-size: 0.85rem; /* Specific font-size, global is 0.8rem */
+    margin-top: 0.25rem; /* Specific margin */
   }
-  .book-note-preview .read-more:hover {
-    color: var(--color-text);
-  }
+  /* .read-more:hover is global */
 
   /* Mobile adjustments */
   @media (max-width: 600px) {
@@ -247,6 +198,10 @@ const previewDefaultWidth = previewImageWidths.includes(100)
     }
     .book-note-preview .description {
       -webkit-line-clamp: 2; /* Show fewer lines on mobile */
+    }
+    .book-note-preview .preview-title { /* h3 */
+       /* Example: adjust title size on mobile if needed, though not in original */
+       /* font-size: 1.4rem; */
     }
   }
 </style>
