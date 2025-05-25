@@ -1,7 +1,8 @@
 ---
 // src/pages/admin/create-post.astro
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { SITE_TITLE, AUTHOR_NAME } from '../../siteConfig'; // AUTHOR_NAME is used for define:vars
+import PostForm from '../../components/admin/PostForm.astro'; // Import the new form component
+import { SITE_TITLE } from '../../siteConfig';
 
 // --- DEV Mode Check ---
 if (!import.meta.env.DEV) {
@@ -9,8 +10,8 @@ if (!import.meta.env.DEV) {
 }
 
 const pageTitle = `Create New Post (DEV) - ${SITE_TITLE}`;
-const today = new Date().toISOString().split('T')[0];
-const postTypes = ["standard", "fleeting", "bookNote"];
+// AUTHOR_NAME is handled by the API route directly from siteConfig.ts,
+// so no need to pass it via define:vars for form population.
 ---
 
 <BaseLayout title={pageTitle}>
@@ -18,140 +19,124 @@ const postTypes = ["standard", "fleeting", "bookNote"];
     <h1>Create New Post</h1>
   </div>
 
-  {/* Form HTML remains largely the same: include all fields as before */}
-  <form id="createPostForm" class="post-form">
-    <fieldset>
-      <legend>Core Information</legend>
-      <div class="form-field"><label for="title">Title (Required)</label><input type="text" id="title" name="title" required /></div>
-      <div class="form-field"><label for="pubDate">Publication Date</label><input type="date" id="pubDate" name="pubDate" value={today} required /></div>
-      <div class="form-field"><label for="description">Description (Optional)</label><textarea id="description" name="description"></textarea></div>
-      <div class="form-field">
-        <label for="postType">Post Type</label>
-        <select id="postType" name="postType">
-          {postTypes.map(type => <option value={type} selected={type === "standard"}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>)}
-        </select>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Metadata</legend>
-      <div class="form-field"><label for="tags">Tags (Optional, comma-separated)</label><input type="text" id="tags" name="tags" placeholder="e.g., tech, philosophy, life" /></div>
-      <div class="form-field"><label for="series">Series (Optional)</label><input type="text" id="series" name="series" placeholder="e.g., My Learning Journey" /></div>
-      <div class="form-field"><label><input type="checkbox" id="draft" name="draft" checked />Mark as Draft</label></div>
-    </fieldset>
-
-    <fieldset id="bookNoteFields" class="book-note-fields" style="display: none;">
-      <legend>Book Note Details</legend>
-      <div class="form-field"><label for="bookTitle">Book Title</label><input type="text" id="bookTitle" name="bookTitle" /></div>
-      <div class="form-field"><label for="bookAuthor">Book Author</label><input type="text" id="bookAuthor" name="bookAuthor" /></div>
-      <div class="form-field"><label for="bookCoverImageName">Book Cover Image Name</label><input type="text" id="bookCoverImageName" name="bookCoverImageName" placeholder="e.g., meditations-cover" /></div>
-      <div class="form-field"><label for="bookCoverAlt">Book Cover Alt Text</label><input type="text" id="bookCoverAlt" name="bookCoverAlt" /></div>
-      <div class="form-field"><label for="quotesRef">Quotes Reference</label><input type="text" id="quotesRef" name="quotesRef" placeholder="e.g., meditations-quotes" /></div>
-      <div class="form-field"><label for="bookTags">Book Tags</label><input type="text" id="bookTags" name="bookTags" placeholder="e.g., stoicism, philosophy" /></div>
-    </fieldset>
-
-    <fieldset>
-        <legend>Body Content</legend>
-        <div class="form-field">
-            <label for="bodyContent">Post Body (Markdown)</label>
-            <textarea id="bodyContent" name="bodyContent" rows="15" placeholder="Start writing your Markdown content here..."></textarea>
-        </div>
-    </fieldset>
-
+  {/* The main form tag remains here.
+      The PostForm component renders the fieldsets and inputs inside this form. */}
+  <form id="createPostForm" class="post-form"> {/* Added .post-form class if PostForm.astro styles rely on it */}
+    <PostForm /> {/* Using the reusable form component for a new post (no postData prop passed) */}
     <button type="submit" class="button-primary" style="margin-top: 1rem;">Save New Post</button>
   </form>
 
   {/* Feedback area for API response */}
   <div id="formFeedback" style="margin-top: 1.5rem; padding: 1rem; border-radius: 4px; display: none;">
     <p id="feedbackMessage"></p>
-    <a id="viewPostLink" href="#" style="display:none; margin-top: 0.5rem; display: inline-block;" class="button-edit">View Post</a>
+    <a id="viewPostLink" href="#" style="display:none; margin-top: 0.5rem;" class="button-edit">View Post</a>
   </div>
-
-  {/* Removed the old generatedOutput div and copy button */}
-
 </BaseLayout>
 
-<script define:vars={{ AUTHOR_NAME_PASSED: AUTHOR_NAME }}> // Pass AUTHOR_NAME if needed client-side, though API uses its own import
-  const form = document.getElementById('createPostForm');
-  const postTypeSelect = document.getElementById('postType');
-  const bookNoteFields = document.getElementById('bookNoteFields');
-  const formFeedback = document.getElementById('formFeedback');
-  const feedbackMessage = document.getElementById('feedbackMessage');
-  const viewPostLink = document.getElementById('viewPostLink');
+<script>
+  // Client-side script for handling form submission to the API
+  const form = document.getElementById('createPostForm') as HTMLFormElement | null;
+  const formFeedback = document.getElementById('formFeedback') as HTMLDivElement | null;
+  const feedbackMessage = document.getElementById('feedbackMessage') as HTMLParagraphElement | null;
+  const viewPostLink = document.getElementById('viewPostLink') as HTMLAnchorElement | null;
+  // The script within PostForm.astro handles its internal DOM manipulations (like toggling bookNoteFields)
 
-  // Show/hide book note fields (same as before)
-  postTypeSelect.addEventListener('change', (e) => {
-    bookNoteFields.style.display = e.target.value === 'bookNote' ? 'block' : 'none';
-  });
-  if (postTypeSelect.value === 'bookNote') {
-      bookNoteFields.style.display = 'block';
-  }
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const submitButton = form.querySelector('button[type="submit"]');
-    submitButton.disabled = true;
-    submitButton.textContent = 'Saving...';
-    formFeedback.style.display = 'none';
-    viewPostLink.style.display = 'none';
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Saving...';
+      }
+      if (formFeedback) formFeedback.style.display = 'none';
+      if (viewPostLink) viewPostLink.style.display = 'none';
 
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-    // Convert checkbox 'on' to boolean for draft status
-    data.draft = formData.has('draft');
-
-
-    try {
-      const response = await fetch('/api/create-post-handler', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+      const formData = new FormData(form);
+      const data: Record<string, any> = {};
+      formData.forEach((value, key) => {
+        // Handle cases where a key might appear multiple times (e.g., multi-select, though not used here)
+        // For this form, simple assignment is fine.
+        if (data[key] === undefined) {
+            data[key] = value;
+        } else {
+            if (!Array.isArray(data[key])) {
+                data[key] = [data[key]];
+            }
+            data[key].push(value);
+        }
       });
 
-      const result = await response.json();
+      // Convert checkbox 'on' to boolean for draft status
+      data.draft = formData.has('draft');
 
-      if (response.ok) {
-        feedbackMessage.textContent = result.message + ` (Filename: ${result.filename})`;
-        formFeedback.style.backgroundColor = 'var(--color-note-paper)'; // Or a success color
-        formFeedback.style.border = '1px solid var(--color-accent)';
-        if (result.path) {
-            viewPostLink.href = result.path;
-            viewPostLink.style.display = 'inline-block';
-        }
-        form.reset(); // Optionally reset the form
-         // Re-set default draft state and postType after reset
-        document.getElementById('draft').checked = true;
-        postTypeSelect.value = 'standard';
-        bookNoteFields.style.display = 'none';
-
-
-      } else {
-        feedbackMessage.textContent = `Error: ${result.message || response.statusText}`;
-        formFeedback.style.backgroundColor = '#ffdddd'; // Error color
-        formFeedback.style.border = '1px solid red';
+      // Convert bookCover fields into a nested object if present
+      if (data.bookCoverImageName || data.bookCoverAlt) {
+        data.bookCover = {
+            imageName: data.bookCoverImageName || '',
+            alt: data.bookCoverAlt || ''
+        };
+        delete data.bookCoverImageName; // Clean up flat properties
+        delete data.bookCoverAlt;
       }
-    } catch (error) {
-      console.error('Network or other error:', error);
-      feedbackMessage.textContent = 'Network error or failed to connect to the API.';
-      formFeedback.style.backgroundColor = '#ffdddd';
-      formFeedback.style.border = '1px solid red';
-    } finally {
-      formFeedback.style.display = 'block';
-      submitButton.disabled = false;
-      submitButton.textContent = 'Save New Post';
-      formFeedback.scrollIntoView({ behavior: 'smooth' });
-    }
-  });
-</script>
 
-{/* Styles: form styles remain, button styles should be global */}
-<style is:global>
-  /* ... (Keep your existing form and fieldset styles) ... */
-  /* Ensure .button-primary and .button-edit are in global.css */
-  /* Example feedback styling (add to your styles) */
-  #formFeedback {
-    /* Styles defined in script for dynamic background/border based on success/error */
+
+      try {
+        const response = await fetch('/api/create-post-handler', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (feedbackMessage && formFeedback) { // Ensure elements exist
+            if (response.ok) {
+                feedbackMessage.textContent = result.message + (result.filename ? ` (Filename: ${result.filename})` : '');
+                formFeedback.style.backgroundColor = 'var(--color-note-paper)'; // Or a success color
+                formFeedback.style.border = '1px solid var(--color-accent)';
+                if (result.path && viewPostLink) {
+                    viewPostLink.href = result.path;
+                    viewPostLink.style.display = 'inline-block';
+                }
+                form.reset(); // Optionally reset the form
+                // Re-set default draft state and postType after reset
+                (document.getElementById('draft') as HTMLInputElement).checked = true;
+                const postTypeSelect = document.getElementById('postType') as HTMLSelectElement;
+                if (postTypeSelect) postTypeSelect.value = 'standard';
+                // Trigger display logic in PostForm if needed, though reset should handle values
+                const formBookNoteFields = document.getElementById('formBookNoteFields') as HTMLFieldSetElement | null;
+                if(formBookNoteFields && postTypeSelect.value !== 'bookNote') {
+                    formBookNoteFields.style.display = 'none';
+                }
+
+
+            } else {
+                feedbackMessage.textContent = `Error: ${result.message || response.statusText}`;
+                formFeedback.style.backgroundColor = '#ffdddd'; // Error color
+                formFeedback.style.border = '1px solid red';
+            }
+        }
+      } catch (error) {
+        console.error('Network or other error:', error);
+        if (feedbackMessage && formFeedback) {
+            feedbackMessage.textContent = 'Network error or failed to connect to the API.';
+            formFeedback.style.backgroundColor = '#ffdddd';
+            formFeedback.style.border = '1px solid red';
+        }
+      } finally {
+        if (formFeedback) {
+            formFeedback.style.display = 'block';
+            formFeedback.scrollIntoView({ behavior: 'smooth' });
+        }
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Save New Post';
+        }
+      }
+    });
   }
-</style>
+</script>
