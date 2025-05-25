@@ -416,3 +416,16 @@ pre {
   white-space: pre; /* Or pre-wrap */
   line-height: 1.5;
 }
+
+/* Status badge for drafts, potentially reusable in admin areas */
+.status-draft-badge {
+  background-color: var(--color-accent);
+  color: var(--color-background, #fff);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+}

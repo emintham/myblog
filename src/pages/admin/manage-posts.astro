@@ -20,7 +20,7 @@ const pageDescription = "Create or edit blog posts. This page is available in de
     <h1>Manage Posts</h1>
   </div>
 
-  <div class="admin-actions" style="margin-bottom: 2rem; text-align: right;">
+  <div class="admin-actions">
     <a href="/admin/create-post" class="button-primary" role="button">Create New Post</a>
   </div>
 
@@ -30,8 +30,8 @@ const pageDescription = "Create or edit blog posts. This page is available in de
     <ul class="item-list-container admin-post-list">
       {posts.map(post => (
         <li class="list-item-entry">
-          <div style="flex-grow: 1; display: flex; flex-direction: column; margin-right: 1rem; justify-content: center;">
-            <div class="title-line" style="display: flex; align-items: baseline; margin-bottom: 0.2rem;">
+          <div class="post-info-column">
+            <div class="title-line">
               {post.data.draft && (
                 <span class="status-draft-badge">
                   Draft
@@ -39,16 +39,15 @@ const pageDescription = "Create or edit blog posts. This page is available in de
               )}
               <a
                 href={`/blog/${post.slug}/`}
-                class="list-item-name"
+                class:list={["list-item-name", { "title-with-draft-badge": post.data.draft }]}
                 target="_blank"
                 rel="noopener noreferrer"
                 title={`View '${post.data.title}' live`}
-                style={post.data.draft ? "margin-left: 0.5em;" : ""} /* Add margin if draft badge is present */
               >
                 {post.data.title}
               </a>
             </div>
-            <small class="post-meta-details" style="font-size: 0.85rem; margin-top: 0.1rem;">
+            <small class="post-meta-details">
               {post.data.pubDate.toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' })} |
               <span class="post-type-label">{post.data.postType || 'standard'}</span>
             </small>
@@ -60,35 +59,50 @@ const pageDescription = "Create or edit blog posts. This page is available in de
   )}
 </BaseLayout>
 
-<style is:global>
-  /* Styling for this admin page list */
+<style>
+  /* Styling for this admin page list (scoped) */
+  .admin-actions {
+    margin-bottom: 2rem;
+    text-align: right;
+  }
+
   .admin-post-list .list-item-entry {
     align-items: center;
     padding-top: 0.75rem; /* Adjusted padding */
     padding-bottom: 0.75rem; /* Adjusted padding */
   }
 
-  .admin-post-list .post-meta-details span {
+  .post-info-column {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    margin-right: 1rem; /* Space before the Edit button */
+    justify-content: center;
+  }
+
+  .title-line {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 0.2rem;
+  }
+
+  .title-with-draft-badge {
+    margin-left: 0.5em; /* Add margin if draft badge is present */
+  }
+
+  .post-meta-details {
+    font-size: 0.85rem;
+    margin-top: 0.1rem;
+    color: var(--color-meta); /* Ensure meta details have consistent color */
+  }
+
+  .admin-post-list .post-meta-details span { /* Spacing for date | type */
     margin-left: 0.75rem;
   }
-  .admin-post-list .post-meta-details span:first-of-type { /* For the date */
+  .admin-post-list .post-meta-details span:first-of-type { /* For the date, no left margin */
     margin-left: 0;
   }
   .admin-post-list .post-meta-details .post-type-label {
-    color: var(--color-meta);
-  }
-
-  /* New style for the draft badge next to the title */
-  .status-draft-badge {
-    background-color: var(--color-accent); /* Using accent color for a change, can revert to orange */
-    color: var(--color-background, #fff);
-    padding: 0.15em 0.4em; /* Adjusted padding */
-    border-radius: 3px;
-    font-size: 0.7rem; /* Made it a bit smaller */
-    font-weight: 600;
-    line-height: 1.2;
-    text-transform: uppercase;
-    white-space: nowrap;
-    /* margin-right: 0.5em; /* Moved to inline style on title for conditional spacing */
+    color: var(--color-meta); /* Already set, but reinforces */
   }
 </style>

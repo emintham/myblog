@@ -2,6 +2,7 @@
 import type { APIRoute } from 'astro';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { dump } from 'js-yaml';
 import { generateSlug } from '../../utils/slugify';
 import { AUTHOR_NAME } from '../../siteConfig';
 
@@ -27,14 +28,13 @@ export const POST: APIRoute = async ({ request }) => {
 
     const title = data.title;
     const slug = generateSlug(title || 'untitled');
-    console.log("[API create-post-handler] Input title:", title); // <--- ADD THIS
-    console.log("[API create-post-handler] Generated slug:", slug); // <--- ADD THIS
-    const filename = `${slug}.md`;
+    const filename = `${slug}.md`; // Assuming .md, update if .mdx logic is needed
     const projectRoot = process.cwd();
     const filePath = path.join(projectRoot, 'src', 'content', 'blog', filename);
 
     try {
       await fs.access(filePath);
+      // File exists, return 409
       return new Response(JSON.stringify({ message: `File already exists: ${filename}` }), {
         status: 409,
         headers: { 'Content-Type': 'application/json' },
@@ -43,72 +43,95 @@ export const POST: APIRoute = async ({ request }) => {
       // File does not exist, proceed
     }
 
-    let content = '---\n';
-    content += `title: "${title.replace(/"/g, '\\"')}"\n`;
-    content += `pubDate: ${data.pubDate}\n`; // Dates typically don't need quotes in YAML
-    // Updated lines for author and postType:
-    content += `author: "${AUTHOR_NAME.replace(/"/g, '\\"')}"\n`;
-    content += `postType: "${data.postType.replace(/"/g, '\\"')}"\n`;
+    const frontmatterObject: Record<string, any> = {
+      title: title,
+      pubDate: data.pubDate, // Ensure this is YYYY-MM-DD string
+      author: AUTHOR_NAME,
+      postType: data.postType,
+      draft: data.draft === true || data.draft === 'on' || data.draft === 'true', // Ensure boolean
+    };
 
     if (data.description) {
-      content += `description: "${data.description.replace(/\n/g, '\\n').replace(/"/g, '\\"')}"\n`;
+      frontmatterObject.description = data.description;
     }
     if (data.tags) {
-      const tagsArray = data.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+      const tagsArray = data.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag);
       if (tagsArray.length > 0) {
-        content += `tags:\n${tagsArray.map(tag => `  - "${tag.replace(/"/g, '\\"')}"`).join('\n')}\n`;
+        frontmatterObject.tags = tagsArray;
       }
     }
     if (data.series) {
-      content += `series: "${data.series.replace(/"/g, '\\"')}"\n`;
+      frontmatterObject.series = data.series;
     }
-    content += `draft: ${data.draft === true || data.draft === 'on' ? true : false}\n`; // Booleans don't need quotes
 
-    // Book Note specific fields (if any are sent and need quoting, apply same logic)
+    // Book Note specific fields
     if (data.postType === 'bookNote') {
-        if (data.bookTitle) content += `bookTitle: "${data.bookTitle.replace(/"/g, '\\"')}"\n`;
-        if (data.bookAuthor) content += `bookAuthor: "${data.bookAuthor.replace(/"/g, '\\"')}"\n`;
-        if (data.bookCoverImageName && data.bookCoverAlt) {
-            content += `bookCover:\n`;
-            content += `  imageName: "${data.bookCoverImageName.replace(/"/g, '\\"')}"\n`;
-            content += `  alt: "${data.bookCoverAlt.replace(/"/g, '\\"')}"\n`;
+      if (data.bookTitle) frontmatterObject.bookTitle = data.bookTitle;
+      if (data.bookAuthor) frontmatterObject.bookAuthor = data.bookAuthor;
+      
+      // Handle bookCover from flat properties from FormData
+      if (data.bookCoverImageName || data.bookCoverAlt) {
+        frontmatterObject.bookCover = {
+          imageName: data.bookCoverImageName || '',
+          alt: data.bookCoverAlt || '',
+        };
+      } else if (data.bookCover && typeof data.bookCover === 'object') { // Handle if sent as object
+        frontmatterObject.bookCover = data.bookCover;
+      }
+
+      if (data.quotesRef) frontmatterObject.quotesRef = data.quotesRef;
+      if (data.bookTags) {
+        const bookTagsArray = data.bookTags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag);
+        if (bookTagsArray.length > 0) {
+          frontmatterObject.bookTags = bookTagsArray;
         }
-        if (data.quotesRef) content += `quotesRef: "${data.quotesRef.replace(/"/g, '\\"')}"\n`;
-        if (data.bookTags) {
-            const bookTagsArray = data.bookTags.split(',').map(tag => tag.trim()).filter(tag => tag);
-            if (bookTagsArray.length > 0) {
-            content += `bookTags:\n${bookTagsArray.map(tag => `  - "${tag.replace(/"/g, '\\"')}"`).join('\n')}\n`;
-            }
-        }
+      }
+    }
+    
+    // Remove any undefined fields that might have been set conditionally
+    for (const key in frontmatterObject) {
+      if (frontmatterObject[key] === undefined) {
+        delete frontmatterObject[key];
+      }
     }
 
-    content += '---\n\n';
+    const frontmatterString = dump(frontmatterObject, { skipInvalid: true }); // skipInvalid to avoid issues with undefined if any slip through
+
+    let fileContent = `---\n${frontmatterString}---\n\n`;
 
     const bodyInput = (data.bodyContent || '').trim();
     if (bodyInput) {
-        content += bodyInput;
+      fileContent += bodyInput;
     } else if (data.postType !== 'fleeting') {
-        content += '## Introduction\n\nReplace this with your first paragraph.';
+      fileContent += '## Introduction\n\nReplace this with your first paragraph.';
     } else {
-        content += '';
+      // Fleeting posts can have an empty body
+      fileContent += '';
     }
 
-    await fs.writeFile(filePath, content);
+    await fs.writeFile(filePath, fileContent);
 
-    return new Response(JSON.stringify({ message: 'Post created successfully!', filename: filename, path: `/blog/${slug}`, newSlug: slug}), {
+    return new Response(JSON.stringify({ 
+      message: 'Post created successfully!', 
+      filename: filename, 
+      path: `/blog/${slug}`, // Path for viewing the post
+      newSlug: slug // Slug for redirecting to edit page for example
+    }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     });
 
-  } catch (error) {
-    if (error instanceof SyntaxError && error.message.includes("JSON")) {
+  } catch (error: any) {
+    // Specific check for JSON parsing errors
+    if (error instanceof SyntaxError && error.message.toLowerCase().includes("json")) {
         console.error('Error parsing JSON body:', error);
         return new Response(JSON.stringify({ message: 'Invalid JSON data received.', error: error.message }), {
-            status: 400,
+            status: 400, // Bad Request
             headers: { 'Content-Type': 'application/json' },
         });
     }
     console.error('Error creating post:', error);
+    // Default to 500 Internal Server Error for other issues
     return new Response(JSON.stringify({ message: 'Error creating post.', error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
