@@ -1,0 +1,202 @@
+---
+export const prerender = false; // This page is dynamic and for dev mode only
+
+// src/pages/admin/edit/[slug].astro
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostForm from '../../../components/admin/PostForm.astro'; // Reusable form
+import { SITE_TITLE } from '../../../siteConfig';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import matter from 'gray-matter'; // For parsing frontmatter
+
+// --- DEV Mode Check & Data Fetching ---
+if (import.meta.env.PROD) {
+  // In a real app, you might redirect or show a custom 404
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+
+const { slug } = Astro.params;
+let postToEdit: Record<string, any> | null = null;
+let errorMessage: string | null = null;
+let originalFileDetails = { path: '', extension: '.md' }; // Store original file details
+
+if (!slug) {
+  errorMessage = "No post slug provided for editing.";
+  // Potentially redirect or return a 400/404 response earlier
+} else {
+  const projectRoot = process.cwd();
+  const contentDir = path.join(projectRoot, 'src', 'content', 'blog');
+
+  const potentialFilenames = [`${slug}.md`, `${slug}.mdx`];
+  let fileFound = false;
+
+  for (const filename of potentialFilenames) {
+    const filePath = path.join(contentDir, filename);
+    try {
+      const fileContentString = await fs.readFile(filePath, 'utf-8');
+      const { data: frontmatterData, content: bodyContent } = matter(fileContentString);
+
+      originalFileDetails.path = filePath;
+      originalFileDetails.extension = path.extname(filePath);
+
+      postToEdit = {
+        originalSlug: slug, // Keep for reference, in case title/slug changes
+        originalFilePath: filePath, // Pass to form/API for update logic
+        originalExtension: originalFileDetails.extension,
+        ...frontmatterData,
+        bodyContent: bodyContent.trim(), // Send trimmed body to form
+      };
+      // Ensure pubDate is in 'YYYY-MM-DD' for the input[type="date"]
+      if (postToEdit.pubDate && postToEdit.pubDate instanceof Date) {
+        postToEdit.pubDate = postToEdit.pubDate.toISOString().split('T')[0];
+      } else if (typeof postToEdit.pubDate === 'string') {
+        // Attempt to re-format if it's a string but not YYYY-MM-DD
+        try {
+            postToEdit.pubDate = new Date(postToEdit.pubDate).toISOString().split('T')[0];
+        } catch(e) { /* ignore if already in correct format or invalid */ }
+      }
+
+      fileFound = true;
+      break;
+    } catch (e) {
+      // File not found at this path, loop will try next or eventually set error
+    }
+  }
+
+  if (!fileFound) {
+    errorMessage = `Post with slug "${slug}" not found.`;
+    // Set a 404 status for the Astro response if post not found
+    Astro.response.status = 404;
+  }
+}
+
+const pageTitle = `Edit Post: ${postToEdit?.title || slug} (DEV) - ${SITE_TITLE}`;
+---
+
+<BaseLayout title={pageTitle}>
+  <div class="page-detail-header" style="margin-bottom: 1.5rem;">
+    <h1>Edit Post: {postToEdit?.title ? `"${postToEdit.title}"` : `"${slug}"`}</h1>
+  </div>
+
+  {errorMessage && !postToEdit && (
+    <div class="form-feedback error-message" style="background-color: #ffdddd; border:1px solid red; padding: 1rem; margin-bottom:1rem;">
+      <p>{errorMessage}</p>
+      <a href="/admin/manage-posts/" class="button-edit">Back to Manage Posts</a>
+    </div>
+  )}
+
+  {postToEdit && !errorMessage && (
+    <form id="editPostForm" class="post-form">
+      {/* Hidden fields to pass original slug and path for update logic */}
+      <input type="hidden" name="originalSlug" value={postToEdit.originalSlug} />
+      <input type="hidden" name="originalFilePath" value={postToEdit.originalFilePath} />
+      <input type="hidden" name="originalExtension" value={postToEdit.originalExtension} />
+
+      <PostForm postData={postToEdit} /> {/* Pass fetched data to the form */}
+      <button type="submit" class="button-primary" style="margin-top: 1rem;">Update Post</button>
+    </form>
+  )}
+
+  <div id="formFeedback" style="margin-top: 1.5rem; padding: 1rem; border-radius: 4px; display: none;">
+    <p id="feedbackMessage"></p>
+    <a id="viewPostLink" href="#" style="display:none; margin-top: 0.5rem;" class="button-edit">View Post</a>
+    <a href="/admin/manage-posts/" style="margin-left:1rem; margin-top: 0.5rem; display:inline-block;" class="button-edit">Back to Manage Posts</a>
+  </div>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('editPostForm') as HTMLFormElement | null;
+  const formFeedback = document.getElementById('formFeedback') as HTMLDivElement | null;
+  const feedbackMessage = document.getElementById('feedbackMessage') as HTMLParagraphElement | null;
+  const viewPostLink = document.getElementById('viewPostLink') as HTMLAnchorElement | null;
+  const pageTitleElement = document.querySelector('h1'); // To update page title if post title changes
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Updating...';
+      }
+      if (formFeedback) formFeedback.style.display = 'none';
+      if (viewPostLink) viewPostLink.style.display = 'none';
+
+      const formData = new FormData(form);
+      const data: Record<string, any> = {};
+      formData.forEach((value, key) => { data[key] = value; });
+      data.draft = formData.has('draft'); // Convert checkbox
+
+      // Reconstruct bookCover object
+      if (data.bookCoverImageName !== undefined || data.bookCoverAlt !== undefined) { // Check existence of keys
+        data.bookCover = {
+            imageName: data.bookCoverImageName || '',
+            alt: data.bookCoverAlt || ''
+        };
+        // originalWidth would be handled here if it were an input
+        delete data.bookCoverImageName;
+        delete data.bookCoverAlt;
+      }
+
+      try {
+        const response = await fetch('/api/update-post-handler', { // New API endpoint
+          method: 'POST', // Using POST, but PUT could also be appropriate
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data), // originalSlug, originalFilePath, originalExtension are sent
+        });
+
+        const result = await response.json();
+
+        if (feedbackMessage && formFeedback) {
+            feedbackMessage.textContent = result.message || 'Operation completed.';
+            if (response.ok) {
+                formFeedback.style.backgroundColor = 'var(--color-note-paper)';
+                formFeedback.style.border = '1px solid var(--color-accent)';
+                if (result.path && viewPostLink) {
+                    viewPostLink.href = result.path;
+                    viewPostLink.style.display = 'inline-block';
+                }
+                // If title changed, update the H1 and originalSlug hidden input for subsequent saves
+                const newTitle = formData.get('title') as string;
+                if (pageTitleElement && newTitle !== document.querySelector('#title')?.getAttribute('value')) { // Compare with initial value if needed
+                    pageTitleElement.textContent = `Edit Post: "${newTitle}"`;
+                }
+                if (result.newSlug && form.elements.namedItem('originalSlug')) {
+                  (form.elements.namedItem('originalSlug') as HTMLInputElement).value = result.newSlug;
+                }
+                if (result.newFilePath && form.elements.namedItem('originalFilePath')) {
+                  (form.elements.namedItem('originalFilePath') as HTMLInputElement).value = result.newFilePath;
+                }
+                 if (result.newExtension && form.elements.namedItem('originalExtension')) {
+                  (form.elements.namedItem('originalExtension') as HTMLInputElement).value = result.newExtension;
+                }
+
+            } else {
+                formFeedback.style.backgroundColor = '#ffdddd';
+                formFeedback.style.border = '1px solid red';
+            }
+        }
+      } catch (error) {
+        console.error('Network or other error:', error);
+        if (feedbackMessage && formFeedback) {
+            feedbackMessage.textContent = 'Network error or failed to connect to the API.';
+            formFeedback.style.backgroundColor = '#ffdddd';
+            formFeedback.style.border = '1px solid red';
+        }
+      } finally {
+        if (formFeedback) {
+            formFeedback.style.display = 'block';
+            formFeedback.scrollIntoView({ behavior: 'smooth' });
+        }
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Update Post';
+        }
+      }
+    });
+  }
+</script>
+<style>
+/* Add any page-specific styles if needed */
+</style>

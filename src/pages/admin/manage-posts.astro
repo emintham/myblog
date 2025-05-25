@@ -53,7 +53,7 @@ const pageDescription = "Create or edit blog posts. This page is available in de
               <span class="post-type-label">{post.data.postType || 'standard'}</span>
             </small>
           </div>
-          <a href={`#edit-${post.slug}`} class="button-edit" role="button">Edit</a>
+          <a href={`/admin/edit/${post.slug}/`} class="button-edit" role="button">Edit</a>
         </li>
       ))}
     </ul>
