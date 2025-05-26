@@ -1,11 +1,13 @@
-import React, { useEffect, useState, useCallback }  from 'react'; // Added useCallback
+import React, { useEffect, useState, useCallback }  from 'react';
 import { useForm, type UseFormReturn } from 'react-hook-form';
-import type { PostSourceData, PostFormData } from '../../types/admin';
-import { usePostSubmission } from '../../hooks/usePostSubmission'; // Import the new hook
+import type { PostSourceData, PostFormData, Quote } from '../../types/admin'; // Added Quote
+import { usePostSubmission } from '../../hooks/usePostSubmission';
+import InlineQuotesManager from './InlineQuotesManager'; // Import the new component
 
 export interface PostFormProps {
   postData?: PostSourceData; // Data from source, optional for create mode
   formId: string; // ID of the parent <form> element
+  // initialInlineQuotes?: Quote[]; // This will be added in Deliverable 2
 }
 
 const POST_TYPES = ["standard", "fleeting", "bookNote"];
@@ -40,6 +42,7 @@ const defaultValues: PostFormData = {
   bookCoverAlt: '',
   quotesRef: '',
   bookTags: '',
+  inlineQuotes: [], // Added for inline quotes
   originalSlug: undefined,
   originalFilePath: undefined,
   originalExtension: undefined,
@@ -78,6 +81,9 @@ const PostForm: React.FC<PostFormProps> = ({
   const watchedPostType = watch('postType', defaultValues.postType);
   const watchedBookTitle = watch('bookTitle'); // Watch bookTitle for dynamic alt text
   const [showBookNoteFieldsUI, setShowBookNoteFieldsUI] = useState(watchedPostType === 'bookNote');
+  // For D1, inlineQuotes always start empty or from defaultValues.
+  // It will be populated by `initialInlineQuotes` prop in D2.
+  const [inlineQuotes, setInlineQuotes] = useState<Quote[]>(defaultValues.inlineQuotes || []);
 
   useEffect(() => {
     setShowBookNoteFieldsUI(watchedPostType === 'bookNote');
@@ -100,15 +106,45 @@ const PostForm: React.FC<PostFormProps> = ({
         bookCoverAlt: postData.bookCover?.alt || '',
         quotesRef: postData.quotesRef || '',
         bookTags: formatTagsForInput(postData.bookTags),
+        inlineQuotes: defaultValues.inlineQuotes || [], // Keep consistent with initial state for D1
         originalSlug: postData.originalSlug,
         originalFilePath: postData.originalFilePath,
         originalExtension: postData.originalExtension,
       };
       reset(transformedData);
+      // For D1, setInlineQuotes will only use defaultValues or an empty array.
+      // The logic for `initialInlineQuotes` prop will be added in D2.
+      setInlineQuotes(defaultValues.inlineQuotes || []);
     } else {
       reset(defaultValues);
+      setInlineQuotes(defaultValues.inlineQuotes || []);
     }
   }, [postData, reset]);
+
+  // Handlers for InlineQuotesManager
+  const handleAddQuote = useCallback(() => {
+    setInlineQuotes(prevQuotes => [
+      ...prevQuotes,
+      {
+        id: Date.now().toString() + Math.random().toString(36).substring(2, 15), // Simple unique ID
+        text: '',
+        tags: [],
+      }
+    ]);
+  }, []);
+
+  const handleRemoveQuote = useCallback((id: string) => {
+    setInlineQuotes(prevQuotes => prevQuotes.filter(quote => quote.id !== id));
+  }, []);
+
+  const handleUpdateQuoteField = useCallback(<K extends keyof Omit<Quote, 'id'>>(id: string, field: K, value: Quote[K]) => {
+    setInlineQuotes(prevQuotes =>
+      prevQuotes.map(quote =>
+        quote.id === id ? { ...quote, [field]: value } : quote
+      )
+    );
+  }, []);
+
 
   // Effect to automatically set bookCoverAlt based on bookTitle
   useEffect(() => {
@@ -130,7 +166,11 @@ const PostForm: React.FC<PostFormProps> = ({
       const formSubmitWrapper = async (event: SubmitEvent) => {
         event.preventDefault(); // Explicitly prevent default
         // Manually trigger validation and then submission if valid
-        const isValid = await handleSubmit(submitPost)(); // This triggers validation
+        // For D1, submitPost doesn't yet handle inlineQuotes. This will be addressed in D3/D4.
+        // const currentFormData = getValues();
+        // const dataToSubmit = { ...currentFormData, inlineQuotes };
+        // const isValid = await handleSubmit(() => submitPost(dataToSubmit))();
+        const isValid = await handleSubmit(formData => submitPost({...formData, inlineQuotes}))(); // Pass merged data
         // Note: handleSubmit(submitPost)() will call submitPost if validation passes.
         // If we don't want to rely on its internal call due to the manual setup,
         // we could do:
@@ -222,6 +262,12 @@ const PostForm: React.FC<PostFormProps> = ({
             <label htmlFor="bookTags">Book Tags</label>
             <input type="text" id="bookTags" {...register('bookTags')} placeholder="e.g., stoicism, philosophy" />
           </div>
+          <InlineQuotesManager
+            quotes={inlineQuotes}
+            onAddQuote={handleAddQuote}
+            onRemoveQuote={handleRemoveQuote}
+            onUpdateQuoteField={handleUpdateQuoteField}
+          />
         </fieldset>
       )}
 

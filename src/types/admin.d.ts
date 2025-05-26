@@ -28,6 +28,14 @@ export interface PostSourceData {
   originalExtension?: string; // e.g., ".md" or ".mdx"
 }
 
+export interface Quote {
+  id: string; // Unique ID for React key prop and managing edits
+  text: string;
+  quoteAuthor?: string;
+  tags?: string[]; // Stored as array in form state
+  quoteSource?: string;
+}
+
 /**
  * Interface for the data structure used by the react-hook-form.
  * This structure is flat to simplify form handling.
@@ -55,6 +63,7 @@ export interface PostFormData {
   originalSlug?: string;
   originalFilePath?: string;
   originalExtension?: string;
+  inlineQuotes?: Quote[]; // New field for managing quotes in the form
 }
 
 /**
@@ -84,6 +93,7 @@ export interface PostApiPayload {
   originalSlug?: string;
   originalFilePath?: string;
   originalExtension?: string;
+  inlineQuotes?: Quote[]; // For sending quotes data to the API
 }
 
 /**
