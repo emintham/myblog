@@ -11,20 +11,20 @@
 }
 
 .form-feedback-container.success-message {
-  background-color: #ddffdd;
-  border: 1px solid green;
+  background-color: #e6f4ea; /* Softer green */
+  border: 1px solid #a7c9b3; /* Muted green border */
   color: #155724; /* Dark green text for better readability */
 }
 
 .form-feedback-container.error-message {
-  background-color: #ffdddd;
-  border: 1px solid red;
+  background-color: #fce8e6; /* Softer red */
+  border: 1px solid #f0b9b5; /* Muted red border */
   color: #721c24; /* Dark red text for better readability */
 }
 
 .form-feedback-container.warning-message {
-  background-color: #fff3cd; /* Light yellow */
-  border: 1px solid #ffeeba; /* Yellow border */
+  background-color: #fff8e1; /* Softer yellow */
+  border: 1px solid #fce5a0; /* Muted yellow border */
   color: #856404; /* Dark yellow/brown text */
 }
 
@@ -49,7 +49,7 @@
 .form-field textarea {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #ccc;
+  border: 1px solid #d1d5db; /* Softer gray border */
   border-radius: 4px;
   box-sizing: border-box;
 }
@@ -78,40 +78,38 @@
   text-align: center;
 }
 
+/* Base style for .button-primary */
+.button-primary {
+  background-color: #707070; /* Muted warm gray */
+  color: white;
+}
+
 .button-primary:hover {
-  background-color: #0056b3;
+  background-color: #5a5a5a; /* Darker muted gray */
 }
 .button-primary:disabled {
-  background-color: #cccccc;
-  color: #666666;
+  background-color: #e0e0e0; /* Lighter gray for disabled */
+  color: #a0a0a0; /* Muted text for disabled */
   cursor: not-allowed;
 }
 
 .button-edit {
-  background-color: #6c757d;
+  background-color: #7f8c8d; /* Softer, more neutral gray */
   color: white;
 }
 .button-edit:hover {
-  background-color: #545b62;
+  background-color: #6c7a7b; /* Darker shade of the neutral gray */
 }
-button.button-primary:hover {
-  background-color: #0056b3;
-}
+/* Removed redundant button.button-primary:hover (now covered by .button-primary:hover) */
 
-button.button-primary:disabled {
-  background-color: #cccccc;
-  color: #666666;
-  cursor: not-allowed;
-}
+/* Removed redundant button.button-primary:disabled (now covered by .button-primary:disabled) */
 
-a.button-primary:hover {
-  background-color: #0056b3;
-  color: white;
-  text-decoration: none;
-}
+/* Removed a.button-primary:hover (now covered by .button-primary base and .button-primary:hover) */
 /* Styles for InlineQuotesManager component */
 .inline-quotes-manager {
-  margin-top: 1.5rem;
+  margin-top: 1.5rem; /* Consistent with other major sections */
+  padding-top: 1.5rem; /* Added padding for separation */
+  border-top: 1px solid #e0e0e0; /* Light separator for visual grouping */
 }
 
 .inline-quotes-manager > .inline-quotes-label {
@@ -133,15 +131,15 @@ a.button-primary:hover {
 }
 
 .inline-quotes-manager .quote-item .form-field label {
-  font-size: 0.9em;
-  color: #333;
-  font-weight: normal; /* Override general form-field label bold if needed */
+  /* font-size: 0.9em; -- Removed to allow inheritance, matching other form labels */
+  color: #333; /* Retaining specific color for now, can be aligned with general labels if needed */
+  font-weight: normal; /* Specific style for these sub-labels, not bold */
 }
 
 .inline-quotes-manager .quote-item .form-field textarea,
 .inline-quotes-manager .quote-item .form-field input[type="text"] {
-  font-size: 0.95em;
-  padding: 0.4rem;
+  /* font-size removed to inherit from general form/browser default */
+  padding: 0.5rem; /* Matched to general .form-field input/textarea padding */
 }
 
 /* Specific margin for the tags field container if it needs to be different */
@@ -151,8 +149,8 @@ a.button-primary:hover {
 
 .inline-quotes-manager .button-remove-quote {
   background: none;
-  border: 1px solid #ccc;
-  color: #555;
+  border: 1px solid #d1d5db; /* Softer gray border */
+  color: #7f8c8d; /* Muted color */
   padding: 0.3rem 0.6rem;
   font-size: 0.85em;
   border-radius: 3px;
@@ -160,14 +158,14 @@ a.button-primary:hover {
   margin-right: 0.5rem;
 }
 .inline-quotes-manager .button-remove-quote:hover {
-  border-color: #aaa;
-  color: #333;
+  border-color: #b0b8bf; /* Slightly darker border on hover */
+  color: #5F6368; /* Darker muted color on hover */
 }
 
 .inline-quotes-manager .button-add-quote {
   background: none;
-  border: 1px solid #007bff;
-  color: #007bff;
+  border: 1px solid #707070; /* Muted primary color border */
+  color: #707070; /* Muted primary color */
   padding: 0.5rem 1rem;
   border-radius: 3px;
   cursor: pointer;
@@ -175,7 +173,7 @@ a.button-primary:hover {
   font-size: 0.9em;
 }
 .inline-quotes-manager .button-add-quote:hover {
-  background-color: rgba(0, 123, 255, 0.1);
+  background-color: rgba(112, 112, 112, 0.1); /* Subtle background with new primary color */
 }
 /* Styles from create-post.astro and edit/[slug].astro */
 .page-detail-header {
@@ -278,5 +276,4 @@ a.button-primary:hover {
   color: var(--color-primary);
 }
 
-.status-draft-badge {
-}
+/* Removed empty .status-draft-badge rule */
