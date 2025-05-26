@@ -2,6 +2,12 @@
 import { dump } from 'js-yaml';
 import type { PostApiPayload, FrontmatterObject } from '../types/admin';
 import { AUTHOR_NAME } from '../siteConfig'; // Assuming AUTHOR_NAME is exported from siteConfig
+import sharp from 'sharp';
+import path from 'node:path';
+import fs from 'node:fs/promises';
+
+const projectRoot = process.cwd(); // Define projectRoot once
+const originalImagesDir = path.join(projectRoot, 'images', 'originals'); // Define path to original images
 
 /**
  * Transforms the raw API payload (similar to PostFormData) into a structured
@@ -9,7 +15,7 @@ import { AUTHOR_NAME } from '../siteConfig'; // Assuming AUTHOR_NAME is exported
  * @param payload The raw data received by the API endpoint.
  * @returns A structured object for frontmatter.
  */
-export function transformApiPayloadToFrontmatter(payload: PostApiPayload): FrontmatterObject {
+export async function transformApiPayloadToFrontmatter(payload: PostApiPayload): Promise<FrontmatterObject> {
   const frontmatter: FrontmatterObject = {
     title: payload.title,
     pubDate: new Date(payload.pubDate), // Convert string to Date object
@@ -39,15 +45,52 @@ export function transformApiPayloadToFrontmatter(payload: PostApiPayload): Front
     if (payload.bookTitle) frontmatter.bookTitle = payload.bookTitle;
     if (payload.bookAuthor) frontmatter.bookAuthor = payload.bookAuthor;
 
-    let finalBookCover: { imageName?: string; alt?: string } = {};
+    let finalBookCover: { imageName?: string; alt?: string; originalWidth?: number } = {};
     // Check if bookCover is already an object (e.g., from update handler if it was already structured)
     if (payload.bookCover && typeof payload.bookCover === 'object' && (payload.bookCover.imageName || payload.bookCover.alt)) {
-        finalBookCover = { imageName: payload.bookCover.imageName || '', alt: payload.bookCover.alt || ''};
+        finalBookCover = {
+            imageName: payload.bookCover.imageName || '',
+            alt: payload.bookCover.alt || '',
+            originalWidth: payload.bookCover.originalWidth // Preserve if already there
+        };
     } else if (payload.bookCoverImageName || payload.bookCoverAlt) { // From flat form fields
-        finalBookCover = { imageName: payload.bookCoverImageName || '', alt: payload.bookCoverAlt || ''};
+        finalBookCover = {
+            imageName: payload.bookCoverImageName || '',
+            alt: payload.bookCoverAlt || ''
+        };
     }
 
-    if (finalBookCover.imageName || finalBookCover.alt) { // Only add if there's something to add
+    if (finalBookCover.imageName && !finalBookCover.originalWidth) { // Only try to get width if imageName exists and width isn't already set
+      const imageBaseName = finalBookCover.imageName;
+      const extensionsToTry = ['.jpg', '.jpeg', '.png', '.webp'];
+      let foundImagePath: string | null = null;
+
+      for (const ext of extensionsToTry) {
+        const testPath = path.join(originalImagesDir, `${imageBaseName}${ext}`);
+        try {
+          await fs.access(testPath);
+          foundImagePath = testPath;
+          break;
+        } catch {
+          // File not found with this extension, try next
+        }
+      }
+
+      if (foundImagePath) {
+        try {
+          const metadata = await sharp(foundImagePath).metadata();
+          if (metadata.width) {
+            finalBookCover.originalWidth = metadata.width;
+          }
+        } catch (sharpError) {
+          console.warn(`[AdminAPIHelpers] Error getting metadata for ${foundImagePath} with sharp:`, sharpError);
+        }
+      } else {
+        console.warn(`[AdminAPIHelpers] Original image not found for ${imageBaseName} in ${originalImagesDir}`);
+      }
+    }
+
+    if (finalBookCover.imageName || finalBookCover.alt || finalBookCover.originalWidth) { // Only add if there's something to add
         frontmatter.bookCover = finalBookCover;
     }
 

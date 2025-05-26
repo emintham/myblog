@@ -18,7 +18,7 @@ export interface PostSourceData {
   // BookNote specific fields
   bookTitle?: string;
   bookAuthor?: string;
-  bookCover?: { imageName?: string; alt?: string }; // Nested object for book cover details
+  bookCover?: { imageName?: string; alt?: string; originalWidth?: number }; // Added originalWidth
   quotesRef?: string; // Reference to a quotes file or section
   bookTags?: string | string[]; // Tags specific to the book note
   inlineQuotes?: Quote[]; // Loaded inline quotes for edit mode
@@ -84,10 +84,10 @@ export interface PostApiPayload {
 
   bookTitle?: string;
   bookAuthor?: string;
-  bookCoverImageName?: string;
-  bookCoverAlt?: string;
-  // API might also receive bookCover as a pre-structured object in some cases
-  bookCover?: { imageName?: string; alt?: string };
+  bookCoverImageName?: string; // This is sent from client
+  bookCoverAlt?: string;       // This is sent from client
+  // API will enrich bookCover with originalWidth before saving to frontmatter
+  bookCover?: { imageName?: string; alt?: string; originalWidth?: number }; // Added originalWidth
   quotesRef?: string;
   bookTags?: string; // Comma-separated string or potentially an array
 
@@ -114,7 +114,7 @@ export interface FrontmatterObject {
   // BookNote specific fields
   bookTitle?: string;
   bookAuthor?: string;
-  bookCover?: { imageName?: string; alt?: string };
+  bookCover?: { imageName?: string; alt?: string; originalWidth?: number }; // Added originalWidth
   quotesRef?: string;
   bookTags?: string[]; // Stored as an array of strings
 }

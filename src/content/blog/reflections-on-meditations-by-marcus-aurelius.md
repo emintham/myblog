@@ -16,6 +16,7 @@ bookAuthor: Marcus Aurelius
 bookCover:
   imageName: meditations
   alt: ''
+  originalWidth: 976
 quotesRef: meditations-quotes
 bookTags:
   - philosophy

@@ -53,7 +53,7 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
-    const frontmatterObject = transformApiPayloadToFrontmatter(payload);
+    const frontmatterObject = await transformApiPayloadToFrontmatter(payload); // Await the promise
     const fileContent = generatePostFileContent(frontmatterObject, payload.bodyContent || '', payload.postType, false);
 
     await fs.writeFile(newFilePath, fileContent);

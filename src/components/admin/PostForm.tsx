@@ -262,17 +262,8 @@ const PostForm: React.FC<PostFormProps> = ({
             <input type="text" id="bookCoverImageName" {...register('bookCoverImageName')} placeholder="e.g., meditations-cover" />
           </div>
           {/* Book Cover Alt Text field is removed and will be auto-generated */}
-          <div className="form-field">
-            <label htmlFor="quotesRef">Quotes Reference</label>
-            <input
-              type="text"
-              id="quotesRef"
-              {...register('quotesRef')}
-              placeholder="e.g., meditations-quotes"
-              readOnly={isQuotesRefReadOnly} // Set readOnly based on state
-            />
-            {isQuotesRefReadOnly && <small style={{ display: 'block', marginTop: '0.25rem', color: '#555' }}>This field is read-only when inline quotes are loaded.</small>}
-          </div>
+          {/* quotesRef input is now removed from UI as per Deliverable 4 */}
+          {/* The value will be managed internally or by the API */}
           <div className="form-field">
             <label htmlFor="bookTags">Book Tags</label>
             <input type="text" id="bookTags" {...register('bookTags')} placeholder="e.g., stoicism, philosophy" />
