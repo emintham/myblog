@@ -55,6 +55,7 @@ const PostForm: React.FC<PostFormProps> = ({
     watch,
     reset,
     getValues, // Add getValues
+    setValue, // Add setValue
     formState: { errors },
   }: UseFormReturn<PostFormData> = useForm<PostFormData>({
     defaultValues,
@@ -75,6 +76,7 @@ const PostForm: React.FC<PostFormProps> = ({
   // If PostForm needed to change its own UI based on submission state, use isSubmittingHook.
 
   const watchedPostType = watch('postType', defaultValues.postType);
+  const watchedBookTitle = watch('bookTitle'); // Watch bookTitle for dynamic alt text
   const [showBookNoteFieldsUI, setShowBookNoteFieldsUI] = useState(watchedPostType === 'bookNote');
 
   useEffect(() => {
@@ -107,6 +109,16 @@ const PostForm: React.FC<PostFormProps> = ({
       reset(defaultValues);
     }
   }, [postData, reset]);
+
+  // Effect to automatically set bookCoverAlt based on bookTitle
+  useEffect(() => {
+    if (watchedBookTitle) {
+      setValue('bookCoverAlt', `Cover for ${watchedBookTitle}`, { shouldValidate: false, shouldDirty: false });
+    } else {
+      // Clear alt text if book title is removed
+      setValue('bookCoverAlt', '', { shouldValidate: false, shouldDirty: false });
+    }
+  }, [watchedBookTitle, setValue]);
 
   // The submitPost function from the hook is already stable due to useCallback in the hook.
   // We pass it directly to handleSubmit.
@@ -201,10 +213,7 @@ const PostForm: React.FC<PostFormProps> = ({
             <label htmlFor="bookCoverImageName">Book Cover Image Name</label>
             <input type="text" id="bookCoverImageName" {...register('bookCoverImageName')} placeholder="e.g., meditations-cover" />
           </div>
-          <div className="form-field">
-            <label htmlFor="bookCoverAlt">Book Cover Alt Text</label>
-            <input type="text" id="bookCoverAlt" {...register('bookCoverAlt')} />
-          </div>
+          {/* Book Cover Alt Text field is removed and will be auto-generated */}
           <div className="form-field">
             <label htmlFor="quotesRef">Quotes Reference</label>
             <input type="text" id="quotesRef" {...register('quotesRef')} placeholder="e.g., meditations-quotes" />
