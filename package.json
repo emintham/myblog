@@ -19,6 +19,7 @@
     "lint:fix": "eslint . --ext .js,.cjs,.mjs,.ts,.astro --fix"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^12.5.3",
     "@astrojs/mdx": "^4.3.0",
     "@astrojs/react": "^4.3.0",
     "@astrojs/sitemap": "^3.3.1",
