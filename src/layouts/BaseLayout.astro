@@ -2,11 +2,17 @@
 import Navigation from "../components/Navigation.astro";
 import "../styles/global.css";
 import "../styles/sidenotes.css";
-import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR_NAME } from "../siteConfig.ts";
+import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR_NAME } from "../siteConfig";
 
-const { title = SITE_TITLE, description = SITE_DESCRIPTION } = Astro.props;
+interface Props {
+  title?: string;
+  description?: string;
+  isAdminPage?: boolean;
+}
+
+const { title = SITE_TITLE, description = SITE_DESCRIPTION, isAdminPage = false } = Astro.props as Props;
 const googleFontsURL =
-  "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@300..700&family=Spectral:wght@400;700&family=Corinthia:wght@400;700&display=swap";
+  "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@300..700&family=Spectral:wght@400;700&family=Corinthia:wght@400;700&family=Inter:wght@300..700&display=swap";
 const TEMPLATE_GITHUB_URL = "https://github.com/emintham/blog-template";
 const TEMPLATE_AUTHOR_URL = "https://emintham.com";
 const TEMPLATE_AUTHOR_NAME = "Emin Tham + Gemini 2.5 Pro";
@@ -37,7 +43,7 @@ const TEMPLATE_AUTHOR_NAME = "Emin Tham + Gemini 2.5 Pro";
     }
     <noscript><link rel="stylesheet" href={googleFontsURL} /></noscript>
   </head>
-  <body>
+  <body class:list={[ { 'admin-scope': isAdminPage } ]}>
     <Navigation />
     <main class="content-wrapper">
       <slot />

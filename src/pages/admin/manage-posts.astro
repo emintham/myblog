@@ -1,0 +1,56 @@
+---
+// src/pages/admin/manage-posts.astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { SITE_TITLE } from '../../siteConfig';
+
+if (!import.meta.env.DEV) {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
+}
+
+const posts = await getCollection('blog');
+posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const pageTitle = `Manage Posts (DEV) - ${SITE_TITLE}`;
+const pageDescription = "Create or edit blog posts. This page is available in development mode only.";
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} isAdminPage={true}>
+  <div class="admin-actions">
+    <a href="/admin/create-post" class="button-primary" role="button">Create New Post</a>
+  </div>
+
+  {posts.length === 0 ? (
+    <p class="empty-state-message">No posts found. Ready to create your first one?</p>
+  ) : (
+    <ul class="item-list-container admin-post-list">
+      {posts.map(post => (
+        <li class="list-item-entry">
+          <div class="post-info-column">
+            <div class="title-line">
+              {post.data.draft && (
+                <span class="status-draft-badge">
+                  Draft
+                </span>
+              )}
+              <a
+                href={`/blog/${post.slug}/`}
+                class:list={["list-item-name", { "title-with-draft-badge": post.data.draft }]}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`View '${post.data.title}' live`}
+              >
+                {post.data.title}
+              </a>
+            </div>
+            <small class="post-meta-details">
+              {post.data.pubDate.toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' })} |
+              <span class="post-type-label">{post.data.postType || 'standard'}</span>
+            </small>
+          </div>
+          <a href={`/admin/edit/${post.slug}/`} class="button-edit" role="button">Edit</a>
+        </li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>

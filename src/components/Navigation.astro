@@ -2,13 +2,17 @@
 // src/components/Navigation.astro
 import { SITE_TITLE } from "../siteConfig.ts";
 
-const navLinks = [
+const baseNavLinks = [
   { href: "/", label: "Home" },
   { href: "/book-notes", label: "Book Notes" }, // Added Book Notes link
   { href: "/tags", label: "Tags" },
   { href: "/series", label: "Series" },
   { href: "/about", label: "About" },
 ];
+// Conditionally add the "Edit Content" link only in DEV mode
+const navLinks = import.meta.env.DEV
+  ? [...baseNavLinks, { href: "/admin/manage-posts", label: "Manage" }]
+  : baseNavLinks;
 ---
 
 <nav>
