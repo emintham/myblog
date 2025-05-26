@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import PostForm from '../../../components/admin/PostForm.tsx';
+import PostForm from '../../../components/admin/PostForm'; // Removed .tsx extension
 import { SITE_TITLE } from '../../../siteConfig';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -9,6 +9,7 @@ import matter from 'gray-matter';
 import yaml from 'js-yaml'; // Import js-yaml
 import '../../../styles/admin.css'; // Import admin styles
 import type { PostSourceData, Quote } from '../../../types/admin'; // Import Quote type
+import { getUniqueTagNames } from '../../../utils/tagUtils'; // Import the utility
 
 
 if (import.meta.env.PROD) {
@@ -84,6 +85,11 @@ if (!slug) {
   }
 }
 
+// Fetch all unique tag names for suggestions
+const allPostTags = await getUniqueTagNames('blog', (data) => data.tags);
+const allBookTags = await getUniqueTagNames('blog', (data) => data.bookTags, (entry) => entry.data.postType === 'bookNote');
+const allQuoteTags = await getUniqueTagNames('bookQuotes', (data) => data.quotes?.flatMap(q => q.tags || []) || []);
+
 const pageTitleDisplay = postToEdit?.title || slug || "Post";
 const pageTitle = `Edit Post: ${pageTitleDisplay} (DEV) - ${SITE_TITLE}`;
 ---
@@ -113,7 +119,14 @@ const pageTitle = `Edit Post: ${pageTitleDisplay} (DEV) - ${SITE_TITLE}`;
       <input type="hidden" name="originalFilePath" value={postToEdit.originalFilePath} />
       <input type="hidden" name="originalExtension" value={postToEdit.originalExtension} />
 
-      <PostForm client:load postData={postToEdit} formId="editPostForm" />
+      <PostForm
+        client:load
+        postData={postToEdit}
+        formId="editPostForm"
+        allPostTags={allPostTags}
+        allBookTags={allBookTags}
+        allQuoteTags={allQuoteTags}
+      />
 
       <button type="submit" class="button-primary">Update Post</button>
     </form>

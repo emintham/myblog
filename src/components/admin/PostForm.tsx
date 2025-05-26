@@ -1,12 +1,16 @@
 import React, { useEffect, useState, useCallback }  from 'react';
-import { useForm, type UseFormReturn } from 'react-hook-form';
+import { useForm, type UseFormReturn, Controller } from 'react-hook-form'; // Import Controller
 import type { PostSourceData, PostFormData, Quote } from '../../types/admin'; // Added Quote
 import { usePostSubmission } from '../../hooks/usePostSubmission';
 import InlineQuotesManager from './InlineQuotesManager'; // Import the new component
+import TagsComponent from './TagsComponent'; // Import TagsComponent
 
 export interface PostFormProps {
   postData?: PostSourceData; // Data from source, optional for create mode. Now includes optional inlineQuotes.
   formId: string; // ID of the parent <form> element
+  allPostTags?: string[]; // Optional: All unique post tags for suggestions
+  allBookTags?: string[]; // Optional: All unique book tags for suggestions
+  allQuoteTags?: string[]; // Optional: All unique quote tags for suggestions
 }
 
 const POST_TYPES = ["standard", "fleeting", "bookNote"];
@@ -21,17 +25,14 @@ const formatDateForInput = (date?: string | Date): string => {
     }
 };
 
-const formatTagsForInput = (tags?: string | string[]): string => {
-    if (Array.isArray(tags)) return tags.join(', ');
-    return tags || '';
-};
+// formatTagsForInput function is no longer needed and will be removed.
 
 const defaultValues: PostFormData = {
   title: '',
   pubDate: TODAY_ISO,
   description: '',
   postType: 'standard',
-  tags: '',
+  tags: [], // Changed from '' to []
   series: '',
   draft: true,
   bodyContent: '',
@@ -40,7 +41,7 @@ const defaultValues: PostFormData = {
   bookCoverImageName: '',
   bookCoverAlt: '',
   quotesRef: '',
-  bookTags: '',
+  bookTags: [], // Changed from '' to []
   inlineQuotes: [], // Added for inline quotes
   originalSlug: undefined,
   originalFilePath: undefined,
@@ -49,18 +50,22 @@ const defaultValues: PostFormData = {
 
 const PostForm: React.FC<PostFormProps> = ({
     postData,
-    formId
+    formId,
+    allPostTags, // Destructure new props
+    allBookTags,
+    allQuoteTags
 }) => {
   const {
-    register,
+    register, // register might not be needed for controlled fields like TagsComponent
     handleSubmit,
     watch,
     reset,
     getValues, // Add getValues
     setValue, // Add setValue
+    control, // Add control for Controller
     formState: { errors },
   }: UseFormReturn<PostFormData> = useForm<PostFormData>({
-    defaultValues,
+    defaultValues, // Default values now have tags and bookTags as []
     mode: "onSubmit", // Validate on submit
     reValidateMode: "onChange" // Re-validate on change after first submission attempt
   });
@@ -92,12 +97,20 @@ const PostForm: React.FC<PostFormProps> = ({
       // If postData includes inlineQuotes (from Astro page loading them), use those.
       // Otherwise, use the default (empty array).
       const initialQuotes = postData.inlineQuotes || defaultValues.inlineQuotes || [];
+
+      // Helper to process tags from PostSourceData to string[]
+      const processSourceTags = (tags?: string | string[]): string[] => {
+        if (Array.isArray(tags)) return tags.map(tag => String(tag).trim()).filter(Boolean);
+        if (typeof tags === 'string') return tags.split(',').map(tag => tag.trim()).filter(Boolean);
+        return [];
+      };
+
       const transformedData: PostFormData = {
         title: postData.title || '',
         pubDate: formatDateForInput(postData.pubDate),
         description: postData.description || '',
         postType: postData.postType || 'standard',
-        tags: formatTagsForInput(postData.tags),
+        tags: processSourceTags(postData.tags), // Use new processing logic
         series: postData.series || '',
         draft: postData.hasOwnProperty('draft') ? !!postData.draft : false,
         bodyContent: postData.bodyContent || '',
@@ -106,7 +119,7 @@ const PostForm: React.FC<PostFormProps> = ({
         bookCoverImageName: postData.bookCover?.imageName || '',
         bookCoverAlt: postData.bookCover?.alt || '',
         quotesRef: postData.quotesRef || '',
-        bookTags: formatTagsForInput(postData.bookTags),
+        bookTags: processSourceTags(postData.bookTags), // Use new processing logic
         inlineQuotes: initialQuotes, // Use loaded or default quotes
         originalSlug: postData.originalSlug,
         originalFilePath: postData.originalFilePath,
@@ -218,8 +231,25 @@ const PostForm: React.FC<PostFormProps> = ({
       <fieldset>
         <legend>Metadata</legend>
         <div className="form-field">
-          <label htmlFor="tags">Tags</label>
-          <input type="text" id="tags" {...register('tags')} placeholder="e.g., tech, philosophy, life" />
+          {/* <label htmlFor="tags">Tags</label>
+          <input type="text" id="tags" {...register('tags')} placeholder="e.g., tech, philosophy, life" /> */}
+          <Controller
+            name="tags"
+            control={control}
+            defaultValue={[]} // Ensure default is an array
+            render={({ field }) => (
+              <TagsComponent
+                id="tags"
+                label="Tags"
+                value={field.value || []} // Ensure value is always an array
+                onChange={field.onChange}
+                onBlur={field.onBlur} // Pass onBlur for RHF
+                suggestions={allPostTags} // Prop passed from Astro page
+                placeholder="e.g., tech, philosophy, life"
+              />
+            )}
+          />
+          {errors.tags && <span className="field-error-message">{(errors.tags as any).message || 'Invalid tags'}</span>}
         </div>
         <div className="form-field">
           <label htmlFor="series">Series</label>
@@ -253,14 +283,32 @@ const PostForm: React.FC<PostFormProps> = ({
           {/* quotesRef input is now removed from UI as per Deliverable 4 */}
           {/* The value will be managed internally or by the API */}
           <div className="form-field">
-            <label htmlFor="bookTags">Book Tags</label>
-            <input type="text" id="bookTags" {...register('bookTags')} placeholder="e.g., stoicism, philosophy" />
+            {/* <label htmlFor="bookTags">Book Tags</label>
+            <input type="text" id="bookTags" {...register('bookTags')} placeholder="e.g., stoicism, philosophy" /> */}
+            <Controller
+              name="bookTags"
+              control={control}
+              defaultValue={[]}
+              render={({ field }) => (
+                <TagsComponent
+                  id="bookTags"
+                  label="Book Tags"
+                  value={field.value || []}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  suggestions={allBookTags} // Prop passed from Astro page
+                  placeholder="e.g., stoicism, philosophy"
+                />
+              )}
+            />
+            {errors.bookTags && <span className="field-error-message">{(errors.bookTags as any).message || 'Invalid book tags'}</span>}
           </div>
           <InlineQuotesManager
             quotes={inlineQuotes}
             onAddQuote={handleAddQuote}
             onRemoveQuote={handleRemoveQuote}
             onUpdateQuoteField={handleUpdateQuoteField}
+            allQuoteTags={allQuoteTags} // Pass down to InlineQuotesManager
           />
         </fieldset>
       )}

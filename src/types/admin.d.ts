@@ -47,7 +47,7 @@ export interface PostFormData {
   pubDate: string; // Always a string in 'YYYY-MM-DD' format for the date input
   description: string;
   postType: string;
-  tags: string; // Always a comma-separated string for the input field
+  tags: string[]; // Changed from string to string[]
   series: string;
   draft: boolean;
   bodyContent: string;
@@ -58,7 +58,7 @@ export interface PostFormData {
   bookCoverImageName: string; // Flat structure for form input
   bookCoverAlt: string;       // Flat structure for form input
   quotesRef: string;
-  bookTags: string; // Always a comma-separated string for book tags input
+  bookTags: string[]; // Changed from string to string[]
 
   // Original identifiers, carried over if editing an existing post
   originalSlug?: string;
@@ -77,7 +77,7 @@ export interface PostApiPayload {
   pubDate: string;
   description?: string;
   postType: string;
-  tags?: string; // Comma-separated string or potentially already an array if pre-processed
+  tags?: string | string[]; // Explicitly allow string array
   series?: string;
   draft?: boolean | string; // Can be boolean or string like "on" from form
   bodyContent?: string;
@@ -89,7 +89,7 @@ export interface PostApiPayload {
   // API will enrich bookCover with originalWidth before saving to frontmatter
   bookCover?: { imageName?: string; alt?: string; originalWidth?: number }; // Added originalWidth
   quotesRef?: string;
-  bookTags?: string; // Comma-separated string or potentially an array
+  bookTags?: string | string[]; // Explicitly allow string array
 
   originalSlug?: string;
   originalFilePath?: string;
