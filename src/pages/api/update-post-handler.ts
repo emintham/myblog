@@ -1,10 +1,9 @@
-// src/pages/api/update-post-handler.ts
 import type { APIRoute } from 'astro';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { dump } from 'js-yaml';
 import { generateSlug } from '../../utils/slugify';
-import { AUTHOR_NAME } from '../../siteConfig';
+import type { PostApiPayload } from '../../types/admin';
+import { transformApiPayloadToFrontmatter, generatePostFileContent } from '../../utils/adminApiHelpers';
 
 export const prerender = false;
 
@@ -17,27 +16,8 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
-    const data = await request.json();
-    const {
-      originalSlug,
-      originalFilePath,
-      originalExtension,
-      title,
-      pubDate,
-      postType,
-      description,
-      tags, // string or array
-      series,
-      draft, // boolean
-      bodyContent,
-      bookTitle,
-      bookAuthor,
-      bookCover, // object { imageName, alt } or potentially flat properties
-      bookCoverImageName, // flat property from form
-      bookCoverAlt,       // flat property from form
-      quotesRef,
-      bookTags, // string or array
-    } = data;
+    const payload: PostApiPayload = await request.json();
+    const { originalFilePath, originalExtension, title, pubDate, postType } = payload;
 
     if (!originalFilePath || !title || !pubDate || !postType) {
       return new Response(JSON.stringify({ message: 'Missing required fields (originalFilePath, title, pubDate, postType)' }), {
@@ -46,70 +26,23 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const currentTitle = title || 'untitled';
+    const currentTitle = title || 'untitled'; // Should always have a title from the form
     const newSlug = generateSlug(currentTitle);
-    const fileExtension = originalExtension || path.extname(originalFilePath) || '.md';
+    // Determine the file extension: use original, or derive from originalFilePath, or default to .mdx
+    const fileExtension = originalExtension || (originalFilePath ? path.extname(originalFilePath) : '.mdx');
     const newFilename = `${newSlug}${fileExtension}`;
 
     const projectRoot = process.cwd();
     const contentBlogDir = path.join(projectRoot, 'src', 'content', 'blog');
     const newFilePath = path.join(contentBlogDir, newFilename);
 
-    const frontmatterObject: Record<string, any> = {
-      title: currentTitle,
-      pubDate: new Date(pubDate), // Convert string to Date object
-      author: AUTHOR_NAME,
-      postType: postType,
-      draft: draft === true || draft === 'on' || draft === 'true', // Ensure boolean
-    };
-
-    if (description) frontmatterObject.description = description;
-    if (series) frontmatterObject.series = series;
-
-    if (tags) {
-      const tagsArray = (typeof tags === 'string' ? tags.split(',') : Array.isArray(tags) ? tags : [])
-        .map((tag: string) => tag.trim()).filter((tag: string) => tag);
-      if (tagsArray.length > 0) frontmatterObject.tags = tagsArray;
-    }
-
-    if (postType === 'bookNote') {
-      if (bookTitle) frontmatterObject.bookTitle = bookTitle;
-      if (bookAuthor) frontmatterObject.bookAuthor = bookAuthor;
-      
-      // Consolidate bookCover information
-      let finalBookCover: { imageName?: string; alt?: string } = {};
-      if (bookCover && typeof bookCover === 'object' && (bookCover.imageName || bookCover.alt)) {
-        finalBookCover = { imageName: bookCover.imageName || '', alt: bookCover.alt || ''};
-      } else if (bookCoverImageName || bookCoverAlt) { // From flat form fields
-        finalBookCover = { imageName: bookCoverImageName || '', alt: bookCoverAlt || ''};
-      }
-      if (finalBookCover.imageName || finalBookCover.alt) { // Only add if there's something to add
-          frontmatterObject.bookCover = finalBookCover;
-      }
-
-      if (quotesRef) frontmatterObject.quotesRef = quotesRef;
-      if (bookTags) {
-        const bookTagsArray = (typeof bookTags === 'string' ? bookTags.split(',') : Array.isArray(bookTags) ? bookTags : [])
-          .map((tag: string) => tag.trim()).filter((tag: string) => tag);
-        if (bookTagsArray.length > 0) frontmatterObject.bookTags = bookTagsArray;
-      }
-    }
-    
-    // Remove any undefined fields
-    for (const key in frontmatterObject) {
-      if (frontmatterObject[key] === undefined) {
-        delete frontmatterObject[key];
-      }
-    }
-
-    const frontmatterString = dump(frontmatterObject, { skipInvalid: true });
-    const fileContent = `---\n${frontmatterString}---\n\n${(bodyContent || '').trim()}`;
-
+    // Check if a different file exists at the new path (potential slug change conflict)
     if (newFilePath !== originalFilePath) {
       try {
         await fs.access(newFilePath);
-        return new Response(JSON.stringify({ 
-          message: `Cannot update post. A different file already exists with the new title/slug: ${newFilename}. Please choose a different title.` 
+        // If fs.access doesn't throw, a file exists at the new path, which is a conflict
+        return new Response(JSON.stringify({
+          message: `Cannot update post. A different file already exists with the new title/slug: ${newFilename}. Please choose a different title or resolve the conflict.`
         }), {
           status: 409, // Conflict
           headers: { 'Content-Type': 'application/json' },
@@ -119,14 +52,23 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
+    const frontmatterObject = transformApiPayloadToFrontmatter(payload);
+    const fileContent = generatePostFileContent(frontmatterObject, payload.bodyContent || '', payload.postType, false);
+
     await fs.writeFile(newFilePath, fileContent);
 
+    // If the filename/path changed, delete the old file
     if (newFilePath !== originalFilePath && originalFilePath) {
       try {
-        await fs.access(originalFilePath); // Check before unlinking
+        await fs.access(originalFilePath); // Check if old file actually exists before unlinking
         await fs.unlink(originalFilePath);
+        if (import.meta.env.DEV) {
+          console.log(`[API Update] Successfully deleted old file: ${originalFilePath}`);
+        }
       } catch (err: any) {
-        console.warn(`Could not delete old file at ${originalFilePath} or it didn't exist: ${err.message}`);
+        // Log a warning if the old file couldn't be deleted, but don't fail the whole operation
+        // as the new file has been successfully written.
+        console.warn(`[API Update] Could not delete old file at ${originalFilePath} (it might have been already moved/deleted or permissions issue): ${err.message}`);
       }
     }
 
@@ -135,22 +77,24 @@ export const POST: APIRoute = async ({ request }) => {
       filename: newFilename,
       path: `/blog/${newSlug}`,
       newSlug: newSlug,
-      newFilePath: newFilePath,
-      newExtension: fileExtension
+      newFilePath: newFilePath, // Send back the new path
+      newExtension: fileExtension, // Send back the extension used
+      title: frontmatterObject.title // Return the processed title
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
 
   } catch (error: any) {
-    console.error('Error updating post:', error);
     if (error instanceof SyntaxError && error.message.toLowerCase().includes("json")) {
-        return new Response(JSON.stringify({ message: 'Invalid JSON data received for update.', error: error.message }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+      console.error('[API Update] Error parsing JSON body:', error);
+      return new Response(JSON.stringify({ message: 'Invalid JSON data received for update.', errorDetail: error.message }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
-    return new Response(JSON.stringify({ message: 'Error updating post.', error: error.message }), {
+    console.error('[API Update] Error updating post:', error);
+    return new Response(JSON.stringify({ message: 'Error updating post.', errorDetail: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

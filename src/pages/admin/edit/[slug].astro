@@ -1,21 +1,21 @@
 ---
-export const prerender = false; // This page is dynamic and server-rendered in dev mode
-
-// src/pages/admin/edit/[slug].astro
+export const prerender = false;
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import PostForm from '../../../components/admin/PostForm.tsx'; // Import the React form component
+import PostForm from '../../../components/admin/PostForm.tsx';
 import { SITE_TITLE } from '../../../siteConfig';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import matter from 'gray-matter'; // For parsing frontmatter
+import matter from 'gray-matter';
+import '../../../styles/admin.css'; // Import admin styles
+import type { PostSourceData } from '../../../types/admin';
 
-// --- DEV Mode Check & Data Fetching ---
+
 if (import.meta.env.PROD) {
   return new Response(null, { status: 404, statusText: 'Not Found (Admin Only)' });
 }
 
 const { slug } = Astro.params;
-let postToEdit: Record<string, any> | null = null; // Will conform to PostFormProps['postData']
+let postToEdit: PostSourceData | null = null;
 let errorMessage: string | null = null;
 
 if (!slug) {
@@ -24,12 +24,8 @@ if (!slug) {
 } else {
   const projectRoot = process.cwd();
   const contentDir = path.join(projectRoot, 'src', 'content', 'blog');
-
-  // Try common Markdown extensions
   const potentialFilenames = [`${slug}.md`, `${slug}.mdx`];
   let fileFound = false;
-  let foundFilePath = '';
-  let foundFileExtension = '';
 
   for (const filename of potentialFilenames) {
     const filePath = path.join(contentDir, filename);
@@ -37,44 +33,27 @@ if (!slug) {
       const fileContentString = await fs.readFile(filePath, 'utf-8');
       const { data: frontmatterData, content: bodyContentString } = matter(fileContentString);
 
-      foundFilePath = filePath;
-      foundFileExtension = path.extname(filePath);
-
-      // Prepare data for PostForm.tsx (aligning with its PostData interface)
       postToEdit = {
-        originalSlug: slug, // Current slug from URL
-        originalFilePath: foundFilePath,
-        originalExtension: foundFileExtension,
-        // Spread frontmatter data
+        originalSlug: slug,
+        originalFilePath: filePath, // Store full path
+        originalExtension: path.extname(filePath),
         ...frontmatterData,
-        // Add bodyContent
         bodyContent: bodyContentString.trim(),
       };
 
-      // Ensure pubDate is a string in YYYY-MM-DD for the form input
-      // PostForm.tsx's formatDateForInput will handle this if it's a Date object or valid string
-      if (postToEdit.pubDate && postToEdit.pubDate instanceof Date) {
-        postToEdit.pubDate = postToEdit.pubDate.toISOString().split('T')[0];
-      } else if (typeof postToEdit.pubDate === 'string') {
-        try {
-          // Re-parse and format to ensure YYYY-MM-DD
-          postToEdit.pubDate = new Date(postToEdit.pubDate).toISOString().split('T')[0];
-        } catch (dateError) {
-          console.warn(`Could not parse pubDate string: ${postToEdit.pubDate}`, dateError);
-          // Let PostForm.tsx handle it with its default if parsing fails
-        }
-      }
+      // PostForm's useEffect and formatDateForInput will handle date formatting.
+      // No need to pre-format pubDate here.
 
       fileFound = true;
       break;
     } catch (e) {
-      // File not found at this path, or error reading/parsing
+      // File not found or error reading
     }
   }
 
   if (!fileFound) {
     errorMessage = `Error: Post with slug "${slug}" not found in src/content/blog/.`;
-    Astro.response.status = 404; // Not Found
+    Astro.response.status = 404;
   }
 }
 
@@ -83,106 +62,53 @@ const pageTitle = `Edit Post: ${pageTitleDisplay} (DEV) - ${SITE_TITLE}`;
 ---
 
 <BaseLayout title={pageTitle}>
-  <script is:inline>
-    document.addEventListener('DOMContentLoaded', () => {
-      const submitButton = document.querySelector('#editPostForm button[type="submit"]');
-      const feedbackDiv = document.getElementById('formFeedback');
-      const feedbackMessage = document.getElementById('feedbackMessage');
-      const viewPostLink = document.getElementById('viewPostLink');
-
-      window.addEventListener('postFormSubmitting', (event) => {
-        const { isSubmitting } = event.detail;
-        if (submitButton) {
-          submitButton.disabled = isSubmitting;
-          submitButton.textContent = isSubmitting ? 'Updating...' : 'Update Post';
-        }
-      });
-
-      window.addEventListener('postFormError', (event) => {
-        const { error, actionType } = event.detail;
-        if (actionType === 'update' && feedbackMessage && feedbackDiv) {
-          feedbackMessage.textContent = `Error updating post: ${error?.message || 'Unknown error'}`;
-          feedbackDiv.className = 'form-feedback error-message';
-          feedbackDiv.style.display = 'block';
-          feedbackDiv.style.backgroundColor = '#ffdddd';
-          feedbackDiv.style.border = '1px solid red';
-          if(viewPostLink) viewPostLink.style.display = 'none';
-        }
-      });
-
-      window.addEventListener('postFormSuccess', (event) => {
-        const { result, actionType } = event.detail;
-        if (actionType === 'update' && feedbackMessage && feedbackDiv) {
-          feedbackMessage.textContent = result.message || 'Post updated successfully!';
-          feedbackDiv.className = 'form-feedback success-message';
-          feedbackDiv.style.display = 'block';
-          feedbackDiv.style.backgroundColor = '#ddffdd';
-          feedbackDiv.style.border = '1px solid green';
-
-          if (viewPostLink && result.path) {
-            viewPostLink.href = result.path; // Update link to new path if slug changed
-            viewPostLink.style.display = 'inline-block';
-          }
-          // Update the main h1 title if the title changed, which might change the slug
-          const pageH1 = document.querySelector('.page-detail-header h1');
-          if (pageH1 && result.newSlug && postToEdit && result.newSlug !== postToEdit.originalSlug) {
-             // If title was part of result, use it, otherwise construct from slug
-             const newTitleDisplay = result.title || result.newSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-             pageH1.textContent = `Edit Post: "${newTitleDisplay}"`;
-             // Also update browser title if possible (more complex, Astro might re-render parts)
-             // document.title = `Edit Post: ${newTitleDisplay} (DEV) - ${SITE_TITLE}`;
-
-             // Update hidden originalSlug field if it changed, so subsequent saves use the new slug
-             const originalSlugInput = document.querySelector('input[name="originalSlug"]');
-             if (originalSlugInput) originalSlugInput.value = result.newSlug;
-             const originalFilePathInput = document.querySelector('input[name="originalFilePath"]');
-             if (originalFilePathInput && result.newFilePath) originalFilePathInput.value = result.newFilePath;
-
-
-             // Update postToEdit.originalSlug for the current page context if slug changed
-             // This is tricky because postToEdit is server-rendered. A full reload or more complex state management
-             // might be needed if we want to avoid issues with stale data on multiple edits without page refresh.
-             // For now, the hidden input update is the most critical for form resubmission.
-          } else if (viewPostLink && postToEdit && postToEdit.originalSlug) {
-            // If slug didn't change, ensure link still points to current slug's path
-             viewPostLink.href = `/blog/${postToEdit.originalSlug}`;
-             viewPostLink.style.display = 'inline-block';
-          }
-        }
-      });
-    });
-  </script>
-  <div class="page-detail-header" style="margin-bottom: 1.5rem;">
+  <div class="page-detail-header">
     <h1>Edit Post: {postToEdit?.title ? `"${postToEdit.title}"` : (slug ? `"${slug}"` : "Unknown")}</h1>
   </div>
 
   {errorMessage && !postToEdit && (
-    <div class="form-feedback error-message" style="background-color: #ffdddd; border:1px solid red; padding: 1rem; margin-bottom:1rem;">
+    <div class="form-feedback-container error-message visible">
       <p>{errorMessage}</p>
       <a href="/admin/manage-posts/" class="button-edit">Back to Manage Posts</a>
     </div>
   )}
 
   {postToEdit && !errorMessage && (
-    <form id="editPostForm" class="post-form"> {/* Ensure .post-form class matches your global form styles */}
-      {/* Hidden fields to pass original identifiers for the update logic */}
+    <form
+      id="editPostForm"
+      class="post-form"
+      data-form-type="edit"
+      data-original-slug={postToEdit.originalSlug}
+    >
+      {/* Hidden fields are still useful for initial state if JS fails or for non-JS scenarios,
+          but adminFormHandler.js will also update them if slug changes. */}
       <input type="hidden" name="originalSlug" value={postToEdit.originalSlug} />
       <input type="hidden" name="originalFilePath" value={postToEdit.originalFilePath} />
       <input type="hidden" name="originalExtension" value={postToEdit.originalExtension} />
 
-      {/* Use the React PostForm component, passing the fetched data.
-          The `key` prop ensures React re-initializes the component if the slug (and thus postData) changes,
-          e.g., if we had direct navigation between edit pages (less common in this setup). */}
       <PostForm client:load postData={postToEdit} formId="editPostForm" />
 
-      <button type="submit" class="button-primary" style="margin-top: 1rem;">Update Post</button>
+      <button type="submit" class="button-primary">Update Post</button>
     </form>
   )}
 
-  {/* Feedback area for API response */}
-  <div id="formFeedback" style="margin-top: 1.5rem; padding: 1rem; border-radius: 4px; display: none;">
+  <div id="formFeedback" class="form-feedback-container">
     <p id="feedbackMessage"></p>
-    <a id="viewPostLink" href="#" style="display:none; margin-top: 0.5rem;" class="button-edit">View Post</a>
-    <a href="/admin/manage-posts/" style="margin-left:1rem; margin-top: 0.5rem; display:inline-block;" class="button-edit">Back to Manage Posts</a>
+    <a id="viewPostLink" href="#" style="display:none;" class="button-edit">View Post</a>
+    <a href="/admin/manage-posts/" class="button-edit" style="margin-left:1rem;">Back to Manage Posts</a>
   </div>
+  <script src="/scripts/adminFormHandler.js" is:inline></script>
 </BaseLayout>
+
+<style>
+  .page-detail-header {
+    margin-bottom: 1.5rem;
+  }
+  .post-form button[type="submit"] {
+    margin-top: 1rem;
+  }
+  #formFeedback a.button-edit {
+    margin-top: 0.5rem;
+    display: inline-block; /* Ensure it's visible when display is not none */
+  }
+</style>
