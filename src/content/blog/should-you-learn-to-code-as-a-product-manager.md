@@ -4,7 +4,6 @@ pubDate: 2024-08-26
 description: "My thoughts on learning to code if you are a product manager"
 tags: ["opinion", "technical", "guide", "product management", "software engineering", "learning", "career development"]
 series: "Software Engineering"
-draft: true
 postType: "standard"
 
 ---
