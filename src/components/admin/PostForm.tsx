@@ -194,7 +194,7 @@ const PostForm: React.FC<PostFormProps> = ({
         parentForm.removeEventListener('submit', formSubmitWrapper);
       };
     }
-  }, [formId, handleSubmit, submitPost, getValues]); // Added getValues to dependencies
+  }, [formId, handleSubmit, submitPost, getValues, inlineQuotes]); // Added inlineQuotes to dependencies
 
   return (
     <>

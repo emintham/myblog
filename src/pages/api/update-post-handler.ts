@@ -1,8 +1,9 @@
 import type { APIRoute } from 'astro';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import yaml from 'js-yaml'; // Import js-yaml
 import { generateSlug } from '../../utils/slugify';
-import type { PostApiPayload } from '../../types/admin';
+import type { PostApiPayload, Quote } from '../../types/admin'; // Import Quote
 import { transformApiPayloadToFrontmatter, generatePostFileContent } from '../../utils/adminApiHelpers';
 
 export const prerender = false;
@@ -71,6 +72,48 @@ export const POST: APIRoute = async ({ request }) => {
         console.warn(`[API Update] Could not delete old file at ${originalFilePath} (it might have been already moved/deleted or permissions issue): ${err.message}`);
       }
     }
+
+    // --- Handle Inline Quotes Update ---
+    if (payload.postType === 'bookNote' && payload.quotesRef && payload.inlineQuotes !== undefined) {
+      const quotesDir = path.join(projectRoot, 'src', 'content', 'bookQuotes');
+      const quotesFilePath = path.join(quotesDir, `${payload.quotesRef}.yaml`);
+
+      // Ensure the bookQuotes directory exists
+      try {
+        await fs.mkdir(quotesDir, { recursive: true });
+      } catch (mkdirError: any) {
+        console.error(`[API Update] Error creating bookQuotes directory ${quotesDir}:`, mkdirError);
+        // Potentially return an error or log and continue without saving quotes
+        // For now, we'll log and attempt to write, which might fail if dir doesn't exist.
+      }
+
+      const quotesToSave = payload.inlineQuotes.map(q => ({
+        text: q.text,
+        quoteAuthor: q.quoteAuthor,
+        tags: q.tags,
+        quoteSource: q.quoteSource,
+        // Client-side 'id' is not saved
+      }));
+
+      const yamlData = {
+        bookSlug: newSlug, // Use the new slug of the post
+        quotes: quotesToSave,
+      };
+
+      try {
+        const yamlString = yaml.dump(yamlData);
+        await fs.writeFile(quotesFilePath, yamlString);
+        if (import.meta.env.DEV) {
+          console.log(`[API Update] Successfully updated quotes file: ${quotesFilePath}`);
+        }
+      } catch (quoteError: any) {
+        console.error(`[API Update] Error writing quotes file ${quotesFilePath}:`, quoteError);
+        // Decide if this should be a critical error. For now, log and continue.
+        // The main post was updated, but quotes might be out of sync.
+        // Could add a warning to the response message.
+      }
+    }
+    // --- End Handle Inline Quotes Update ---
 
     return new Response(JSON.stringify({
       message: 'Post updated successfully!',

@@ -68,7 +68,29 @@ const InlineQuotesManager: React.FC<InlineQuotesManagerProps> = ({
               id={`quote-tags-${quote.id}`}
               value={(quote.tags || []).join(', ')}
               onChange={(e) => {
-                const tagsArray = e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+                // Allow commas and spaces during typing.
+                // Split by comma, trim each part, but don't filter out empty strings yet
+                // to allow typing "tag1, tag2, " before the next tag.
+                // The final filtering of empty tags can happen on blur or submission if needed,
+                // but for live state update, this is more permissive.
+                const tagsArray = e.target.value.split(',').map(tag => tag.trim());
+                // If the input is empty, treat as an empty array rather than [""]
+                if (e.target.value === '') {
+                    onUpdateQuoteField(quote.id, 'tags', []);
+                } else if (e.target.value.endsWith(',')) {
+                    // If the user just typed a comma, add an empty string to represent the next potential tag
+                    // and to ensure the comma is preserved by the join(', ') for the value.
+                    onUpdateQuoteField(quote.id, 'tags', [...tagsArray, '']);
+                }
+                else {
+                    onUpdateQuoteField(quote.id, 'tags', tagsArray.filter(tag => tag !== '' || tagsArray.length === 1));
+                }
+              }}
+              onBlur={(e) => {
+                // On blur, clean up the tags: split, trim, and filter empty ones.
+                const tagsArray = e.target.value.split(',')
+                  .map(tag => tag.trim())
+                  .filter(tag => tag); // Filter empty strings on blur
                 onUpdateQuoteField(quote.id, 'tags', tagsArray);
               }}
               style={{ fontSize: '0.95em', padding: '0.4rem' }}
