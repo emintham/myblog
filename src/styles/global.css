@@ -15,6 +15,7 @@
   --color-border-subtle: #eeeeee;
   --color-note-paper: #fbfaf9; /* Example: extremely close to page background */
   --color-code-background: #f4f4f4; /* For <pre> blocks */
+  --color-accent-secondary: #f7a76c;
 
   --content-max-width: 720px; /* Adjust for optimal line length */
 }
@@ -419,13 +420,16 @@ pre {
 
 /* Status badge for drafts, potentially reusable in admin areas */
 .status-draft-badge {
-  background-color: var(--color-accent);
-  color: var(--color-background, #fff);
-  padding: 0.15em 0.4em;
+  background-color: var(--color-accent-secondary); /* Example: a muted yellow/orange */
   border-radius: 3px;
-  font-size: 0.7rem;
-  font-weight: 600;
+  color: var(--color-background, #fff);
+  display: inline-block;
+  font-size: 0.75em;
+  font-weight: bold;
   line-height: 1.2;
+  margin-right: 0.3em; /* Space between badge and title */
+  padding: 0.15em 0.4em;
   text-transform: uppercase;
+  vertical-align: baseline;
   white-space: nowrap;
 }

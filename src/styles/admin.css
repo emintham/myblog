@@ -78,10 +78,6 @@
   text-align: center;
 }
 
-.button-primary {
-  background-color: #007bff;
-  color: white;
-}
 .button-primary:hover {
   background-color: #0056b3;
 }
@@ -97,4 +93,190 @@
 }
 .button-edit:hover {
   background-color: #545b62;
+}
+button.button-primary:hover {
+  background-color: #0056b3;
+}
+
+button.button-primary:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+}
+
+a.button-primary:hover {
+  background-color: #0056b3;
+  color: white;
+  text-decoration: none;
+}
+/* Styles for InlineQuotesManager component */
+.inline-quotes-manager {
+  margin-top: 1.5rem;
+}
+
+.inline-quotes-manager > .inline-quotes-label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  font-size: 1.1em;
+}
+
+.inline-quotes-manager .quote-item {
+  border-bottom: 1px solid #e0e0e0;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.inline-quotes-manager .quote-item .form-field {
+  margin-bottom: 0.75rem;
+}
+
+.inline-quotes-manager .quote-item .form-field label {
+  font-size: 0.9em;
+  color: #333;
+  font-weight: normal; /* Override general form-field label bold if needed */
+}
+
+.inline-quotes-manager .quote-item .form-field textarea,
+.inline-quotes-manager .quote-item .form-field input[type="text"] {
+  font-size: 0.95em;
+  padding: 0.4rem;
+}
+
+/* Specific margin for the tags field container if it needs to be different */
+.inline-quotes-manager .quote-item .tags-field-container {
+  margin-bottom: 1rem;
+}
+
+.inline-quotes-manager .button-remove-quote {
+  background: none;
+  border: 1px solid #ccc;
+  color: #555;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85em;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-right: 0.5rem;
+}
+.inline-quotes-manager .button-remove-quote:hover {
+  border-color: #aaa;
+  color: #333;
+}
+
+.inline-quotes-manager .button-add-quote {
+  background: none;
+  border: 1px solid #007bff;
+  color: #007bff;
+  padding: 0.5rem 1rem;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  font-size: 0.9em;
+}
+.inline-quotes-manager .button-add-quote:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+/* Styles from create-post.astro and edit/[slug].astro */
+.page-detail-header {
+  margin-bottom: 1.5rem;
+}
+
+/* Styles from edit/[slug].astro */
+#formFeedback a.button-edit {
+  margin-top: 0.5rem;
+  display: inline-block; /* Ensure it's visible when display is not none */
+}
+
+#formFeedback #viewPostLink {
+  /* display: none; by default, JS will make it visible */
+  /* This class can be used by JS to show it, or it can be styled directly if always hidden by default */
+}
+
+#formFeedback .manage-posts-link { /* Added a class for more specific targeting */
+  margin-left: 1rem;
+}
+/* Styles from manage-posts.astro */
+.admin-actions {
+  margin-bottom: 2rem;
+  text-align: right;
+}
+
+.admin-post-list .list-item-entry {
+  align-items: center;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.admin-post-list .post-info-column {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: 1rem; /* Space before the Edit button */
+  justify-content: center;
+}
+
+.admin-post-list .title-line {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 0.2rem;
+}
+
+.admin-post-list .title-with-draft-badge {
+  margin-left: 0.5em; /* Add margin if draft badge is present */
+}
+
+.admin-post-list .post-meta-details {
+  font-size: 0.85rem;
+  margin-top: 0.1rem;
+  color: var(--color-meta);
+}
+
+.admin-post-list .post-meta-details span { /* Spacing for date | type */
+  margin-left: 0.75rem;
+}
+.admin-post-list .post-meta-details span:first-of-type { /* For the date, no left margin */
+  margin-left: 0;
+}
+/* .admin-post-list .post-meta-details .post-type-label is already covered by .post-meta-details */
+
+.empty-state-message {
+  margin-top: 2rem;
+  text-align: center;
+  font-style: italic;
+  color: var(--color-meta);
+}
+
+/* General list item styling (if not already in global.css or similar) */
+/* This assumes a base .item-list-container and .list-item-entry structure */
+/* If these are unique to admin, they can stay here. If global, move them. */
+.item-list-container {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.list-item-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Default alignment */
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.list-item-entry:last-child {
+  border-bottom: none;
+}
+
+.list-item-name {
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+}
+.list-item-name:hover {
+  text-decoration: underline;
+  color: var(--color-primary);
+}
+
+.status-draft-badge {
 }

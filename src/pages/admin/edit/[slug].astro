@@ -121,21 +121,8 @@ const pageTitle = `Edit Post: ${pageTitleDisplay} (DEV) - ${SITE_TITLE}`;
 
   <div id="formFeedback" class="form-feedback-container">
     <p id="feedbackMessage"></p>
-    <a id="viewPostLink" href="#" style="display:none;" class="button-edit">View Post</a>
-    <a href="/admin/manage-posts/" class="button-edit" style="margin-left:1rem;">Back to Manage Posts</a>
+    <a id="viewPostLink" href="#" class="button-edit">View Post</a> {/* style="display:none;" removed, CSS/JS will handle visibility */}
+    <a href="/admin/manage-posts/" class="button-edit manage-posts-link">Back to Manage Posts</a> {/* style removed, class added */}
   </div>
   <script src="/scripts/adminFormHandler.js" is:inline></script>
 </BaseLayout>
-
-<style>
-  .page-detail-header {
-    margin-bottom: 1.5rem;
-  }
-  .post-form button[type="submit"] {
-    margin-top: 1rem;
-  }
-  #formFeedback a.button-edit {
-    margin-top: 0.5rem;
-    display: inline-block; /* Ensure it's visible when display is not none */
-  }
-</style>

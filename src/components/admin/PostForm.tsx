@@ -164,29 +164,17 @@ const PostForm: React.FC<PostFormProps> = ({
     }
   }, [watchedBookTitle, setValue]);
 
-  // The submitPost function from the hook is already stable due to useCallback in the hook.
-  // We pass it directly to handleSubmit.
-  // const onFormSubmit = handleSubmit(submitPost); // We will call submitPost directly
+  // The submitPost function from the hook is stable due to useCallback.
+  // It's used within the custom submit handler attached to the parent form.
 
   useEffect(() => {
     const parentForm = document.getElementById(formId);
     if (parentForm && parentForm instanceof HTMLFormElement) {
       const formSubmitWrapper = async (event: SubmitEvent) => {
-        event.preventDefault(); // Explicitly prevent default
-        // Manually trigger validation and then submission if valid
-        // For D1, submitPost doesn't yet handle inlineQuotes. This will be addressed in D3/D4.
-        // const currentFormData = getValues();
-        // const dataToSubmit = { ...currentFormData, inlineQuotes };
-        // const isValid = await handleSubmit(() => submitPost(dataToSubmit))();
-        const isValid = await handleSubmit(formData => submitPost({...formData, inlineQuotes}))(); // Pass merged data
-        // Note: handleSubmit(submitPost)() will call submitPost if validation passes.
-        // If we don't want to rely on its internal call due to the manual setup,
-        // we could do:
-        // const isValid = await trigger(); // trigger validation for all fields
-        // if (isValid) {
-        //   submitPost(getValues());
-        // }
-        // For now, let's stick to the simpler handleSubmit()() which should work.
+        event.preventDefault();
+        // Manually trigger RHF validation and then call submitPost with all form data, including inlineQuotes.
+        const isValid = await handleSubmit(formData => submitPost({...formData, inlineQuotes}))();
+        // handleSubmit(callback)() calls the callback if validation passes.
       };
 
       parentForm.addEventListener('submit', formSubmitWrapper);
