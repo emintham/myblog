@@ -28,7 +28,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     const title = data.title;
     const slug = generateSlug(title || 'untitled');
-    const filename = `${slug}.md`; // Assuming .md, update if .mdx logic is needed
+    const filename = `${slug}.mdx`;
     const projectRoot = process.cwd();
     const filePath = path.join(projectRoot, 'src', 'content', 'blog', filename);
 
@@ -45,7 +45,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     const frontmatterObject: Record<string, any> = {
       title: title,
-      pubDate: data.pubDate, // Ensure this is YYYY-MM-DD string
+      pubDate: new Date(data.pubDate), // Convert string to Date object
       author: AUTHOR_NAME,
       postType: data.postType,
       draft: data.draft === true || data.draft === 'on' || data.draft === 'true', // Ensure boolean

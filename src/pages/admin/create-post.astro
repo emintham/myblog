@@ -10,6 +10,8 @@ if (import.meta.env.PROD) {
 export const prerender = false;
 
 const pageTitle = `Create New Post (DEV) - ${SITE_TITLE}`;
+
+// Callbacks are now handled by custom events dispatched from PostForm.tsx
 ---
 
 <BaseLayout title={pageTitle}>
@@ -17,14 +19,88 @@ const pageTitle = `Create New Post (DEV) - ${SITE_TITLE}`;
     <h1>Create New Post</h1>
   </div>
 
+  <script is:inline>
+    // Event handlers for custom events dispatched by PostForm.tsx
+    // is:inline ensures this script runs as-is on the client.
+
+    function handlePostFormSubmitting(event) {
+      const { isSubmitting } = event.detail;
+      const submitButton = document.getElementById('createPostSubmitButton');
+      if (submitButton) {
+        submitButton.disabled = isSubmitting;
+        submitButton.textContent = isSubmitting ? 'Saving...' : 'Save New Post';
+      }
+    }
+
+    function handlePostFormError(event) {
+      const { error, actionType } = event.detail;
+      const feedbackDiv = document.getElementById('formFeedback');
+      const feedbackMessage = document.getElementById('feedbackMessage');
+
+      if (feedbackMessage && feedbackDiv) {
+        const message = error && error.message ? error.message : 'Unknown error';
+        feedbackMessage.textContent = `Error ${actionType === 'create' ? 'creating' : 'updating'} post: ${message}`;
+        feedbackDiv.className = 'form-feedback error-message'; // Ensure CSS for .error-message
+        feedbackDiv.style.display = 'block';
+        feedbackDiv.style.backgroundColor = '#ffdddd'; // Example error styling
+        feedbackDiv.style.border = '1px solid red';
+      }
+      console.error(`Error during ${actionType} post:`, error);
+    }
+
+    function handlePostFormSuccess(event) {
+      const { result, actionType } = event.detail;
+      console.log('[handlePostFormSuccess] Event received. Result:', result, 'ActionType:', actionType);
+      const feedbackDiv = document.getElementById('formFeedback');
+      const feedbackMessage = document.getElementById('feedbackMessage');
+
+      if (actionType === 'create' && result && result.newSlug) {
+        if (feedbackMessage && feedbackDiv) {
+          feedbackMessage.textContent = (result.message || 'Post created!') + ' Redirecting to edit page...';
+          feedbackDiv.className = 'form-feedback success-message'; // Ensure CSS for .success-message
+          feedbackDiv.style.display = 'block';
+          feedbackDiv.style.backgroundColor = '#ddffdd'; // Example success styling
+          feedbackDiv.style.border = '1px solid green';
+        }
+        console.log('[handlePostFormSuccess] Attempting redirect to:', `/admin/edit/${result.newSlug}`);
+        // Redirect to the edit page
+        window.location.href = `/admin/edit/${result.newSlug}`;
+      } else if (actionType === 'create') {
+        // Handle create success but no slug (should not happen with current API)
+        if (feedbackMessage && feedbackDiv) {
+          feedbackMessage.textContent = (result && result.message) || 'Post created, but no slug returned for redirect.';
+          feedbackDiv.className = 'form-feedback warning-message'; // Ensure CSS for .warning-message
+          feedbackDiv.style.display = 'block';
+        }
+      }
+      // If actionType is 'update', this callback on create-post.astro won't do anything specific.
+    }
+
+    // Add event listeners when the DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      window.addEventListener('postFormSubmitting', handlePostFormSubmitting);
+      window.addEventListener('postFormError', handlePostFormError);
+      window.addEventListener('postFormSuccess', handlePostFormSuccess);
+    });
+
+    // Optional: Clean up event listeners when the page unloads, though for Astro pages this might be overkill.
+    // window.addEventListener('beforeunload', () => {
+    //   window.removeEventListener('postFormSubmitting', handlePostFormSubmitting);
+    //   window.removeEventListener('postFormError', handlePostFormError);
+    //   window.removeEventListener('postFormSuccess', handlePostFormSuccess);
+    // });
+  </script>
+
   <form id="createPostForm" class="post-form">
-    <PostForm client:load key="create-form" /> {/* Added a static key for create form instance stability */}
-    <button type="submit" class="button-primary" style="margin-top: 1rem;">Save New Post</button>
+    <PostForm
+      client:load
+      formId="createPostForm"
+    />
+    <button type="submit" id="createPostSubmitButton" class="button-primary" style="margin-top: 1rem;">Save New Post</button>
   </form>
 
   {/* Feedback area can still be used for errors or very brief success before redirect */}
   <div id="formFeedback" style="margin-top: 1.5rem; padding: 1rem; border-radius: 4px; display: none;">
     <p id="feedbackMessage"></p>
-    {/* viewPostLink is not needed if we redirect to edit page */}
   </div>
 </BaseLayout>

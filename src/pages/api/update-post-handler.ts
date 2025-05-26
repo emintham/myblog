@@ -57,7 +57,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     const frontmatterObject: Record<string, any> = {
       title: currentTitle,
-      pubDate: pubDate, // Ensure YYYY-MM-DD
+      pubDate: new Date(pubDate), // Convert string to Date object
       author: AUTHOR_NAME,
       postType: postType,
       draft: draft === true || draft === 'on' || draft === 'true', // Ensure boolean
