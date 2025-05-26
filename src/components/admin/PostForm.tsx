@@ -5,9 +5,8 @@ import { usePostSubmission } from '../../hooks/usePostSubmission';
 import InlineQuotesManager from './InlineQuotesManager'; // Import the new component
 
 export interface PostFormProps {
-  postData?: PostSourceData; // Data from source, optional for create mode
+  postData?: PostSourceData; // Data from source, optional for create mode. Now includes optional inlineQuotes.
   formId: string; // ID of the parent <form> element
-  // initialInlineQuotes?: Quote[]; // This will be added in Deliverable 2
 }
 
 const POST_TYPES = ["standard", "fleeting", "bookNote"];
@@ -81,9 +80,8 @@ const PostForm: React.FC<PostFormProps> = ({
   const watchedPostType = watch('postType', defaultValues.postType);
   const watchedBookTitle = watch('bookTitle'); // Watch bookTitle for dynamic alt text
   const [showBookNoteFieldsUI, setShowBookNoteFieldsUI] = useState(watchedPostType === 'bookNote');
-  // For D1, inlineQuotes always start empty or from defaultValues.
-  // It will be populated by `initialInlineQuotes` prop in D2.
-  const [inlineQuotes, setInlineQuotes] = useState<Quote[]>(defaultValues.inlineQuotes || []);
+  const [inlineQuotes, setInlineQuotes] = useState<Quote[]>([]); // Initialize empty, will be set by useEffect
+  const [isQuotesRefReadOnly, setIsQuotesRefReadOnly] = useState(false); // State for quotesRef read-only status
 
   useEffect(() => {
     setShowBookNoteFieldsUI(watchedPostType === 'bookNote');
@@ -91,6 +89,9 @@ const PostForm: React.FC<PostFormProps> = ({
 
   useEffect(() => {
     if (postData && postData.originalSlug) {
+      // If postData includes inlineQuotes (from Astro page loading them), use those.
+      // Otherwise, use the default (empty array).
+      const initialQuotes = postData.inlineQuotes || defaultValues.inlineQuotes || [];
       const transformedData: PostFormData = {
         title: postData.title || '',
         pubDate: formatDateForInput(postData.pubDate),
@@ -106,18 +107,25 @@ const PostForm: React.FC<PostFormProps> = ({
         bookCoverAlt: postData.bookCover?.alt || '',
         quotesRef: postData.quotesRef || '',
         bookTags: formatTagsForInput(postData.bookTags),
-        inlineQuotes: defaultValues.inlineQuotes || [], // Keep consistent with initial state for D1
+        inlineQuotes: initialQuotes, // Use loaded or default quotes
         originalSlug: postData.originalSlug,
         originalFilePath: postData.originalFilePath,
         originalExtension: postData.originalExtension,
       };
       reset(transformedData);
-      // For D1, setInlineQuotes will only use defaultValues or an empty array.
-      // The logic for `initialInlineQuotes` prop will be added in D2.
-      setInlineQuotes(defaultValues.inlineQuotes || []);
+      setInlineQuotes(initialQuotes);
+
+      // If quotesRef has a value (meaning it's an existing book note with a ref,
+      // potentially with loaded quotes), make the input read-only.
+      if (postData.quotesRef && postData.postType === 'bookNote') {
+        setIsQuotesRefReadOnly(true);
+      } else {
+        setIsQuotesRefReadOnly(false);
+      }
     } else {
       reset(defaultValues);
       setInlineQuotes(defaultValues.inlineQuotes || []);
+      setIsQuotesRefReadOnly(false);
     }
   }, [postData, reset]);
 
@@ -256,7 +264,14 @@ const PostForm: React.FC<PostFormProps> = ({
           {/* Book Cover Alt Text field is removed and will be auto-generated */}
           <div className="form-field">
             <label htmlFor="quotesRef">Quotes Reference</label>
-            <input type="text" id="quotesRef" {...register('quotesRef')} placeholder="e.g., meditations-quotes" />
+            <input
+              type="text"
+              id="quotesRef"
+              {...register('quotesRef')}
+              placeholder="e.g., meditations-quotes"
+              readOnly={isQuotesRefReadOnly} // Set readOnly based on state
+            />
+            {isQuotesRefReadOnly && <small style={{ display: 'block', marginTop: '0.25rem', color: '#555' }}>This field is read-only when inline quotes are loaded.</small>}
           </div>
           <div className="form-field">
             <label htmlFor="bookTags">Book Tags</label>

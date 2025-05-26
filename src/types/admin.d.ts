@@ -21,6 +21,7 @@ export interface PostSourceData {
   bookCover?: { imageName?: string; alt?: string }; // Nested object for book cover details
   quotesRef?: string; // Reference to a quotes file or section
   bookTags?: string | string[]; // Tags specific to the book note
+  inlineQuotes?: Quote[]; // Loaded inline quotes for edit mode
 
   // Fields for identifying an existing post, typically used for updates
   originalSlug?: string;
