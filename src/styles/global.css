@@ -15,6 +15,7 @@
   --color-border-subtle: #eeeeee;
   --color-note-paper: #fbfaf9; /* Example: extremely close to page background */
   --color-code-background: #f4f4f4; /* For <pre> blocks */
+  --color-accent-secondary: #f7a76c;
 
   --content-max-width: 720px; /* Adjust for optimal line length */
 }
@@ -257,4 +258,178 @@ pre {
 
 .read-more:hover {
   color: var(--color-text);
+}
+
+/* Common Button Styles */
+.button-primary {
+  display: inline-block;
+  padding: 0.65em 1.3em;
+  background-color: var(--color-accent);
+  color: var(--color-background, #fff); /* Fallback for background color */
+  text-decoration: none;
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.9rem;
+  border: 1px solid var(--color-accent);
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+.button-primary:hover {
+  background-color: var(--color-text);
+  border-color: var(--color-text);
+  color: var(--color-background, #fff);
+}
+
+.button-edit { /* Style for edit buttons, e.g., on manage-posts page */
+  display: inline-block;
+  padding: 0.5em 1em;
+  background-color: transparent;
+  color: var(--color-accent);
+  text-decoration: none;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  white-space: nowrap; /* Prevents button text from wrapping */
+}
+.button-edit:hover {
+  background-color: var(--color-accent);
+  color: var(--color-background, #fff);
+  border-color: var(--color-accent);
+}
+
+/* Styles for the admin post creation/editing form */
+.post-form fieldset {
+  border: 1px solid var(--color-border-subtle);
+  padding: 1rem 1.5rem 1.5rem; /* top, horizontal, bottom */
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+}
+
+.post-form legend {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--color-accent);
+  padding: 0 0.5em; /* Space around legend text */
+}
+
+.post-form .form-field {
+  margin-bottom: 1rem;
+}
+
+.post-form .form-field:last-child {
+  margin-bottom: 0;
+}
+
+.post-form .form-field label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+.post-form .form-field input[type="text"],
+.post-form .form-field input[type="date"],
+.post-form .form-field select,
+.post-form .form-field textarea {
+  width: 100%;
+  padding: 0.6em 0.8em;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 3px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  box-sizing: border-box; /* Important for 100% width + padding */
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.post-form .form-field input[type="text"]:focus,
+.post-form .form-field input[type="date"]:focus,
+.post-form .form-field select:focus,
+.post-form .form-field textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 25%, transparent); /* Subtle focus ring */
+}
+
+.post-form .form-field textarea { /* General textarea in form */
+  min-height: 80px;
+  line-height: 1.6;
+}
+
+/* Specific styling for the main body content textarea using its ID */
+/* Ensure this ID is unique per page if PostForm is ever used multiple times on one page (not current scenario) */
+.post-form #bodyContent {
+  min-height: 200px;
+}
+
+.post-form .form-field input[type="checkbox"] {
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+/* Ensures label containing checkbox doesn't force 100% width on the checkbox input itself */
+.post-form .form-field label input[type="checkbox"] {
+   width: auto;
+}
+
+/* Styles for the 'Book Note Details' fieldset */
+/* The React component PostForm.tsx uses className="book-note-fields" for this fieldset */
+.post-form .book-note-fields {
+  border-color: var(--color-accent);
+  /* margin-top is already handled by fieldset's general margin-bottom */
+}
+
+.post-form .book-note-fields legend {
+  color: var(--color-accent);
+}
+
+#generatedOutput,
+#formFeedback { /* Assuming formFeedback uses similar styling */
+  background-color: color-mix(in srgb, var(--color-background) 95%, black);
+  padding: 1.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border-subtle);
+}
+
+#generatedOutput h2,
+#formFeedback h2 { /* If formFeedback were to have an h2 */
+  margin-top: 0;
+  font-family: var(--font-sans);
+  font-size: 1.5rem;
+}
+
+#generatedOutput pre {
+  background-color: var(--color-background);
+  padding: 1em;
+  overflow-x: auto;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 0.9em;
+  white-space: pre; /* Or pre-wrap */
+  line-height: 1.5;
+}
+
+/* Status badge for drafts, potentially reusable in admin areas */
+.status-draft-badge {
+  background-color: var(--color-accent-secondary); /* Example: a muted yellow/orange */
+  border-radius: 3px;
+  color: var(--color-background, #fff);
+  display: inline-block;
+  font-size: 0.75em;
+  font-weight: bold;
+  line-height: 1.2;
+  margin-right: 0.3em; /* Space between badge and title */
+  padding: 0.15em 0.4em;
+  text-transform: uppercase;
+  vertical-align: baseline;
+  white-space: nowrap;
 }

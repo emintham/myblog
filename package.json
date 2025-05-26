@@ -19,14 +19,26 @@
     "lint:fix": "eslint . --ext .js,.cjs,.mjs,.ts,.astro --fix"
   },
   "dependencies": {
+    "@astrojs/mdx": "^4.3.0",
+    "@astrojs/react": "^4.3.0",
     "@astrojs/sitemap": "^3.3.1",
+    "@types/react": "^19.1.5",
+    "@types/react-dom": "^19.1.5",
+    "@types/react-select": "^5.0.0",
     "astro": "^5.7.11",
     "glob": "^11.0.2",
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-hook-form": "^7.56.4",
+    "react-select": "^5.10.1",
     "sharp": "^0.34.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.26.0",
+    "@types/js-yaml": "^4.0.9",
     "@typescript-eslint/eslint-plugin": "^8.32.0",
     "@typescript-eslint/parser": "^8.32.0",
     "eslint": "^9.26.0",

@@ -1,8 +1,11 @@
 ---
 title: "Side notes included"
 pubDate: 2025-05-14
+author: "Your Name"
+postType: "standard"
 description: "An article with side notes"
-tags: ["features"]
+tags:
+  - "features"
 draft: true
 ---
 

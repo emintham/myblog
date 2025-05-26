@@ -1,10 +1,8 @@
 # Kinfolk Inspired Astro Blog Template
 
-A minimalist, text-focused blog template built with [Astro](https://astro.build/),
-inspired by the clean aesthetic of Kinfolk magazine. Designed for writers and developers
-who appreciate typography and a serene reading experience. Provides features
-that enhance knowledge curation and management, ideal for a personal blog or
-Second Brain.
+An Astro blog template focused on minimalism and typography, inspired by Kinfolk magazine.
+Ideal for writers, developers, and knowledge curators seeking a serene reading experience
+and tools for a personal blog or Second Brain.
 
 [Live Demo](https://emintham.com)
 [Changelog](https://github.com/emintham/blog-template/blob/master/CHANGELOG.md)
@@ -15,23 +13,23 @@ Second Brain.
 - **Astro Powered:** Leverages Astro for a fast, modern, and content-focused experience.
 - **Responsive Layout:** Adapts gracefully to all screen sizes, ensuring a great reading experience on any device.
 - **SEO Friendly:** Includes structural SEO enhancements and automatic sitemap generation.
-- **Optimized Images:** Includes a script to convert and resize images to WebP format with JPG fallbacks, using the `<picture>` element for responsive delivery.
-- **Homepage:** Lists recent posts with previews for easy discovery.
+- **Optimized Images:** Script for WebP conversion, resizing, and responsive delivery via `<picture>` element.
+- **Homepage:** Displays recent posts with previews.
   ![Main Page Screenshot](images/IMG_0028.PNG)
 
 ## Advanced Content & Knowledge Management
 
-This template goes beyond a simple blog, offering features tailored for organizing and curating knowledge:
+Offers advanced features for knowledge organization and curation:
 
 - **Multiple Post Types:**
 
   - **Standard Posts:** For traditional, long-form blog articles.
-  - **Fleeting Thoughts:** Compact posts for brief insights or notes, displayed fully in previews without a "Read More" link. Ideal for quick, atomic ideas.
+  - **Fleeting Thoughts:** Short-form posts for quick insights, fully displayed in previews.
     ![Short Post Screenshot](images/IMG_0041.jpeg)
-  - **Book Notes:** A dedicated format for in-depth book reviews, summaries, and curated quotes. This feature helps in building a personal knowledge base from your reading.
-    - **Detailed Display:** Rich presentation for individual book notes, including responsive book cover, author details, your review, and a collapsible quotes section.
+  - **Book Notes:** In-depth format for book reviews, summaries, and quotes, aiding personal knowledge base construction.
+    - **Detailed Display:** Rich presentation with book cover, author details, review, and collapsible quotes section.
       ![Book Notes Screenshot in Details Page](images/IMG_0042.PNG)
-    - **Organized Quotes:** Quotes are managed in separate YAML files for clarity and ease of editing, complete with their own tags for granular categorization.
+    - **Organized Quotes:** Quotes in separate YAML files with dedicated tags for easy management.
       ![Book Quotes Screenshot](images/IMG_0043.PNG)
     - **Dedicated Tagging Systems:**
       - **Book Tags:** Categorize books by genre, theme, etc. (e.g., "non-fiction", "philosophy").
@@ -51,8 +49,8 @@ This template goes beyond a simple blog, offering features tailored for organizi
 
 - **Sidenotes / Marginalia:**
 
-  - Tufte-style sidenotes that appear in the margin on wider screens, gracefully falling back to standard footnotes on smaller screens.
-  - Supports numbered `[^1]` or named `[^my-note]` footnotes for better organization and easier reference, especially in longer texts.
+  - Tufte-style sidenotes (margin notes on wide screens, footnotes on small screens).
+  - Supports numbered `[^1]` and named `[^my-note]` footnotes for clarity.
     ![Sidenotes Screenshot](images/IMG_0032.jpeg)
     _Example Markdown for Sidenotes:_
 
@@ -64,11 +62,18 @@ This template goes beyond a simple blog, offering features tailored for organizi
     [^my-memorable-note]: This is the second one, referenced by a name. This can be helpful for managing many footnotes.
     ```
 
+- **Authoring Tools in Dev Mode:**
+
+    - Live previews and hot reloading via Astro's dev server.
+      ![Dev Mode Screenshot](images/IMG_0054.PNG)
+    - Interactive dropdown menus for quick tagging.
+      ![Tagging Dropdown Screenshot](images/IMG_0056.PNG)
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) (LTS version recommended, check Astro's current requirements)
 - [pnpm](https://pnpm.io/installation) (This template uses `pnpm` for package management)
-- `sharp` and `glob` dependencies (install with `pnpm add sharp glob fs-extra` if not already present from `pnpm install`).
+- `sharp` and `glob` (installed via `pnpm install` if listed in `package.json`).
 
 ## Getting Started
 
@@ -84,7 +89,6 @@ This template goes beyond a simple blog, offering features tailored for organizi
     pnpm install
     ```
 
-    _(This should install `sharp`, `glob`, and `fs-extra` if they are listed in `package.json`.)_
 
 3.  **Initial Configuration (Important TODOs):**
 
@@ -92,14 +96,14 @@ This template goes beyond a simple blog, offering features tailored for organizi
     - **Site Name & Author Details:** Modify `src/siteConfig.ts` to match your details.
     - **About Page:** Customize the content in `src/pages/about.astro`.
     - **Favicon & Public Assets:** Replace `public/favicon.svg` with your own. Update other assets in `public/` as needed.
-    - **Image Source Directory:** Create an `images/originals/` directory in your project root. This is where you will place your original high-resolution images before processing.
+    - **Image Source Directory:** Create `images/originals/` in project root for your original images.
 
 4.  **Clear Example Content (Optional):**
     The template may include example posts and quote files. To remove them:
     ```bash
     pnpm run clear-posts
     ```
-    _(This script clears both `src/content/blog/` and `src/content/bookQuotes/`.)_
+    _(Clears `src/content/blog/` and `src/content/bookQuotes/`.)_
 
 ## Development Workflow
 
@@ -122,57 +126,13 @@ This template goes beyond a simple blog, offering features tailored for organizi
       ```bash
       pnpm run img
       ```
-    - Processed images will be saved to `public/images/processed/`. You only need to run this script when you add or change images in `images/originals/`.
+    - Processed images are saved to `public/images/processed/`. Run when new/changed originals are added.
 
 3.  **Content Creation:**
-    Use the interactive script to scaffold new content:
+    New content (Standard Posts, Fleeting Thoughts, Book Notes) can be created via the admin interface in development mode (e.g., `/admin/create-post`).
+    This interface provides fields for all post types, including specific sections for book details and inline quote management for Book Notes.
 
-    ```bash
-    pnpm run new-post
-    ```
-
-    The script will guide you through creating:
-
-    - **Standard Posts:** Traditional blog articles.
-    - **Fleeting Thoughts:** Short, compact notes.
-    - **Book Notes:** Detailed book reviews with associated quote files.
-
-    **Detailed instructions for each type:**
-
-    **a. Standard Posts:**
-
-    - The script prompts for a description, tags, and series (all optional).
-    - A Markdown file is created in `src/content/blog/` with `postType: "standard"`.
-
-    **b. Fleeting Thoughts:**
-
-    - The script prompts for a short description/thought (main content) and optional tags.
-    - A Markdown file is created in `src/content/blog/` with `postType: "fleeting"`.
-
-    **c. Book Notes:**
-
-    - The script prompts for:
-      - Review description, book title, and author.
-      - Optional: **Base image name** for the book cover (e.g., `my-book-cover` if your original image is `images/originals/my-book-cover.jpg`) and alt text. The script and components will expect processed versions in `public/images/processed/`.
-      - Optional: Book-specific tags (genre, theme).
-      - Optional: General post tags and series for the review itself.
-    - A Markdown file for your review is created in `src/content/blog/` with `postType: "bookNote"` and relevant frontmatter (including `bookCover.imageName` and `quotesRef`).
-    - **Quotes File:** A YAML file with stub quotes is automatically created in `src/content/bookQuotes/`. The filename matches the `quotesRef` (e.g., `your-post-slug-quotes.yaml`).
-      - **Manually edit this YAML file** to add your actual quotes.
-      - **Example `...-quotes.yaml` structure:**
-        ```yaml
-        bookSlug: "your-post-slug" # Matches the slug of the .md file
-        quotes:
-          - text: "This is an example quote..."
-            # quoteAuthor: "Book Author Name" # Optional
-            # quoteSource: "Chapter 1, Page 10" # Optional
-            tags: ["example-tag", "theme-inspiration"]
-          - text: "Another placeholder quote..."
-            # quoteAuthor: "A Character"
-            tags: ["placeholder"]
-        ```
-
-    **Publishing:** All new content defaults to `draft: true`. Change to `draft: false` in the Markdown frontmatter to publish.
+    **Publishing:** All new content defaults to `draft: true`. Change to `draft: false` in the Markdown frontmatter (or via the admin edit interface) to publish.
 
 4.  **Linting & Formatting:**
     - Apply formatting: `pnpm run format`
@@ -191,7 +151,7 @@ If this template repository receives updates, you can merge them into your proje
 
 1.  Commit all your local changes: `git add . && git commit -m "My work before updating template"`
 2.  (Recommended) Export your content: `pnpm run export-posts`
-    (This backs up `src/content/blog/` and `src/content/bookQuotes/` to `.exported-content/`)
+    (Backs up content to `.exported-content/`)
 
 **Update Process:**
 

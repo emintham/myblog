@@ -1,30 +1,14 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
 import { generateSlug } from "../../utils/slugify";
+import { getUniqueTagsWithCounts } from "../../utils/tagUtils"; // Updated import
 
-// Fetch all blog posts, filtering out drafts if you have that logic
-const allPosts = await getCollection("blog", ({ data }) => {
-  return import.meta.env.PROD ? data.draft !== true : true;
-});
-
-const tagCounts = new Map<string, number>();
-
-allPosts.forEach((post) => {
-  if (post.data.tags && Array.isArray(post.data.tags)) {
-    post.data.tags.forEach((tag) => {
-      const normalizedTag = tag.toLowerCase();
-      tagCounts.set(normalizedTag, (tagCounts.get(normalizedTag) || 0) + 1);
-    });
-  }
-});
-
-const sortedTags = Array.from(tagCounts.entries()).sort((a, b) => {
-  if (b[1] === a[1]) {
-    return a[0].localeCompare(b[0]);
-  }
-  return b[1] - a[1];
-});
+// Fetch all unique tags with their counts, filtering out drafts in production
+const sortedTags = await getUniqueTagsWithCounts(
+  "blog",
+  (data) => data.tags, // Extractor function for post tags
+  ({ data }) => (import.meta.env.PROD ? data.draft !== true : true) // Filter predicate
+);
 
 const pageTitle = "All Tags";
 const pageDescription =
@@ -41,7 +25,7 @@ const pageDescription =
     {
       sortedTags.length > 0 ? (
         <ul class="item-list-container">
-          {sortedTags.map(([tag, count]) => (
+          {sortedTags.map(({ tag, count }) => (
             <li class="list-item-entry">
               <a
                 href={`/tags/${generateSlug(tag)}/`}
