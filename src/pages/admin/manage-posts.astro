@@ -15,11 +15,7 @@ const pageTitle = `Manage Posts (DEV) - ${SITE_TITLE}`;
 const pageDescription = "Create or edit blog posts. This page is available in development mode only.";
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription}>
-  <div class="page-detail-header">
-    <h1>Manage Posts</h1>
-  </div>
-
+<BaseLayout title={pageTitle} description={pageDescription} isAdminPage={true}>
   <div class="admin-actions">
     <a href="/admin/create-post" class="button-primary" role="button">Create New Post</a>
   </div>

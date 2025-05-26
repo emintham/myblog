@@ -20,61 +20,123 @@ interface TagsComponentProps {
   onBlur?: () => void;
 }
 
-// Basic styling to make it fit in better with existing form fields.
-// You can expand on this or use global CSS.
+// Kinfolk Inspired Minimalist Styles for react-select
 const customStyles: StylesConfig<TagOption, true> = {
-  control: (provided) => ({
+  control: (provided, state) => ({
     ...provided,
-    borderColor: 'var(--form-input-border-color, #ccc)', // Example using CSS variables if you have them
+    backgroundColor: 'var(--color-background-admin, #FAF8F5)',
+    borderColor: state.isFocused ? 'var(--color-focus-admin, #93A191)' : 'var(--color-border-admin-subtle, #EDEDED)',
+    borderRadius: 'var(--border-radius-admin, 3px)',
+    minHeight: 'auto', // Allow padding to dictate height
+    padding: 'calc(var(--spacing-md-admin, 16px) - 6px) calc(var(--spacing-md-admin, 16px) - 1px)', // Approximate to match visual height of other inputs
+    boxShadow: state.isFocused ? '0 0 0 2px rgba(163, 177, 161, 0.2)' : 'none',
+    transition: 'border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
     '&:hover': {
-      borderColor: 'var(--form-input-border-color-hover, #aaa)',
+      borderColor: state.isFocused ? 'var(--color-focus-admin, #93A191)' : 'var(--color-border-admin-subtle, #EDEDED)', // Keep focus color if focused
     },
-    backgroundColor: 'var(--form-input-bg, white)',
-    minHeight: '38px', // Match typical input height
-    boxShadow: 'none', // Remove default react-select shadow if desired
-  }),
-  input: (provided) => ({
-    ...provided,
-    color: 'var(--form-input-text-color, #333)',
-    margin: '0px', // Reset margin
+    fontFamily: 'var(--font-sans)', // Use global --font-sans (Montserrat)
+    fontSize: '1rem',
   }),
   valueContainer: (provided) => ({
     ...provided,
-    padding: '2px 8px', // Adjust padding
+    padding: '0px 4px', // Reduced internal padding
+    fontFamily: 'var(--font-sans)',
   }),
-  multiValue: (provided) => ({
+  input: (provided) => ({
     ...provided,
-    backgroundColor: 'var(--tag-bg-color, #e0e0e0)',
-    borderRadius: 'var(--tag-border-radius, 4px)',
-  }),
-  multiValueLabel: (provided) => ({
-    ...provided,
-    color: 'var(--tag-text-color, #333)',
-    padding: '3px 6px',
-  }),
-  multiValueRemove: (provided) => ({
-    ...provided,
-    '&:hover': {
-      backgroundColor: 'var(--tag-remove-hover-bg, #c0c0c0)',
-      color: 'var(--tag-remove-hover-color, white)',
-    },
+    color: 'var(--color-text-admin-primary, #4A4A4A)',
+    margin: '0px',
+    paddingTop: '0px',
+    paddingBottom: '0px',
+    fontFamily: 'var(--font-sans)',
   }),
   placeholder: (provided) => ({
     ...provided,
-    color: 'var(--form-input-placeholder-color, #888)',
+    color: 'var(--color-text-admin-secondary, #8C8C8C)',
+    fontFamily: 'var(--font-sans)',
+  }),
+  multiValue: (provided) => ({
+    ...provided,
+    backgroundColor: 'rgba(163, 177, 161, 0.15)', // Subtle accent background (using fixed values as accent-admin is greenish)
+    borderRadius: 'var(--border-radius-admin, 3px)',
+    margin: '2px 4px 2px 0',
+  }),
+  multiValueLabel: (provided) => ({
+    ...provided,
+    color: 'var(--color-text-admin-primary, #4A4A4A)',
+    padding: 'var(--spacing-xs-admin, 4px) var(--spacing-sm-admin, 8px)',
+    fontSize: '0.875rem',
+    fontFamily: 'var(--font-sans)',
+  }),
+  multiValueRemove: (provided) => ({
+    ...provided,
+    color: 'var(--color-text-admin-secondary, #8C8C8C)',
+    borderRadius: '0 var(--border-radius-admin, 3px) var(--border-radius-admin, 3px) 0',
+    '&:hover': {
+      backgroundColor: 'rgba(183, 86, 79, 0.1)', // Subtle error color bg
+      color: 'var(--color-error-admin, #B7564F)',
+      cursor: 'pointer',
+    },
   }),
   menu: (provided) => ({
     ...provided,
-    backgroundColor: 'var(--dropdown-bg, white)',
-    zIndex: 2 // Ensure dropdown is above other elements
+    backgroundColor: 'var(--color-background-admin, #FAF8F5)',
+    borderRadius: 'var(--border-radius-admin, 3px)',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+    marginTop: 'var(--spacing-sm-admin, 8px)',
+    zIndex: 10, // Ensure menu is above other elements
+    fontFamily: 'var(--font-sans)',
+  }),
+  menuList: (provided) => ({
+    ...provided,
+    paddingTop: 'var(--spacing-xs-admin, 4px)',
+    paddingBottom: 'var(--spacing-xs-admin, 4px)',
   }),
   option: (provided, state) => ({
     ...provided,
-    backgroundColor: state.isSelected ? 'var(--dropdown-selected-bg, #007bff)' : state.isFocused ? 'var(--dropdown-hover-bg, #f0f0f0)' : 'var(--dropdown-bg, white)',
-    color: state.isSelected ? 'var(--dropdown-selected-text, white)' : 'var(--dropdown-text, #333)',
+    backgroundColor: state.isSelected
+      ? 'var(--color-accent-admin, #A3B1A1)'
+      : state.isFocused
+      ? 'rgba(163, 177, 161, 0.1)' // Subtle accent focus
+      : 'transparent',
+    color: state.isSelected
+      ? 'var(--color-background-admin, #FAF8F5)' // Text color on selected option
+      : 'var(--color-text-admin-primary, #4A4A4A)',
+    padding: 'var(--spacing-sm-admin, 8px) var(--spacing-md-admin, 16px)',
+    cursor: 'pointer',
+    fontSize: '0.9375rem',
+    fontFamily: 'var(--font-sans)',
     '&:active': {
-      backgroundColor: state.isSelected ? 'var(--dropdown-selected-bg, #007bff)' : 'var(--dropdown-active-bg, #e0e0e0)',
-    }
+      backgroundColor: state.isSelected ? 'var(--color-accent-admin, #A3B1A1)' : 'rgba(163, 177, 161, 0.2)',
+    },
+  }),
+  indicatorsContainer: (provided) => ({
+    ...provided,
+    paddingRight: 'var(--spacing-sm-admin, 8px)',
+  }),
+  dropdownIndicator: (provided) => ({
+    ...provided,
+    color: 'var(--color-text-admin-secondary, #8C8C8C)',
+    padding: 'var(--spacing-sm-admin, 8px)',
+    '&:hover': {
+      color: 'var(--color-text-admin-primary, #4A4A4A)',
+    },
+  }),
+  clearIndicator: (provided) => ({
+    ...provided,
+    color: 'var(--color-text-admin-secondary, #8C8C8C)',
+    padding: 'var(--spacing-sm-admin, 8px)',
+    '&:hover': {
+      color: 'var(--color-error-admin, #B7564F)',
+    },
+  }),
+  indicatorSeparator: () => ({
+    display: 'none', // Hide the default separator
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: 'var(--color-text-admin-primary, #4A4A4A)',
+    fontFamily: 'var(--font-sans)',
   }),
 };
 

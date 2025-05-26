@@ -18,7 +18,7 @@ const allQuoteTags = await getUniqueTagNames('bookQuotes', (data) => data.quotes
 const pageTitle = `Create New Post (DEV) - ${SITE_TITLE}`;
 ---
 
-<BaseLayout title={pageTitle}>
+<BaseLayout title={pageTitle} isAdminPage={true}>
   <div class="page-detail-header">
     <h1>Create New Post</h1>
   </div>

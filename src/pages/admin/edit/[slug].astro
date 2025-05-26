@@ -91,12 +91,12 @@ const allBookTags = await getUniqueTagNames('blog', (data) => data.bookTags, (en
 const allQuoteTags = await getUniqueTagNames('bookQuotes', (data) => data.quotes?.flatMap(q => q.tags || []) || []);
 
 const pageTitleDisplay = postToEdit?.title || slug || "Post";
-const pageTitle = `Edit Post: ${pageTitleDisplay} (DEV) - ${SITE_TITLE}`;
+const pageTitle = `Edit: ${pageTitleDisplay} - ${SITE_TITLE}`;
 ---
 
-<BaseLayout title={pageTitle}>
+<BaseLayout title={pageTitle} isAdminPage={true}>
   <div class="page-detail-header">
-    <h1>Edit Post: {postToEdit?.title ? `"${postToEdit.title}"` : (slug ? `"${slug}"` : "Unknown")}</h1>
+    <h1>{postToEdit?.title ? `${postToEdit.title}` : (slug ? `"${slug}"` : "Unknown")}</h1>
   </div>
 
   {errorMessage && !postToEdit && (
