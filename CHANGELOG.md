@@ -39,3 +39,4 @@
 ## May 25
 
 - Jules cleaned up CSS and some components.
+- Big update: Added support for dev mode authoring.
