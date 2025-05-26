@@ -142,12 +142,12 @@ const PostForm: React.FC<PostFormProps> = ({
       <fieldset>
         <legend>Core Information</legend>
         <div className="form-field">
-          <label htmlFor="title">Title (Required)</label>
+          <label htmlFor="title">Title*</label>
           <input type="text" id="title" {...register('title', { required: "Title is required" })} />
           {errors.title && <span className="field-error-message">{errors.title.message}</span>}
         </div>
         <div className="form-field">
-          <label htmlFor="pubDate">Publication Date (Required)</label>
+          <label htmlFor="pubDate">Publication Date*</label>
           <input type="date" id="pubDate" {...register('pubDate', {
             required: "Publication date is required",
             valueAsDate: true, // Ensures RHF treats it as a date for potential date-specific validation
@@ -155,7 +155,7 @@ const PostForm: React.FC<PostFormProps> = ({
           {errors.pubDate && <span className="field-error-message">{errors.pubDate.message}</span>}
         </div>
         <div className="form-field">
-          <label htmlFor="description">Description (Optional)</label>
+          <label htmlFor="description">Description</label>
           <textarea id="description" {...register('description')}></textarea>
         </div>
         <div className="form-field">
@@ -170,11 +170,11 @@ const PostForm: React.FC<PostFormProps> = ({
       <fieldset>
         <legend>Metadata</legend>
         <div className="form-field">
-          <label htmlFor="tags">Tags (Optional, comma-separated)</label>
+          <label htmlFor="tags">Tags</label>
           <input type="text" id="tags" {...register('tags')} placeholder="e.g., tech, philosophy, life" />
         </div>
         <div className="form-field">
-          <label htmlFor="series">Series (Optional)</label>
+          <label htmlFor="series">Series</label>
           <input type="text" id="series" {...register('series')} placeholder="e.g., My Learning Journey" />
         </div>
         <div className="form-field">
@@ -218,7 +218,7 @@ const PostForm: React.FC<PostFormProps> = ({
 
       {/* Fieldset for Body Content */}
       <fieldset>
-          <legend>Body Content</legend>
+          <legend>Content</legend>
           <div className="form-field">
             <label htmlFor="bodyContent">Post Body (Markdown)</label>
             <textarea id="bodyContent" {...register('bodyContent')} rows={15} placeholder="Start writing your Markdown content here..."></textarea>
