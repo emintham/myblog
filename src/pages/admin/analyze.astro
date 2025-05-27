@@ -1,0 +1,53 @@
+---
+export const prerender = false; // Ensure it's dynamically rendered
+
+import { SITE_TITLE } from "../../siteConfig";
+import "../../styles/admin.css"; // For potential admin-common styles if any apply
+import "../../styles/analyze.css"; // Specific styles for this page
+
+// This page is only available in development/author mode
+if (import.meta.env.PROD) {
+  return new Response(null, { status: 404, statusText: "Not Found" });
+}
+const pageTitle = `Close Reading Analyzer (DEV) - ${SITE_TITLE}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{pageTitle}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Add UUID library from CDN with defer -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js" integrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="analyze-page-body">
+    <div class="analyze-container">
+      <aside id="left-column" class="left-column">
+        <div class="reconstruction-area">
+          <h2>Reconstructed Passage</h2>
+          <div id="reconstructed-passage-content" class="passage-content">
+            <!-- Auto-generated content will go here -->
+          </div>
+        </div>
+        <div class="left-column-controls">
+          <button id="add-paragraph-btn" class="control-button">New Paragraph</button>
+          <button id="add-sentence-btn" class="control-button">New Sentence</button>
+          <div class="io-buttons">
+            <button id="export-json-btn" class="control-button">Export JSON</button>
+            <label for="import-json-file" class="control-button import-label">
+              Import JSON
+            </label>
+            <input type="file" id="import-json-file" accept=".json" style="display: none;" />
+          </div>
+        </div>
+      </aside>
+      <main id="right-column" class="right-column">
+        <div id="analysis-forms-container">
+          <!-- Analysis form sections will be dynamically added here -->
+        </div>
+      </main>
+    </div>
+    <script src="/scripts/analyzePageHandler.js" is:inline></script>
+  </body>
+</html>

@@ -1,0 +1,232 @@
+:root {
+  /* Define rhetorical purpose colors - slightly muted */
+  --purpose-narration: #E0E0E0; /* Neutral Gray */
+  --purpose-description: #D1E8DF; /* Soft Mint Green */
+  --purpose-argumentation: #D6EAF8; /* Pale Blue */
+  --purpose-logical-appeal: #A9CCE3; /* Stronger Pale Blue */
+  --purpose-emotional-appeal: #FADBD8; /* Soft Pink */
+  --purpose-ethical-appeal: #FCF3CF; /* Pale Yellow */
+  --purpose-foreshadowing: #E8DAEF; /* Lavender */
+  --purpose-character-dev: #FDEBD0; /* Peach */
+  --purpose-world-building: #D4EFDF; /* Light Green */
+  --purpose-metaphor-simile: #D6DBDF; /* Light Gray-Blue */
+  --purpose-irony-satire: #FAE5D3; /* Light Orange */
+  --purpose-juxtaposition: #CCD1D1; /* Cool Gray */
+  --purpose-call-to-action: #AED6F1; /* Sky Blue */
+  --purpose-humor: #F9E79F; /* Soft Yellow */
+  --purpose-social-commentary: #D2B4DE; /* Muted Purple */
+  --purpose-tone-setting: #CFE2F3; /* Very Pale Blue */
+  --purpose-pacing-control: #EBDEF0; /* Light Lilac */
+  --purpose-sexual-titillation: #F5B7B1; /* Muted Coral */
+  --purpose-symbolism: #D0ECE7; /* Pale Aqua */
+  --purpose-allusion: #EAD1DC; /* Dusty Rose */
+  --purpose-default-highlight: #FFF9C4; /* Default highlight for unassigned */
+
+  --admin-bg: #FAF8F5; /* From admin.css */
+  --admin-text-primary: #4A4A4A;
+  --admin-text-secondary: #8C8C8C;
+  --admin-border-subtle: #EDEDED;
+  --admin-accent: #A3B1A1;
+  --admin-focus: #93A191;
+
+  --spacing-unit: 8px;
+  --spacing-sm: var(--spacing-unit);
+  --spacing-md: calc(var(--spacing-unit) * 2); /* 16px */
+  --spacing-lg: calc(var(--spacing-unit) * 3); /* 24px */
+  --spacing-xl: calc(var(--spacing-unit) * 4); /* 32px */
+}
+
+.analyze-page-body {
+  font-family: var(--font-sans, "Montserrat", sans-serif);
+  background-color: var(--admin-bg);
+  color: var(--admin-text-primary);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  font-size: 15px; /* Slightly smaller base for more content */
+  overflow: hidden; /* Prevent body scroll with fixed columns */
+}
+
+.analyze-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+.left-column {
+  width: 35%; /* Adjust as needed */
+  max-width: 450px;
+  background-color: #FDFBF8; /* Slightly different from main bg for subtle separation */
+  padding: var(--spacing-lg);
+  border-right: 1px solid var(--admin-border-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: fixed; /* Fixed position */
+  top: 0;
+  left: 0;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.reconstruction-area {
+  flex-grow: 1;
+  overflow-y: auto; /* Allow reconstructed passage to scroll if it's long */
+  margin-bottom: var(--spacing-md);
+}
+
+.reconstruction-area h2 {
+  font-family: var(--font-serif, "Lora", serif);
+  font-size: 1.4rem;
+  color: var(--admin-text-primary);
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  font-weight: 500;
+}
+
+.passage-content {
+  font-family: var(--font-serif, "Lora", serif);
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--admin-text-secondary);
+}
+
+.passage-content .sentence-highlight {
+  padding: 2px 4px;
+  margin-bottom: 2px; /* Space between highlighted sentences */
+  display: inline; /* Or block if sentences should be on new lines */
+  border-radius: 3px;
+  transition: background-color 0.3s ease;
+}
+
+.passage-content p.reconstructed-paragraph {
+  margin-bottom: var(--spacing-md);
+}
+.passage-content p.reconstructed-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+
+.left-column-controls {
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--admin-border-subtle);
+}
+
+.control-button, .import-label {
+  background: none;
+  border: none;
+  color: var(--admin-accent);
+  text-decoration: none;
+  cursor: pointer;
+  padding: var(--spacing-sm) 0; /* Minimal padding */
+  margin-right: var(--spacing-md);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.control-button:hover, .import-label:hover {
+  color: var(--admin-focus);
+  text-decoration: underline;
+}
+
+.io-buttons {
+  margin-top: var(--spacing-sm);
+}
+
+.right-column {
+  width: 65%; /* Adjust as needed */
+  margin-left: 35%; /* Same as left-column width */
+  padding: var(--spacing-lg) var(--spacing-xl);
+  overflow-y: auto; /* This column scrolls */
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.analysis-form-section {
+  background-color: #fff; /* White cards for forms */
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  border-radius: 4px;
+  border: 1px solid var(--admin-border-subtle);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  position: relative;
+}
+
+.paragraph-divider {
+  height: 1px;
+  margin: var(--spacing-xl) 0;
+  background: linear-gradient(to right, transparent, var(--admin-border-subtle) 20%, var(--admin-border-subtle) 80%, transparent);
+  border: none;
+}
+.paragraph-divider-heading {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--admin-text-secondary);
+  margin-bottom: var(--spacing-md);
+  font-style: italic;
+}
+
+
+.analysis-form-section .form-field {
+  margin-bottom: var(--spacing-md);
+}
+
+.analysis-form-section textarea,
+.analysis-form-section select {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: var(--admin-text-primary);
+  background-color: var(--admin-bg); /* Match page bg for inputs */
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: 3px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  resize: vertical;
+  min-height: 40px; /* For select and small textareas */
+}
+.analysis-form-section textarea {
+  min-height: 60px; /* Default for textareas */
+}
+.analysis-form-section textarea#sentence-text { /* Main sentence input */
+  min-height: 40px;
+  font-family: var(--font-serif, "Lora", serif); /* Match reconstructed text */
+  font-size: 1rem;
+}
+
+
+.analysis-form-section textarea:focus,
+.analysis-form-section select:focus {
+  outline: none;
+  border-color: var(--admin-focus);
+  box-shadow: 0 0 0 2px rgba(163, 177, 161, 0.2);
+}
+
+.analysis-form-section select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238C8C8C' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-md) center;
+  background-size: 1em;
+  padding-right: calc(var(--spacing-md) * 2.5);
+}
+
+.remove-section-btn {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: none;
+  border: none;
+  color: var(--admin-text-secondary);
+  font-size: 1.2rem; /* Larger X */
+  font-weight: 300;
+  cursor: pointer;
+  padding: 2px 5px;
+  line-height: 1;
+}
+.remove-section-btn:hover {
+  color: var(--color-error-admin, #B7564F);
+}

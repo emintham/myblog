@@ -11,8 +11,9 @@ const baseNavLinks = [
 ];
 
 // Add admin link in development mode
+const devLinks = [{ href: "/admin/manage-posts", label: "Manage" }, { href: "/admin/analyze", label: "Analyze" }];
 const navLinks = import.meta.env.DEV
-  ? [...baseNavLinks, { href: "/admin/manage-posts", label: "Manage" }]
+  ? [...baseNavLinks, ...devLinks]
   : baseNavLinks;
 
 function isActiveLink(href: string, pathname: string): boolean {
