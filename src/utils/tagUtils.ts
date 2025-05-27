@@ -1,5 +1,5 @@
 // src/utils/tagUtils.ts
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, type CollectionEntry } from "astro:content";
 
 type TagExtractor<DataType> = (data: DataType) => string[] | string | undefined;
 
@@ -16,25 +16,30 @@ export interface TagWithCount {
  * @returns A promise that resolves to an array of objects, each containing a unique tag and its count,
  *          sorted by count (descending) and then by tag name (ascending alphabetically).
  */
-export async function getUniqueTagsWithCounts<C extends 'blog' | 'bookQuotes'>(
+export async function getUniqueTagsWithCounts<C extends "blog" | "bookQuotes">(
   collectionName: C,
-  extractTagsFn: TagExtractor<CollectionEntry<C>['data']>,
+  extractTagsFn: TagExtractor<CollectionEntry<C>["data"]>,
   filterPredicate?: (entry: CollectionEntry<C>) => boolean
 ): Promise<TagWithCount[]> {
   const allEntries = await getCollection(collectionName, filterPredicate);
   const tagCounts = new Map<string, number>();
 
-  allEntries.forEach(entry => {
+  allEntries.forEach((entry) => {
     const tagsSource = extractTagsFn(entry.data);
     let currentEntryTags: string[] = [];
 
-    if (typeof tagsSource === 'string') {
-      currentEntryTags = tagsSource.split(',').map(t => t.trim()).filter(Boolean);
+    if (typeof tagsSource === "string") {
+      currentEntryTags = tagsSource
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
     } else if (Array.isArray(tagsSource)) {
-      currentEntryTags = tagsSource.map(t => String(t).trim()).filter(Boolean);
+      currentEntryTags = tagsSource
+        .map((t) => String(t).trim())
+        .filter(Boolean);
     }
 
-    currentEntryTags.forEach(tag => {
+    currentEntryTags.forEach((tag) => {
       const normalizedTag = tag.toLowerCase();
       if (normalizedTag) {
         tagCounts.set(normalizedTag, (tagCounts.get(normalizedTag) || 0) + 1);
@@ -42,7 +47,9 @@ export async function getUniqueTagsWithCounts<C extends 'blog' | 'bookQuotes'>(
     });
   });
 
-  const sortedTagsWithCounts = Array.from(tagCounts.entries()).map(([tag, count]) => ({ tag, count }));
+  const sortedTagsWithCounts = Array.from(tagCounts.entries()).map(
+    ([tag, count]) => ({ tag, count })
+  );
 
   // Sort by count (descending), then by tag name (ascending)
   sortedTagsWithCounts.sort((a, b) => {
@@ -63,12 +70,18 @@ export async function getUniqueTagsWithCounts<C extends 'blog' | 'bookQuotes'>(
  * @returns A promise that resolves to a sorted array of unique, normalized (lowercase) tag names,
  *          sorted alphabetically.
  */
-export async function getUniqueTagNames<C extends 'blog' | 'bookQuotes'>(
+export async function getUniqueTagNames<C extends "blog" | "bookQuotes">(
   collectionName: C,
-  extractTagsFn: TagExtractor<CollectionEntry<C>['data']>,
+  extractTagsFn: TagExtractor<CollectionEntry<C>["data"]>,
   filterPredicate?: (entry: CollectionEntry<C>) => boolean
 ): Promise<string[]> {
-  const tagsWithCounts = await getUniqueTagsWithCounts(collectionName, extractTagsFn, filterPredicate);
+  const tagsWithCounts = await getUniqueTagsWithCounts(
+    collectionName,
+    extractTagsFn,
+    filterPredicate
+  );
   // Return only tag names, sorted alphabetically
-  return tagsWithCounts.map(item => item.tag).sort((a, b) => a.localeCompare(b));
+  return tagsWithCounts
+    .map((item) => item.tag)
+    .sort((a, b) => a.localeCompare(b));
 }

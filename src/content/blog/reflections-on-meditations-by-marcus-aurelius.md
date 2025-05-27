@@ -15,7 +15,7 @@ bookTitle: Meditations
 bookAuthor: Marcus Aurelius
 bookCover:
   imageName: meditations
-  alt: ''
+  alt: ""
   originalWidth: 976
 quotesRef: meditations-quotes
 bookTags:

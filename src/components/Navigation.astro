@@ -16,13 +16,12 @@ const navLinks = import.meta.env.DEV
   : baseNavLinks;
 
 function isActiveLink(href: string, pathname: string): boolean {
-  return pathname === href || 
-    (href !== "/" && pathname.startsWith(href + "/"));
+  return pathname === href || (href !== "/" && pathname.startsWith(href + "/"));
 }
 
 // Determine if we're on an admin page for initial rendering
 const isAdminPage = Astro.url.pathname.startsWith(ADMIN_PATH_PREFIX);
-const initialContext = isAdminPage ? 'author' : 'reader';
+const initialContext = isAdminPage ? "author" : "reader";
 ---
 
 <nav data-initial-context={initialContext}>
@@ -31,23 +30,26 @@ const initialContext = isAdminPage ? 'author' : 'reader';
       <a href="/">{SITE_TITLE}</a>
     </div>
     <ul class="nav-links">
-      {navLinks.map((link) => {
-        const isAdminLink = link.href.startsWith(ADMIN_PATH_PREFIX);
-        const shouldHide = initialContext === 'author' ? !isAdminLink : isAdminLink;
-        
-        return (
-          <li style={shouldHide ? 'display: none;' : ''}>
-            <a
-              href={link.href}
-              class:list={{
-                "is-active": isActiveLink(link.href, Astro.url.pathname)
-              }}
-            >
-              {link.label}
-            </a>
-          </li>
-        );
-      })}
+      {
+        navLinks.map((link) => {
+          const isAdminLink = link.href.startsWith(ADMIN_PATH_PREFIX);
+          const shouldHide =
+            initialContext === "author" ? !isAdminLink : isAdminLink;
+
+          return (
+            <li style={shouldHide ? "display: none;" : ""}>
+              <a
+                href={link.href}
+                class:list={{
+                  "is-active": isActiveLink(link.href, Astro.url.pathname),
+                }}
+              >
+                {link.label}
+              </a>
+            </li>
+          );
+        })
+      }
     </ul>
   </div>
 </nav>

@@ -210,7 +210,8 @@ pre {
   margin-bottom: 0;
 }
 
-.preview-title { /* Applied to h2 or h3 in previews */
+.preview-title {
+  /* Applied to h2 or h3 in previews */
   font-family: var(--font-display-title);
   font-weight: 700; /* Base weight, can be adjusted per component if truly needed */
   line-height: 1.3;
@@ -227,14 +228,16 @@ pre {
   color: var(--color-accent);
 }
 
-.meta { /* Common class for meta text (date, author) */
+.meta {
+  /* Common class for meta text (date, author) */
   font-family: var(--font-sans);
   font-size: 0.85rem; /* Standardized size */
   color: var(--color-meta);
   margin-bottom: 1rem; /* Standardized margin */
 }
 
-.preview-text-content p { /* For paragraphs within preview content areas */
+.preview-text-content p {
+  /* For paragraphs within preview content areas */
   font-size: 1rem;
   line-height: 1.65;
   color: var(--color-text);
@@ -245,7 +248,8 @@ pre {
   margin-bottom: 0;
 }
 
-.read-more { /* Common class for read-more links */
+.read-more {
+  /* Common class for read-more links */
   font-family: var(--font-sans);
   font-size: 0.8rem; /* Base size, can be fine-tuned in component if needed */
   text-transform: uppercase;
@@ -273,7 +277,10 @@ pre {
   font-size: 0.9rem;
   border: 1px solid var(--color-accent);
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
 }
 .button-primary:hover {
   background-color: var(--color-text);
@@ -281,7 +288,8 @@ pre {
   color: var(--color-background, #fff);
 }
 
-.button-edit { /* Style for edit buttons, e.g., on manage-posts page */
+.button-edit {
+  /* Style for edit buttons, e.g., on manage-posts page */
   display: inline-block;
   padding: 0.5em 1em;
   background-color: transparent;
@@ -292,7 +300,10 @@ pre {
   font-family: var(--font-sans);
   font-size: 0.85rem;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
   white-space: nowrap; /* Prevents button text from wrapping */
 }
 .button-edit:hover {
@@ -347,7 +358,9 @@ pre {
   background-color: var(--color-background);
   color: var(--color-text);
   box-sizing: border-box; /* Important for 100% width + padding */
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition:
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
 }
 
 .post-form .form-field input[type="text"]:focus,
@@ -359,7 +372,8 @@ pre {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 25%, transparent); /* Subtle focus ring */
 }
 
-.post-form .form-field textarea { /* General textarea in form */
+.post-form .form-field textarea {
+  /* General textarea in form */
   min-height: 80px;
   line-height: 1.6;
 }
@@ -377,7 +391,7 @@ pre {
 
 /* Ensures label containing checkbox doesn't force 100% width on the checkbox input itself */
 .post-form .form-field label input[type="checkbox"] {
-   width: auto;
+  width: auto;
 }
 
 /* Styles for the 'Book Note Details' fieldset */
@@ -392,7 +406,8 @@ pre {
 }
 
 #generatedOutput,
-#formFeedback { /* Assuming formFeedback uses similar styling */
+#formFeedback {
+  /* Assuming formFeedback uses similar styling */
   background-color: color-mix(in srgb, var(--color-background) 95%, black);
   padding: 1.5rem;
   border-radius: 4px;
@@ -400,7 +415,8 @@ pre {
 }
 
 #generatedOutput h2,
-#formFeedback h2 { /* If formFeedback were to have an h2 */
+#formFeedback h2 {
+  /* If formFeedback were to have an h2 */
   margin-top: 0;
   font-family: var(--font-sans);
   font-size: 1.5rem;
@@ -420,7 +436,9 @@ pre {
 
 /* Status badge for drafts, potentially reusable in admin areas */
 .status-draft-badge {
-  background-color: var(--color-accent-secondary); /* Example: a muted yellow/orange */
+  background-color: var(
+    --color-accent-secondary
+  ); /* Example: a muted yellow/orange */
   border-radius: 3px;
   color: var(--color-background, #fff);
   display: inline-block;

@@ -64,10 +64,10 @@ Offers advanced features for knowledge organization and curation:
 
 - **Authoring Tools in Dev Mode:**
 
-    - Live previews and hot reloading via Astro's dev server.
-      ![Dev Mode Screenshot](images/IMG_0054.PNG)
-    - Interactive dropdown menus for quick tagging.
-      ![Tagging Dropdown Screenshot](images/IMG_0056.PNG)
+  - Live previews and hot reloading via Astro's dev server.
+    ![Dev Mode Screenshot](images/IMG_0054.PNG)
+  - Interactive dropdown menus for quick tagging.
+    ![Tagging Dropdown Screenshot](images/IMG_0056.PNG)
 
 ## Prerequisites
 
@@ -88,7 +88,6 @@ Offers advanced features for knowledge organization and curation:
     ```bash
     pnpm install
     ```
-
 
 3.  **Initial Configuration (Important TODOs):**
 

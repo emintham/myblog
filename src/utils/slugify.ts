@@ -5,14 +5,14 @@ export function generateSlug(text: string): string {
   // However, an additional check here doesn't hurt, or we rely on the API's fallback.
 
   const slug = text
-    .toString()  // Ensure it's a string
+    .toString() // Ensure it's a string
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, "-")        // Replace spaces with hyphens
-    .replace(/[^\w-]+/g, "")     // Remove all non-alphanumeric chars except hyphens and underscores
-    .replace(/--+/g, "-")        // Replace multiple hyphens with a single one
-    .replace(/^-+/, "")          // Trim hyphens from the start
-    .replace(/-+$/, "");         // Trim hyphens from the end
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/[^\w-]+/g, "") // Remove all non-alphanumeric chars except hyphens and underscores
+    .replace(/--+/g, "-") // Replace multiple hyphens with a single one
+    .replace(/^-+/, "") // Trim hyphens from the start
+    .replace(/-+$/, ""); // Trim hyphens from the end
 
   // If the slug becomes empty after all the processing (e.g., input was "!!! --- !!!")
   // return a default slug to ensure a filename can always be created.

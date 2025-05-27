@@ -1,19 +1,21 @@
 ---
 export const prerender = false;
-import BaseLayout from '../../../layouts/BaseLayout.astro';
-import PostForm from '../../../components/admin/PostForm'; // Removed .tsx extension
-import { SITE_TITLE } from '../../../siteConfig';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import matter from 'gray-matter';
-import yaml from 'js-yaml'; // Import js-yaml
-import '../../../styles/admin.css'; // Import admin styles
-import type { PostSourceData, Quote } from '../../../types/admin'; // Import Quote type
-import { getUniqueTagNames } from '../../../utils/tagUtils'; // Import the utility
-
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import PostForm from "../../../components/admin/PostForm"; // Removed .tsx extension
+import { SITE_TITLE } from "../../../siteConfig";
+import fs from "node:fs/promises";
+import path from "node:path";
+import matter from "gray-matter";
+import yaml from "js-yaml"; // Import js-yaml
+import "../../../styles/admin.css"; // Import admin styles
+import type { PostSourceData, Quote } from "../../../types/admin"; // Import Quote type
+import { getUniqueTagNames } from "../../../utils/tagUtils"; // Import the utility
 
 if (import.meta.env.PROD) {
-  return new Response(null, { status: 404, statusText: 'Not Found (Admin Only)' });
+  return new Response(null, {
+    status: 404,
+    statusText: "Not Found (Admin Only)",
+  });
 }
 
 const { slug } = Astro.params;
@@ -25,15 +27,16 @@ if (!slug) {
   Astro.response.status = 400; // Bad Request
 } else {
   const projectRoot = process.cwd();
-  const contentDir = path.join(projectRoot, 'src', 'content', 'blog');
+  const contentDir = path.join(projectRoot, "src", "content", "blog");
   const potentialFilenames = [`${slug}.md`, `${slug}.mdx`];
   let fileFound = false;
 
   for (const filename of potentialFilenames) {
     const filePath = path.join(contentDir, filename);
     try {
-      const fileContentString = await fs.readFile(filePath, 'utf-8');
-      const { data: frontmatterData, content: bodyContentString } = matter(fileContentString);
+      const fileContentString = await fs.readFile(filePath, "utf-8");
+      const { data: frontmatterData, content: bodyContentString } =
+        matter(fileContentString);
 
       postToEdit = {
         originalSlug: slug,
@@ -45,29 +48,42 @@ if (!slug) {
       };
 
       // If it's a bookNote and has a quotesRef, try to load and parse the quotes YAML
-      if (postToEdit.postType === 'bookNote' && postToEdit.quotesRef) {
-        const quotesFilePath = path.join(projectRoot, 'src', 'content', 'bookQuotes', `${postToEdit.quotesRef}.yaml`);
+      if (postToEdit.postType === "bookNote" && postToEdit.quotesRef) {
+        const quotesFilePath = path.join(
+          projectRoot,
+          "src",
+          "content",
+          "bookQuotes",
+          `${postToEdit.quotesRef}.yaml`
+        );
         try {
-          const quotesFileContent = await fs.readFile(quotesFilePath, 'utf-8');
-          const parsedQuotesData = yaml.load(quotesFileContent) as { bookSlug?: string, quotes?: any[] };
+          const quotesFileContent = await fs.readFile(quotesFilePath, "utf-8");
+          const parsedQuotesData = yaml.load(quotesFileContent) as {
+            bookSlug?: string;
+            quotes?: any[];
+          };
 
           if (parsedQuotesData && Array.isArray(parsedQuotesData.quotes)) {
-            postToEdit.inlineQuotes = parsedQuotesData.quotes.map((q: any, index: number) => ({
-              id: `loaded-${slug}-${index}-${Date.now()}`, // Generate a unique ID for React key
-              text: q.text || '',
-              quoteAuthor: q.quoteAuthor || '',
-              tags: Array.isArray(q.tags) ? q.tags.map(String) : [],
-              quoteSource: q.quoteSource || '',
-            }));
+            postToEdit.inlineQuotes = parsedQuotesData.quotes.map(
+              (q: any, index: number) => ({
+                id: `loaded-${slug}-${index}-${Date.now()}`, // Generate a unique ID for React key
+                text: q.text || "",
+                quoteAuthor: q.quoteAuthor || "",
+                tags: Array.isArray(q.tags) ? q.tags.map(String) : [],
+                quoteSource: q.quoteSource || "",
+              })
+            );
           } else {
             postToEdit.inlineQuotes = []; // Set to empty if quotes are not in expected format
           }
         } catch (quoteError) {
-          console.warn(`Could not load or parse quotes file: ${quotesFilePath}`, quoteError);
+          console.warn(
+            `Could not load or parse quotes file: ${quotesFilePath}`,
+            quoteError
+          );
           postToEdit.inlineQuotes = []; // Set to empty if file not found or error
         }
       }
-
 
       // PostForm's useEffect and formatDateForInput will handle date formatting.
       // No need to pre-format pubDate here.
@@ -86,9 +102,16 @@ if (!slug) {
 }
 
 // Fetch all unique tag names for suggestions
-const allPostTags = await getUniqueTagNames('blog', (data) => data.tags);
-const allBookTags = await getUniqueTagNames('blog', (data) => data.bookTags, (entry) => entry.data.postType === 'bookNote');
-const allQuoteTags = await getUniqueTagNames('bookQuotes', (data) => data.quotes?.flatMap(q => q.tags || []) || []);
+const allPostTags = await getUniqueTagNames("blog", (data) => data.tags);
+const allBookTags = await getUniqueTagNames(
+  "blog",
+  (data) => data.bookTags,
+  (entry) => entry.data.postType === "bookNote"
+);
+const allQuoteTags = await getUniqueTagNames(
+  "bookQuotes",
+  (data) => data.quotes?.flatMap((q) => q.tags || []) || []
+);
 
 const pageTitleDisplay = postToEdit?.title || slug || "Post";
 const pageTitle = `Edit: ${pageTitleDisplay} - ${SITE_TITLE}`;
@@ -96,46 +119,78 @@ const pageTitle = `Edit: ${pageTitleDisplay} - ${SITE_TITLE}`;
 
 <BaseLayout title={pageTitle} isAdminPage={true}>
   <div class="page-detail-header">
-    <h1>{postToEdit?.title ? `${postToEdit.title}` : (slug ? `"${slug}"` : "Unknown")}</h1>
+    <h1>
+      {
+        postToEdit?.title
+          ? `${postToEdit.title}`
+          : slug
+            ? `"${slug}"`
+            : "Unknown"
+      }
+    </h1>
   </div>
 
-  {errorMessage && !postToEdit && (
-    <div class="form-feedback-container error-message visible">
-      <p>{errorMessage}</p>
-      <a href="/admin/manage-posts/" class="button-edit">Back to Manage Posts</a>
-    </div>
-  )}
+  {
+    errorMessage && !postToEdit && (
+      <div class="form-feedback-container error-message visible">
+        <p>{errorMessage}</p>
+        <a href="/admin/manage-posts/" class="button-edit">
+          Back to Manage Posts
+        </a>
+      </div>
+    )
+  }
 
-  {postToEdit && !errorMessage && (
-    <form
-      id="editPostForm"
-      class="post-form"
-      data-form-type="edit"
-      data-original-slug={postToEdit.originalSlug}
-    >
-      {/* Hidden fields are still useful for initial state if JS fails or for non-JS scenarios,
+  {
+    postToEdit && !errorMessage && (
+      <form
+        id="editPostForm"
+        class="post-form"
+        data-form-type="edit"
+        data-original-slug={postToEdit.originalSlug}
+      >
+        {/* Hidden fields are still useful for initial state if JS fails or for non-JS scenarios,
           but adminFormHandler.js will also update them if slug changes. */}
-      <input type="hidden" name="originalSlug" value={postToEdit.originalSlug} />
-      <input type="hidden" name="originalFilePath" value={postToEdit.originalFilePath} />
-      <input type="hidden" name="originalExtension" value={postToEdit.originalExtension} />
+        <input
+          type="hidden"
+          name="originalSlug"
+          value={postToEdit.originalSlug}
+        />
+        <input
+          type="hidden"
+          name="originalFilePath"
+          value={postToEdit.originalFilePath}
+        />
+        <input
+          type="hidden"
+          name="originalExtension"
+          value={postToEdit.originalExtension}
+        />
 
-      <PostForm
-        client:load
-        postData={postToEdit}
-        formId="editPostForm"
-        allPostTags={allPostTags}
-        allBookTags={allBookTags}
-        allQuoteTags={allQuoteTags}
-      />
+        <PostForm
+          client:load
+          postData={postToEdit}
+          formId="editPostForm"
+          allPostTags={allPostTags}
+          allBookTags={allBookTags}
+          allQuoteTags={allQuoteTags}
+        />
 
-      <button type="submit" class="button-primary">Update Post</button>
-    </form>
-  )}
+        <button type="submit" class="button-primary">
+          Update Post
+        </button>
+      </form>
+    )
+  }
 
   <div id="formFeedback" class="form-feedback-container">
     <p id="feedbackMessage"></p>
-    <a id="viewPostLink" href="#" class="button-edit">View Post</a> {/* style="display:none;" removed, CSS/JS will handle visibility */}
-    <a href="/admin/manage-posts/" class="button-edit manage-posts-link">Back to Manage Posts</a> {/* style removed, class added */}
+    <a id="viewPostLink" href="#" class="button-edit">View Post</a>
+    {/* style="display:none;" removed, CSS/JS will handle visibility */}
+    <a href="/admin/manage-posts/" class="button-edit manage-posts-link"
+      >Back to Manage Posts</a
+    >
+    {/* style removed, class added */}
   </div>
   <script src="/scripts/adminFormHandler.js" is:inline></script>
 </BaseLayout>

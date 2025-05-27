@@ -5,24 +5,24 @@
 /* -------------------------------------------------------------------------- */
 body.admin-scope {
   /* Admin-specific Color Palette & Theme Variables */
-  --color-background-admin: #FAF8F5; /* Warm off-white */
-  --color-text-admin-primary: #4A4A4A; /* Dark, soft gray */
-  --color-text-admin-secondary: #8C8C8C; /* Lighter, muted gray */
-  --color-accent-admin: #A3B1A1; /* Desaturated, earthy green */
-  --color-border-admin-subtle: #EDEDED; /* Very light gray for subtle lines/borders */
-  --color-focus-admin: #93A191; /* Slightly darker accent for focus */
+  --color-background-admin: #faf8f5; /* Warm off-white */
+  --color-text-admin-primary: #4a4a4a; /* Dark, soft gray */
+  --color-text-admin-secondary: #8c8c8c; /* Lighter, muted gray */
+  --color-accent-admin: #a3b1a1; /* Desaturated, earthy green */
+  --color-border-admin-subtle: #ededed; /* Very light gray for subtle lines/borders */
+  --color-focus-admin: #93a191; /* Slightly darker accent for focus */
 
-  --color-success-admin: #5A7D5A; /* Muted green for success text/icon */
-  --color-error-admin: #B7564F;   /* Muted red for error text/icon */
-  --color-warning-admin: #B28A3E; /* Muted yellow/brown for warning text/icon */
+  --color-success-admin: #5a7d5a; /* Muted green for success text/icon */
+  --color-error-admin: #b7564f; /* Muted red for error text/icon */
+  --color-warning-admin: #b28a3e; /* Muted yellow/brown for warning text/icon */
 
   --spacing-unit-admin: 8px;
-  --spacing-xs-admin: calc(var(--spacing-unit-admin) * 0.5);  /* 4px */
-  --spacing-sm-admin: var(--spacing-unit-admin);             /* 8px */
-  --spacing-md-admin: calc(var(--spacing-unit-admin) * 2);   /* 16px */
-  --spacing-lg-admin: calc(var(--spacing-unit-admin) * 3);   /* 24px */
-  --spacing-xl-admin: calc(var(--spacing-unit-admin) * 4);   /* 32px */
-  --spacing-xxl-admin: calc(var(--spacing-unit-admin) * 6);  /* 48px */
+  --spacing-xs-admin: calc(var(--spacing-unit-admin) * 0.5); /* 4px */
+  --spacing-sm-admin: var(--spacing-unit-admin); /* 8px */
+  --spacing-md-admin: calc(var(--spacing-unit-admin) * 2); /* 16px */
+  --spacing-lg-admin: calc(var(--spacing-unit-admin) * 3); /* 24px */
+  --spacing-xl-admin: calc(var(--spacing-unit-admin) * 4); /* 32px */
+  --spacing-xxl-admin: calc(var(--spacing-unit-admin) * 6); /* 48px */
 
   --border-radius-admin: 3px;
 
@@ -56,10 +56,10 @@ body.admin-scope .admin-content-wrapper {
   align-items: center;
   position: relative;
   padding: 0;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   background: #fff;
   border-radius: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   cursor: pointer;
   min-width: 140px;
@@ -115,7 +115,7 @@ body.admin-scope .admin-content-wrapper {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1;
   pointer-events: none;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .context-toggle-pill[data-context="author"] .toggle-slider {
@@ -130,17 +130,17 @@ body.admin-scope .admin-content-wrapper {
 
 /* Context Toggle Responsive */
 @media (max-width: 768px) {
-  .context-toggle-container { 
-    top: 16px; 
-    right: 16px; 
+  .context-toggle-container {
+    top: 16px;
+    right: 16px;
   }
-  .context-toggle-pill { 
-    min-width: 120px; 
-    height: 40px; 
+  .context-toggle-pill {
+    min-width: 120px;
+    height: 40px;
   }
-  .toggle-label { 
-    font-size: 0.8rem; 
-    padding: 0 12px; 
+  .toggle-label {
+    font-size: 0.8rem;
+    padding: 0 12px;
     gap: 4px;
   }
   .toggle-label svg {
@@ -175,7 +175,11 @@ body.admin-scope .button-add-quote {
   text-decoration: none;
   display: inline-block;
   text-align: center;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    opacity 0.2s ease-in-out;
   border: 1px solid transparent;
   font-weight: 500;
 }
@@ -200,7 +204,9 @@ body.admin-scope textarea {
   border: 1px solid var(--color-border-admin-subtle);
   border-radius: var(--border-radius-admin);
   box-sizing: border-box;
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition:
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -323,7 +329,7 @@ body.admin-scope textarea {
 }
 
 body.admin-scope .post-form #bodyContent {
-   min-height: 200px;
+  min-height: 200px;
 }
 
 body.admin-scope input[type="checkbox"] {
@@ -340,8 +346,8 @@ body.admin-scope .form-field input[type="checkbox"] + label {
 }
 
 body.admin-scope .form-field label input[type="checkbox"] {
-   margin-right: var(--spacing-sm-admin);
-   width: auto;
+  margin-right: var(--spacing-sm-admin);
+  width: auto;
 }
 
 body.admin-scope .form-field label > span {
@@ -443,6 +449,6 @@ body.admin-scope .form-feedback-container.success-message {
   border-left-color: var(--color-success-admin);
 }
 
-body.admin-scope .form-feedback-container.error-message { /* Example of a following rule */
+body.admin-scope .form-feedback-container.error-message {
   border-left-color: var(--color-error-admin);
 }

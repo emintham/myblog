@@ -56,7 +56,7 @@ export interface PostFormData {
   bookTitle: string;
   bookAuthor: string;
   bookCoverImageName: string; // Flat structure for form input
-  bookCoverAlt: string;       // Flat structure for form input
+  bookCoverAlt: string; // Flat structure for form input
   quotesRef: string;
   bookTags: string[]; // Changed from string to string[]
 
@@ -85,7 +85,7 @@ export interface PostApiPayload {
   bookTitle?: string;
   bookAuthor?: string;
   bookCoverImageName?: string; // This is sent from client
-  bookCoverAlt?: string;       // This is sent from client
+  bookCoverAlt?: string; // This is sent from client
   // API will enrich bookCover with originalWidth before saving to frontmatter
   bookCover?: { imageName?: string; alt?: string; originalWidth?: number }; // Added originalWidth
   quotesRef?: string;

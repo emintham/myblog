@@ -1,19 +1,26 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import PostForm from '../../components/admin/PostForm'; // Removed .tsx extension
-import { SITE_TITLE } from '../../siteConfig';
-import { getUniqueTagNames } from '../../utils/tagUtils'; // Import the utility
-import '../../styles/admin.css'; // Import admin styles
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PostForm from "../../components/admin/PostForm"; // Removed .tsx extension
+import { SITE_TITLE } from "../../siteConfig";
+import { getUniqueTagNames } from "../../utils/tagUtils"; // Import the utility
+import "../../styles/admin.css"; // Import admin styles
 
 if (import.meta.env.PROD) {
-  return new Response(null, { status: 404, statusText: 'Not Found' });
+  return new Response(null, { status: 404, statusText: "Not Found" });
 }
 export const prerender = false;
 
 // Fetch all unique tag names for suggestions
-const allPostTags = await getUniqueTagNames('blog', (data) => data.tags);
-const allBookTags = await getUniqueTagNames('blog', (data) => data.bookTags, (entry) => entry.data.postType === 'bookNote');
-const allQuoteTags = await getUniqueTagNames('bookQuotes', (data) => data.quotes?.flatMap(q => q.tags || []) || []);
+const allPostTags = await getUniqueTagNames("blog", (data) => data.tags);
+const allBookTags = await getUniqueTagNames(
+  "blog",
+  (data) => data.bookTags,
+  (entry) => entry.data.postType === "bookNote"
+);
+const allQuoteTags = await getUniqueTagNames(
+  "bookQuotes",
+  (data) => data.quotes?.flatMap((q) => q.tags || []) || []
+);
 
 const pageTitle = `Create New Post (DEV) - ${SITE_TITLE}`;
 ---
@@ -31,7 +38,9 @@ const pageTitle = `Create New Post (DEV) - ${SITE_TITLE}`;
       allBookTags={allBookTags}
       allQuoteTags={allQuoteTags}
     />
-    <button type="submit" id="createPostSubmitButton" class="button-primary">Save New Post</button>
+    <button type="submit" id="createPostSubmitButton" class="button-primary"
+      >Save New Post</button
+    >
   </form>
 
   <div id="formFeedback" class="form-feedback-container">
