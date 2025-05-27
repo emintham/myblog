@@ -1,12 +1,12 @@
 ---
 // src/components/ContextToggle.astro
 const isDev = import.meta.env.DEV;
-const { initialContext = 'reader' } = Astro.props; // Default to 'reader' if not provided
+const { initialContext = 'reader', adminPathPrefix } = Astro.props;
 ---
 
 {isDev && (
   <div class="context-toggle-container">
-    <button id="devContextToggle" class="context-toggle-pill" type="button" aria-live="polite" data-context={initialContext}>
+    <button id="devContextToggle" class="context-toggle-pill" type="button" aria-live="polite" data-context={initialContext} data-admin-path-prefix={adminPathPrefix}>
       <span class="toggle-label toggle-reader">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
           <path d="M6 2c-1.1 0-2 .9-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"/>
@@ -49,7 +49,6 @@ const { initialContext = 'reader' } = Astro.props; // Default to 'reader' if not
   cursor: pointer;
   min-width: 140px;
   height: 44px;
-  transition: all 0.2s ease;
   backdrop-filter: blur(8px);
 }
 
@@ -57,7 +56,6 @@ const { initialContext = 'reader' } = Astro.props; // Default to 'reader' if not
   box-shadow: 
     0 4px 12px rgba(0,0,0,0.1),
     0 2px 6px rgba(0,0,0,0.06);
-  transform: translateY(-1px);
 }
 
 .context-toggle-pill:active {

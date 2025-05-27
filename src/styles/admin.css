@@ -442,4 +442,7 @@ body.admin-scope .form-feedback-container p {
 body.admin-scope .form-feedback-container.success-message {
   border-left-color: var(--color-success-admin);
 }
-body.admin.s
+
+body.admin-scope .form-feedback-container.error-message { /* Example of a following rule */
+  border-left-color: var(--color-error-admin);
+}

@@ -5,12 +5,18 @@
   const STORAGE_KEY = 'dev-context';
   const DEFAULT_CONTEXT = 'reader';
   let isInitialized = false;
-  
+  let adminPathPrefix = '/admin'; // Default fallback
+
   document.addEventListener('DOMContentLoaded', initializeContextToggle);
 
   function initializeContextToggle() {
     const toggleBtn = document.getElementById('devContextToggle');
     if (!toggleBtn) return;
+
+    // Read the admin path prefix from the data attribute
+    if (toggleBtn.dataset.adminPathPrefix) {
+      adminPathPrefix = toggleBtn.dataset.adminPathPrefix;
+    }
 
     // Determine initial context based on URL and stored preference
     const currentContext = determineInitialContext();
@@ -32,7 +38,8 @@
 
   function determineInitialContext() {
     const currentPath = window.location.pathname;
-    const isAdminPage = currentPath.startsWith('/admin');
+    // Use the retrieved adminPathPrefix
+    const isAdminPage = currentPath.startsWith(adminPathPrefix); 
     const storedContext = localStorage.getItem(STORAGE_KEY);
     
     // If we're on an admin page, default to 'author' mode
@@ -142,7 +149,8 @@
       if (!link) return;
       
       const href = link.getAttribute('href');
-      const isAdminLink = href?.startsWith('/admin');
+      // Use the retrieved adminPathPrefix here as well for consistency
+      const isAdminLink = href?.startsWith(adminPathPrefix); 
       
       // In author mode: only show admin links, hide others
       // In reader mode: show all non-admin links, hide admin links

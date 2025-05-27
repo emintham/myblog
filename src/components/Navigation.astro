@@ -1,6 +1,6 @@
 ---
 // src/components/Navigation.astro
-import { SITE_TITLE } from "../siteConfig.ts";
+import { SITE_TITLE, ADMIN_PATH_PREFIX } from "../siteConfig.ts";
 
 const baseNavLinks = [
   { href: "/", label: "Home" },
@@ -21,7 +21,7 @@ function isActiveLink(href: string, pathname: string): boolean {
 }
 
 // Determine if we're on an admin page for initial rendering
-const isAdminPage = Astro.url.pathname.startsWith('/admin');
+const isAdminPage = Astro.url.pathname.startsWith(ADMIN_PATH_PREFIX);
 const initialContext = isAdminPage ? 'author' : 'reader';
 ---
 
@@ -32,7 +32,7 @@ const initialContext = isAdminPage ? 'author' : 'reader';
     </div>
     <ul class="nav-links">
       {navLinks.map((link) => {
-        const isAdminLink = link.href.startsWith('/admin');
+        const isAdminLink = link.href.startsWith(ADMIN_PATH_PREFIX);
         const shouldHide = initialContext === 'author' ? !isAdminLink : isAdminLink;
         
         return (
