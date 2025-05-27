@@ -1,5 +1,6 @@
 ---
 import Navigation from "../components/Navigation.astro";
+import ContextToggle from "../components/ContextToggle.astro";
 import "../styles/global.css";
 import "../styles/sidenotes.css";
 import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR_NAME } from "../siteConfig";
@@ -16,6 +17,10 @@ const googleFontsURL =
 const TEMPLATE_GITHUB_URL = "https://github.com/emintham/blog-template";
 const TEMPLATE_AUTHOR_URL = "https://emintham.com";
 const TEMPLATE_AUTHOR_NAME = "Emin Tham + Gemini 2.5 Pro";
+
+// Determine initial context based on URL
+const isAdminPageUrl = Astro.url.pathname.startsWith('/admin');
+const initialContext = isAdminPageUrl ? 'author' : 'reader';
 ---
 
 <!doctype html>
@@ -26,11 +31,9 @@ const TEMPLATE_AUTHOR_NAME = "Emin Tham + Gemini 2.5 Pro";
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    {/* Preconnect to Google Fonts servers */}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    {/* Load Google Fonts CSS asynchronously */}
     <link
       rel="stylesheet"
       href={googleFontsURL}
@@ -38,12 +41,10 @@ const TEMPLATE_AUTHOR_NAME = "Emin Tham + Gemini 2.5 Pro";
       onload="this.media='all'"
     />
 
-    {
-      /* Fallback for users with JavaScript disabled (less critical for fonts but good practice) */
-    }
     <noscript><link rel="stylesheet" href={googleFontsURL} /></noscript>
   </head>
-  <body class:list={[ { 'admin-scope': isAdminPage } ]}>
+  <body class:list={[ { 'admin-scope': isAdminPage } ]} data-dev-context={initialContext}>
+    <ContextToggle initialContext={initialContext} />
     <Navigation />
     <main class="content-wrapper">
       <slot />
@@ -72,9 +73,7 @@ const TEMPLATE_AUTHOR_NAME = "Emin Tham + Gemini 2.5 Pro";
         font-size: 0.85rem;
         color: var(--color-meta);
         font-family: var(--font-sans);
-        /* border-top: 1px solid var(--color-border-subtle); */
         margin-top: 0;
-        /* box-shadow: 0 -2px 10px -5px rgba(0,0,0,0.03); */
       }
 
       footer p {
@@ -97,7 +96,17 @@ const TEMPLATE_AUTHOR_NAME = "Emin Tham + Gemini 2.5 Pro";
         margin-top: 1em;
         font-size: 0.8rem;
       }
+
+      /* Additional styling for context-aware elements */
+      body[data-dev-context="author"] {
+        /* You can add author-specific styling here if needed */
+      }
+
+      body[data-dev-context="reader"] {
+        /* You can add reader-specific styling here if needed */
+      }
     </style>
   </body>
   <script src="/scripts/sidenotes.js" defer></script>
+  <script src="/scripts/contextToggle.js" defer></script>
 </html>
