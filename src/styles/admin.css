@@ -238,7 +238,7 @@ body.admin-scope h5,
 body.admin-scope h6,
 body.admin-scope .page-detail-header h1,
 body.admin-scope legend {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   color: var(--color-text-admin-primary);
   margin-top: var(--spacing-lg-admin);
   margin-bottom: var(--spacing-md-admin);

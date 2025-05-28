@@ -38,37 +38,37 @@
   --spacing-xl: calc(var(--spacing-unit) * 4); /* 32px */
 }
 
-.analyze-page-body {
-  font-family: var(--font-sans, "Montserrat", sans-serif);
-  background-color: var(--admin-bg);
-  color: var(--admin-text-primary);
-  margin: 0;
-  padding: 0;
-  line-height: 1.6;
-  font-size: 15px;
-  overflow: hidden;
-}
+/* Removed .analyze-page-body as BaseLayout now controls the body tag */
 
 .analyze-container {
   display: flex;
-  height: 100vh;
+  align-items: flex-start; /* Important for sticky behavior when columns have different natural heights */
+  height: 100%; /* Occupy full height of its container (main.content-wrapper) */
+
+  /* Make the container span the full viewport width */
   width: 100vw;
+  position: relative; /* Allows left and transform to work as expected */
+  left: 50%; /* Center the element's reference point */
+  transform: translateX(-50%); /* Shift the element left by half its own width */
+  box-sizing: border-box; /* Ensures padding/border are included in the 100vw width */
 }
 
 .left-column {
   width: 35%;
   max-width: 450px;
-  background-color: #FDFBF8;
+  background-color: var(--color-background-admin, #faf8f5); /* Use existing background color */
   padding: var(--spacing-lg);
-  border-right: 1px solid var(--admin-border-subtle);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
+  
+  position: sticky; /* Keep sticky positioning */
+  top: var(--spacing-lg); 
+  max-height: calc(100vh - 70px - (2 * var(--spacing-lg))); 
+  align-self: flex-start; 
+  
   box-sizing: border-box;
+  overflow-y: hidden; /* Keep this, as .reconstruction-area handles internal scroll */
 }
 
 .reconstruction-area {
@@ -117,7 +117,7 @@
 .control-button, .import-label {
   background: none;
   border: none;
-  color: var(--admin-accent);
+  color: var(--admin-accent); /* Default color for control buttons */
   text-decoration: none;
   cursor: pointer;
   padding: var(--spacing-sm) 0;
@@ -138,6 +138,11 @@
   stroke-width: 2; /* Consistent stroke for Lucide */
 }
 
+/* Add a more specific rule for the import label's default color */
+.left-column-controls .import-label {
+  color: var(--admin-accent);
+}
+
 .control-button:hover, .import-label:hover {
   color: var(--admin-focus);
   text-decoration: underline;
@@ -152,15 +157,15 @@
 
 .right-column {
   width: 65%;
-  margin-left: 35%; /* Should match left-column width */
   padding: var(--spacing-lg) var(--spacing-xl);
-  overflow-y: auto;
-  height: 100vh;
+  overflow-y: auto; /* This column will scroll */
+  height: 100%; 
   box-sizing: border-box;
+  background-color: var(--color-background-admin, #faf8f5); /* Use existing background color */
 }
 
 .paragraph-group {
-  background-color: #fff;
+  background-color: var(--admin-bg);
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
   border-radius: 4px;
