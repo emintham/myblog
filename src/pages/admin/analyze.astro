@@ -6,7 +6,6 @@ import { SITE_TITLE } from "../../siteConfig";
 import "../../styles/admin.css"; // Keep this for page-specific admin styles
 import "../../styles/analyze.css"; // Keep this for analyze page styles
 
-// Import Lucide icons
 import { ListPlus, Baseline, Download, Upload } from "lucide-react";
 
 if (import.meta.env.PROD) {
@@ -42,7 +41,6 @@ const pageDescription = "A tool for close reading analysis of text passages."; /
           <Baseline size={16} strokeWidth={2} />
           New Sentence
         </button>
-        <div class="io-buttons">
           <button id="export-json-btn" class="control-button">
             <Download size={16} strokeWidth={2} />
             Export JSON
@@ -57,7 +55,6 @@ const pageDescription = "A tool for close reading analysis of text passages."; /
             accept=".json"
             style="display: none;"
           />
-        </div>
       </div>
     </aside>
     <main id="right-column" class="right-column">
