@@ -7,16 +7,14 @@
   --font-sans: "Montserrat", sans-serif;
   --font-display-title: "Spectral", serif;
   --font-fleeting-title: "Corinthia", cursive;
-
   --color-background: #faf9f6; /* Creamy off-white */
-  --color-text: #333333; /* Dark grey */
+  --color-text: #333; /* Dark grey */
   --color-accent: #5d7a88; /* Muted blue-grey */
-  --color-meta: #777777; /* For dates, subtle info */
-  --color-border-subtle: #eeeeee;
+  --color-meta: #777; /* For dates, subtle info */
+  --color-border-subtle: #eee;
   --color-note-paper: #fbfaf9; /* Example: extremely close to page background */
   --color-code-background: #f4f4f4; /* For <pre> blocks */
   --color-accent-secondary: #f7a76c;
-
   --content-max-width: 720px; /* Adjust for optimal line length */
 }
 
@@ -48,9 +46,11 @@ h6 {
 h1 {
   font-size: 2.5rem;
 }
+
 h2 {
   font-size: 2rem;
 }
+
 h3 {
   font-size: 1.5rem;
 }
@@ -90,6 +90,7 @@ pre {
 }
 
 /* == Common Page Section Title == */
+
 /* Used for: "Latest Writings", "All Tags", "All Series", "About" titles */
 .section-title {
   font-size: 1.2rem;
@@ -103,6 +104,7 @@ pre {
 }
 
 /* == Common Page Introductory Text == */
+
 /* Used for descriptive text below a .section-title */
 .page-intro-text {
   font-family: var(--font-serif);
@@ -110,11 +112,12 @@ pre {
   color: var(--color-text);
   text-align: center;
   max-width: 60ch;
-  margin: 0 auto 2.5rem auto; /* Centering and space below */
+  margin: 0 auto 2.5rem; /* Centering and space below */
   line-height: 1.6;
 }
 
 /* == Common Item Listing Styles == */
+
 /* Used for lists on Tags page, Series page */
 .item-list-container {
   list-style: none;
@@ -140,6 +143,7 @@ pre {
   font-size: 1.1rem;
   color: var(--color-accent);
   text-decoration: none;
+
   /* text-transform: capitalize; /* Apply this locally if needed per page */
 }
 
@@ -155,6 +159,7 @@ pre {
 }
 
 /* == Common Detail Page Header == */
+
 /* For headers on individual tag/series pages */
 .page-detail-header {
   text-align: left; /* Default, can be overridden locally if needed */
@@ -257,6 +262,7 @@ pre {
   color: var(--color-accent);
   text-decoration: none;
   display: inline-block;
+
   /* margin-top can be specific to the component */
 }
 
@@ -282,6 +288,7 @@ pre {
     color 0.2s ease-in-out,
     border-color 0.2s ease-in-out;
 }
+
 .button-primary:hover {
   background-color: var(--color-text);
   border-color: var(--color-text);
@@ -306,6 +313,7 @@ pre {
     border-color 0.2s ease-in-out;
   white-space: nowrap; /* Prevents button text from wrapping */
 }
+
 .button-edit:hover {
   background-color: var(--color-accent);
   color: var(--color-background, #fff);
@@ -379,6 +387,7 @@ pre {
 }
 
 /* Specific styling for the main body content textarea using its ID */
+
 /* Ensure this ID is unique per page if PostForm is ever used multiple times on one page (not current scenario) */
 .post-form #bodyContent {
   min-height: 200px;
@@ -395,9 +404,11 @@ pre {
 }
 
 /* Styles for the 'Book Note Details' fieldset */
+
 /* The React component PostForm.tsx uses className="book-note-fields" for this fieldset */
 .post-form .book-note-fields {
   border-color: var(--color-accent);
+
   /* margin-top is already handled by fieldset's general margin-bottom */
 }
 
@@ -439,6 +450,7 @@ pre {
   background-color: var(
     --color-accent-secondary
   ); /* Example: a muted yellow/orange */
+
   border-radius: 3px;
   color: var(--color-background, #fff);
   display: inline-block;

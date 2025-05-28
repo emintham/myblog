@@ -1,7 +1,9 @@
 /* src/styles/admin.css - Kinfolk Inspired Minimalism Redesign (Reconciled) */
 
 /* -------------------------------------------------------------------------- */
+
 /* Admin Scope Base Styles & Variables                                        */
+
 /* -------------------------------------------------------------------------- */
 body.admin-scope {
   /* Admin-specific Color Palette & Theme Variables */
@@ -11,11 +13,9 @@ body.admin-scope {
   --color-accent-admin: #a3b1a1; /* Desaturated, earthy green */
   --color-border-admin-subtle: #ededed; /* Very light gray for subtle lines/borders */
   --color-focus-admin: #93a191; /* Slightly darker accent for focus */
-
   --color-success-admin: #5a7d5a; /* Muted green for success text/icon */
   --color-error-admin: #b7564f; /* Muted red for error text/icon */
   --color-warning-admin: #b28a3e; /* Muted yellow/brown for warning text/icon */
-
   --spacing-unit-admin: 8px;
   --spacing-xs-admin: calc(var(--spacing-unit-admin) * 0.5); /* 4px */
   --spacing-sm-admin: var(--spacing-unit-admin); /* 8px */
@@ -23,7 +23,6 @@ body.admin-scope {
   --spacing-lg-admin: calc(var(--spacing-unit-admin) * 3); /* 24px */
   --spacing-xl-admin: calc(var(--spacing-unit-admin) * 4); /* 32px */
   --spacing-xxl-admin: calc(var(--spacing-unit-admin) * 6); /* 48px */
-
   --border-radius-admin: 3px;
 
   /* Base styles for admin pages */
@@ -40,7 +39,9 @@ body.admin-scope .admin-content-wrapper {
 }
 
 /* -------------------------------------------------------------------------- */
+
 /* Context Toggle Styles (Development Only)                                   */
+
 /* -------------------------------------------------------------------------- */
 .context-toggle-container {
   position: fixed;
@@ -56,10 +57,10 @@ body.admin-scope .admin-content-wrapper {
   align-items: center;
   position: relative;
   padding: 0;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgb(0 0 0 / 10%);
   background: #fff;
   border-radius: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
   overflow: hidden;
   cursor: pointer;
   min-width: 140px;
@@ -115,7 +116,7 @@ body.admin-scope .admin-content-wrapper {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1;
   pointer-events: none;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 15%);
 }
 
 .context-toggle-pill[data-context="author"] .toggle-slider {
@@ -129,20 +130,23 @@ body.admin-scope .admin-content-wrapper {
 }
 
 /* Context Toggle Responsive */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .context-toggle-container {
     top: 16px;
     right: 16px;
   }
+
   .context-toggle-pill {
     min-width: 120px;
     height: 40px;
   }
+
   .toggle-label {
     font-size: 0.8rem;
     padding: 0 12px;
     gap: 4px;
   }
+
   .toggle-label svg {
     width: 12px;
     height: 12px;
@@ -158,7 +162,9 @@ body.admin-scope .admin-content-wrapper {
 }
 
 /* -------------------------------------------------------------------------- */
+
 /* Shared Component Styles - DRYed from repetitive patterns                   */
+
 /* -------------------------------------------------------------------------- */
 
 /* Base button styles - shared by all button variants */
@@ -208,8 +214,6 @@ body.admin-scope textarea {
     border-color 0.2s ease-in-out,
     box-shadow 0.2s ease-in-out;
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
 }
 
 body.admin-scope .input-base:focus,
@@ -224,11 +228,13 @@ body.admin-scope select:focus,
 body.admin-scope textarea:focus {
   outline: none;
   border-color: var(--color-focus-admin);
-  box-shadow: 0 0 0 2px rgba(163, 177, 161, 0.2);
+  box-shadow: 0 0 0 2px rgb(163 177 161 / 20%);
 }
 
 /* -------------------------------------------------------------------------- */
+
 /* Typography (Scoped to Admin)                                               */
+
 /* -------------------------------------------------------------------------- */
 body.admin-scope h1,
 body.admin-scope h2,
@@ -280,6 +286,7 @@ body.admin-scope a {
   text-decoration: none;
   transition: color 0.2s ease-in-out;
 }
+
 body.admin-scope a:hover,
 body.admin-scope a:focus {
   color: var(--color-focus-admin);
@@ -287,7 +294,9 @@ body.admin-scope a:focus {
 }
 
 /* -------------------------------------------------------------------------- */
+
 /* Layout & Spacing (Scoped to Admin)                                         */
+
 /* -------------------------------------------------------------------------- */
 body.admin-scope .page-detail-header {
   margin-bottom: var(--spacing-xxl-admin);
@@ -302,7 +311,9 @@ body.admin-scope .admin-actions {
 }
 
 /* -------------------------------------------------------------------------- */
+
 /* Form Elements (Scoped to Admin)                                            */
+
 /* -------------------------------------------------------------------------- */
 body.admin-scope fieldset {
   border: none;
@@ -362,19 +373,23 @@ body.admin-scope .form-field .field-error-message {
 }
 
 /* -------------------------------------------------------------------------- */
+
 /* Button Variants - Using base styles                                        */
+
 /* -------------------------------------------------------------------------- */
 body.admin-scope .button-primary {
   background-color: var(--color-text-admin-primary);
   color: var(--color-background-admin);
   border-color: var(--color-text-admin-primary);
 }
+
 body.admin-scope .button-primary:hover,
 body.admin-scope .button-primary:focus {
   background-color: var(--color-focus-admin);
   border-color: var(--color-focus-admin);
   color: var(--color-background-admin);
 }
+
 body.admin-scope .button-primary:disabled {
   background-color: var(--color-border-admin-subtle);
   border-color: var(--color-border-admin-subtle);
@@ -389,11 +404,12 @@ body.admin-scope .button-add-quote {
   color: var(--color-accent-admin);
   border-color: var(--color-accent-admin);
 }
+
 body.admin-scope .button-edit:hover,
 body.admin-scope .button-edit:focus,
 body.admin-scope .button-add-quote:hover,
 body.admin-scope .button-add-quote:focus {
-  background-color: rgba(163, 177, 161, 0.1);
+  background-color: rgb(163 177 161 / 10%);
   border-color: var(--color-focus-admin);
   color: var(--color-focus-admin);
 }
@@ -405,17 +421,19 @@ body.admin-scope .button-remove-quote {
   padding: var(--spacing-sm-admin) var(--spacing-md-admin);
   font-size: 0.875rem;
 }
+
 body.admin-scope .button-remove-quote:hover,
 body.admin-scope .button-remove-quote:focus {
   color: var(--color-error-admin);
   border-color: var(--color-error-admin);
-  background-color: rgba(183, 86, 79, 0.05);
+  background-color: rgb(183 86 79 / 5%);
 }
 
 body.admin-scope #formFeedback a.button-edit {
   margin-top: var(--spacing-md-admin);
   margin-right: var(--spacing-md-admin);
 }
+
 body.admin-scope #formFeedback a.button-edit:last-of-type {
   margin-right: 0;
 }
@@ -425,7 +443,9 @@ body.admin-scope .inline-quotes-manager .button-add-quote {
 }
 
 /* -------------------------------------------------------------------------- */
+
 /* Feedback Messages (Scoped to Admin)                                        */
+
 /* -------------------------------------------------------------------------- */
 body.admin-scope .form-feedback-container {
   margin-top: var(--spacing-lg-admin);
@@ -433,7 +453,7 @@ body.admin-scope .form-feedback-container {
   border-radius: var(--border-radius-admin);
   display: none;
   border-left: 3px solid transparent;
-  background-color: rgba(237, 237, 237, 0.3);
+  background-color: rgb(237 237 237 / 30%);
 }
 
 body.admin-scope .form-feedback-container.visible {

@@ -7,7 +7,7 @@ import "../../styles/admin.css"; // Keep this for page-specific admin styles
 import "../../styles/analyze.css"; // Keep this for analyze page styles
 
 // Import Lucide icons
-import { ListPlus, Baseline, Download, Upload } from 'lucide-react';
+import { ListPlus, Baseline, Download, Upload } from "lucide-react";
 
 if (import.meta.env.PROD) {
   return new Response(null, { status: 404, statusText: "Not Found" });
@@ -18,7 +18,12 @@ const pageDescription = "A tool for close reading analysis of text passages."; /
 
 <BaseLayout title={pageTitle} description={pageDescription} isAdminPage={true}>
   {/* The UUID library script will be hoisted to the head by Astro */}
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js" integrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script
+    defer
+    src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"
+    integrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
 
   <div class="analyze-container">
     <aside id="left-column" class="left-column">
@@ -46,7 +51,12 @@ const pageDescription = "A tool for close reading analysis of text passages."; /
             <Upload size={16} strokeWidth={2} />
             Import JSON
           </label>
-          <input type="file" id="import-json-file" accept=".json" style="display: none;" />
+          <input
+            type="file"
+            id="import-json-file"
+            accept=".json"
+            style="display: none;"
+          />
         </div>
       </div>
     </aside>

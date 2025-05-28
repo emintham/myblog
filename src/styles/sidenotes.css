@@ -1,4 +1,5 @@
 /* src/styles/sidenotes.css */
+
 /* Contains all styles related to the functionality and appearance of sidenotes and their fallback to traditional footnotes. */
 
 /* Style for the superscript reference numbers in text */
@@ -22,13 +23,15 @@ sup[id^="fnref-"] a {
   line-height: 1.5;
   color: var(--color-meta); /* Subtler text color */
   background-color: transparent; /* Or a very light background like var(--color-background) */
+
   /* border-left: 2px solid var(--color-border-subtle); /* Optional separator */
   z-index: 10; /* Ensure it's above other content if necessary */
 }
 
 .sidenote p {
-  margin: 0 0 0.5em 0; /* Spacing for paragraphs within a sidenote */
+  margin: 0 0 0.5em; /* Spacing for paragraphs within a sidenote */
 }
+
 .sidenote p:last-child {
   margin-bottom: 0;
 }
@@ -39,19 +42,21 @@ section.footnotes.sidenotes-transformed {
 }
 
 /* Media Query for Sidenotes (Desktop) */
-@media (min-width: 1100px) {
+@media (width >= 1100px) {
   /* Adjust breakpoint as needed based on your --content-max-width */
   .sidenote {
     display: block; /* Show sidenotes */
   }
+
   /* The original footnote section at the bottom remains hidden due to .sidenotes-transformed */
 }
 
 /* Styles for Original Footnotes (Mobile/Fallback) */
-@media (max-width: 1099px) {
+@media (width <= 1099px) {
   section.footnotes.sidenotes-transformed {
     display: block !important; /* Ensure original footnotes are visible */
   }
+
   .sidenote {
     display: none !important; /* Ensure JS-created sidenotes are hidden */
   }
@@ -64,13 +69,16 @@ section.footnotes.sidenotes-transformed {
     font-size: 0.9rem;
     color: var(--color-meta);
   }
+
   section.footnotes .footnotes-list {
     padding-left: 1.5rem;
   }
+
   section.footnotes .footnote-item p {
     margin-bottom: 0.5em;
     line-height: 1.5;
   }
+
   .footnote-backref {
     text-decoration: none;
     margin-left: 0.25em;
@@ -89,6 +97,7 @@ section.footnotes.sidenotes-transformed {
   color: var(
     --color-accent
   ); /* Use your site's main accent color for the link */
+
   text-decoration: none; /* No underline by default, consistent with other links */
   font-weight: 600; /* Make link text slightly bolder than surrounding sidenote text */
   transition: color 0.2s ease-in-out; /* Smooth color transition on hover */
