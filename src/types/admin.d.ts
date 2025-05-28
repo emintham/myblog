@@ -118,3 +118,32 @@ export interface FrontmatterObject {
   quotesRef?: string;
   bookTags?: string[]; // Stored as an array of strings
 }
+
+export interface SentenceData {
+  id: string;
+  text: string;
+  summary: string;
+  purposeKey: string;
+  ties: string;
+}
+
+export interface ParagraphData {
+  id: string;
+  sentences: SentenceData[];
+}
+
+export interface AnalysisData extends Array<ParagraphData> {}
+
+export interface RhetoricalPurpose {
+  name: string;
+  color: string;
+  isPlaceholder?: boolean;
+}
+
+export interface RhetoricalPurposesMap {
+  [key: string]: RhetoricalPurpose;
+}
+
+// Type for the uuid v4 function, if you want to type it explicitly
+export type UuidV4Function = () => string;
+

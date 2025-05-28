@@ -1,67 +1,30 @@
 ---
-export const prerender = false; // Ensure it's dynamically rendered
+// src/pages/analyze.astro (or your relevant Astro page)
+export const prerender = false;
 
-import BaseLayout from "../../layouts/BaseLayout.astro"; // Import BaseLayout
+import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE_TITLE } from "../../siteConfig";
-import "../../styles/admin.css"; // Keep this for page-specific admin styles
-import "../../styles/analyze.css"; // Keep this for analyze page styles
+import "../../styles/admin.css";
+import "../../styles/analyze.css";
 
-import { ListPlus, Baseline, Download, Upload } from "lucide-react";
+// Import your main React TSX component
+import CloseReadingAnalyzer from "../../components/admin/CloseReadingAnalyzer.tsx";
 
 if (import.meta.env.PROD) {
   return new Response(null, { status: 404, statusText: "Not Found" });
 }
 const pageTitle = `Close Reading Analyzer - ${SITE_TITLE}`;
-const pageDescription = "A tool for close reading analysis of text passages."; // Optional: Add a description
+const pageDescription = "A tool for close reading analysis of text passages.";
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription} isAdminPage={true}>
-  {/* The UUID library script will be hoisted to the head by Astro */}
   <script
     defer
     src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"
-    integrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ=="
+    xintegrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ=="
     crossorigin="anonymous"
     referrerpolicy="no-referrer"></script>
 
-  <div class="analyze-container">
-    <aside id="left-column" class="left-column">
-      <div class="reconstruction-area">
-        <h2>Reconstructed Passage</h2>
-        <div id="reconstructed-passage-content" class="passage-content">
-          <!-- Auto-generated content will go here -->
-        </div>
-      </div>
-      <div class="left-column-controls">
-        <button id="add-paragraph-btn" class="control-button">
-          <ListPlus size={16} strokeWidth={2} />
-          New Paragraph
-        </button>
-        <button id="add-sentence-btn" class="control-button">
-          <Baseline size={16} strokeWidth={2} />
-          New Sentence
-        </button>
-          <button id="export-json-btn" class="control-button">
-            <Download size={16} strokeWidth={2} />
-            Export JSON
-          </button>
-          <label for="import-json-file" class="control-button import-label">
-            <Upload size={16} strokeWidth={2} />
-            Import JSON
-          </label>
-          <input
-            type="file"
-            id="import-json-file"
-            accept=".json"
-            style="display: none;"
-          />
-      </div>
-    </aside>
-    <main id="right-column" class="right-column">
-      <div id="analysis-forms-container">
-        <!-- Analysis form sections will be dynamically added here -->
-      </div>
-    </main>
-  </div>
-  <script src="/scripts/analyzePageHandler.js" is:inline></script>
+  <CloseReadingAnalyzer client:load />
 </BaseLayout>
+
