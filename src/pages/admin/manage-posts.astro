@@ -11,7 +11,7 @@ if (!import.meta.env.DEV) {
 const posts = await getCollection("blog");
 posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-const pageTitle = `Manage Posts (DEV) - ${SITE_TITLE}`;
+const pageTitle = `Manage Posts - ${SITE_TITLE}`;
 const pageDescription =
   "Create or edit blog posts. This page is available in development mode only.";
 ---

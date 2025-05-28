@@ -22,7 +22,7 @@ const allQuoteTags = await getUniqueTagNames(
   (data) => data.quotes?.flatMap((q) => q.tags || []) || []
 );
 
-const pageTitle = `Create New Post (DEV) - ${SITE_TITLE}`;
+const pageTitle = `Create New Post - ${SITE_TITLE}`;
 ---
 
 <BaseLayout title={pageTitle} isAdminPage={true}>
