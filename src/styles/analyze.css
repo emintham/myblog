@@ -87,7 +87,7 @@
 }
 
 .passage-content {
-  font-family: var(--font-serif, "Lora", serif);
+  font-family: var(--font-sans, "Inter", sans-serif);
   font-size: 1rem;
   line-height: 1.7;
   color: var(--admin-text-secondary);
