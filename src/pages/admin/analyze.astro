@@ -2,10 +2,12 @@
 export const prerender = false; // Ensure it's dynamically rendered
 
 import { SITE_TITLE } from "../../siteConfig";
-import "../../styles/admin.css"; // For potential admin-common styles if any apply
-import "../../styles/analyze.css"; // Specific styles for this page
+import "../../styles/admin.css";
+import "../../styles/analyze.css";
 
-// This page is only available in development/author mode
+// Import Lucide icons
+import { ListPlus, Baseline, Download, Upload } from 'lucide-react';
+
 if (import.meta.env.PROD) {
   return new Response(null, { status: 404, statusText: "Not Found" });
 }
@@ -19,9 +21,9 @@ const pageTitle = `Close Reading Analyzer (DEV) - ${SITE_TITLE}`;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{pageTitle}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- Add UUID library from CDN with defer -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js" integrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <link rel="analyze-page-body">
+  </head>
+  <body class="analyze-page-body">
     <div class="analyze-container">
       <aside id="left-column" class="left-column">
         <div class="reconstruction-area">
@@ -31,11 +33,21 @@ const pageTitle = `Close Reading Analyzer (DEV) - ${SITE_TITLE}`;
           </div>
         </div>
         <div class="left-column-controls">
-          <button id="add-paragraph-btn" class="control-button">New Paragraph</button>
-          <button id="add-sentence-btn" class="control-button">New Sentence</button>
+          <button id="add-paragraph-btn" class="control-button">
+            <ListPlus size={16} strokeWidth={2} />
+            New Paragraph
+          </button>
+          <button id="add-sentence-btn" class="control-button">
+            <Baseline size={16} strokeWidth={2} />
+            New Sentence
+          </button>
           <div class="io-buttons">
-            <button id="export-json-btn" class="control-button">Export JSON</button>
+            <button id="export-json-btn" class="control-button">
+              <Download size={16} strokeWidth={2} />
+              Export JSON
+            </button>
             <label for="import-json-file" class="control-button import-label">
+              <Upload size={16} strokeWidth={2} />
               Import JSON
             </label>
             <input type="file" id="import-json-file" accept=".json" style="display: none;" />
