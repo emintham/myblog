@@ -1,11 +1,10 @@
 // src/components/admin/CloseReadingAnalyzer.tsx
-// (Adjust path according to your project structure)
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Paragraph from './Paragraph';
 import ReconstructedPassage from './ReconstructedPassage';
 import { MAX_WAIT_ATTEMPTS, WAIT_INTERVAL_MS, delay } from '../constants';
 import type { AnalysisData, SentenceData, ParagraphData, UuidV4Function } from '../../types/admin';
-import { Plus, Type, Download, Upload } from 'lucide-react';
+import { Download, Upload, PlusSquare } from 'lucide-react';
 
 declare global {
   interface Window {
@@ -36,14 +35,12 @@ const CloseReadingAnalyzer: React.FC = () => {
 
       if (typeof window.uuid !== "undefined" && typeof window.uuid.v4 === "function") {
         setUuidv4Func(() => window.uuid!.v4!);
-        console.log("UUID library successfully accessed via React.");
       } else {
         console.error("UUID library (window.uuid) failed to load after waiting.");
         setError("A critical library (uuid) could not be loaded. Functionality will be limited.");
       }
       setIsUuidLoading(false);
     };
-
     loadUuid();
   }, []);
 
@@ -55,29 +52,35 @@ const CloseReadingAnalyzer: React.FC = () => {
     }
   }, [uuidv4Func, analysisData.length]);
 
-  const handleAddParagraph = useCallback(() => {
+  const handleAddSentenceToSpecificParagraph = useCallback((paragraphId: string) => {
     if (!uuidv4Func) return;
-    const newParagraphId = uuidv4Func();
     const newSentence = { id: uuidv4Func(), text: "", summary: "", purposeKey: "NONE", ties: "" };
-    setAnalysisData(prevData => [
-      ...prevData,
-      { id: newParagraphId, sentences: [newSentence] }
-    ]);
-  }, [uuidv4Func]);
-
-  const handleAddSentenceToLastParagraph = useCallback(() => {
-    if (!uuidv4Func || analysisData.length === 0) return;
-    const lastParagraphId = analysisData[analysisData.length - 1].id;
-    const newSentence = { id: uuidv4Func(), text: "", summary: "", purposeKey: "NONE", ties: "" };
-
     setAnalysisData(prevData =>
       prevData.map(p =>
-        p.id === lastParagraphId
+        p.id === paragraphId
           ? { ...p, sentences: [...p.sentences, newSentence] }
           : p
       )
     );
-  }, [uuidv4Func, analysisData]);
+    setTimeout(() => document.getElementById(`sentence-text-${newSentence.id}`)?.focus(), 0);
+  }, [uuidv4Func]);
+
+  const handleAddParagraphAfter = useCallback((currentParagraphId: string) => {
+    if (!uuidv4Func) return;
+    const newParagraph: ParagraphData = {
+      id: uuidv4Func(),
+      sentences: [{ id: uuidv4Func(), text: "", summary: "", purposeKey: "NONE", ties: "" }]
+    };
+    setAnalysisData(prevData => {
+      const currentIndex = prevData.findIndex(p => p.id === currentParagraphId);
+      if (currentIndex === -1) return prevData; // Should not happen
+      const newData = [...prevData];
+      newData.splice(currentIndex + 1, 0, newParagraph);
+      return newData;
+    });
+    // Consider focusing the new paragraph's first sentence textarea
+  }, [uuidv4Func]);
+
 
   const handleUpdateSentence = useCallback((paragraphId: string, sentenceId: string, updatedSentenceData: SentenceData) => {
     setAnalysisData(prevData =>
@@ -105,13 +108,18 @@ const CloseReadingAnalyzer: React.FC = () => {
         return p;
       });
 
+      // If a paragraph becomes empty, remove it, unless it's the only paragraph
+      const originalLength = newData.length;
       newData = newData.filter(p => {
         if (p.sentences.length === 0) {
-          return newData.length === 1; // Keep if it's the only one (it will be empty)
+          // Only remove if it's not the last remaining paragraph
+          return originalLength <= 1;
         }
         return true;
       });
 
+      // If all paragraphs were removed, or if the last remaining paragraph is now empty,
+      // create a new default paragraph.
       if (newData.length === 0 || (newData.length === 1 && newData[0].sentences.length === 0)) {
          const newPid = uuidv4Func();
          const newSid = uuidv4Func();
@@ -148,23 +156,29 @@ const CloseReadingAnalyzer: React.FC = () => {
         try {
           const importedResult = e.target?.result;
           if (typeof importedResult !== 'string') {
-            alert("Error reading file content.");
-            return;
+            alert("Error reading file content."); return;
           }
-          const imported = JSON.parse(importedResult) as any[]; // Use 'any' for initial parse, then validate
+          const imported = JSON.parse(importedResult) as any[];
 
           if (Array.isArray(imported)) {
             const validatedData: AnalysisData = imported.map((p: any) => ({
               id: p.id || uuidv4Func(),
-              sentences: Array.isArray(p.sentences) ? p.sentences.map((s: any) => ({
+              sentences: Array.isArray(p.sentences) && p.sentences.length > 0 ? p.sentences.map((s: any) => ({
                 id: s.id || uuidv4Func(),
                 text: typeof s.text === 'string' ? s.text : "",
                 summary: typeof s.summary === 'string' ? s.summary : "",
                 purposeKey: typeof s.purposeKey === 'string' ? s.purposeKey : "NONE",
                 ties: typeof s.ties === 'string' ? s.ties : "",
-              })) : [{ id: uuidv4Func(), text: "", summary: "", purposeKey: "NONE", ties: "" }]
+              })) : [{ id: uuidv4Func(), text: "", summary: "", purposeKey: "NONE", ties: "" }] // Ensure at least one sentence
             }));
-            setAnalysisData(validatedData);
+             // Ensure at least one paragraph exists after import, even if imported data is empty array
+            if (validatedData.length === 0) {
+                const newPid = uuidv4Func();
+                const newSid = uuidv4Func();
+                setAnalysisData([{ id: newPid, sentences: [{ id: newSid, text: "", summary: "", purposeKey: "NONE", ties: "" }] }]);
+            } else {
+                setAnalysisData(validatedData);
+            }
           } else {
             alert("Invalid JSON file format: Data should be an array of paragraphs.");
           }
@@ -173,18 +187,12 @@ const CloseReadingAnalyzer: React.FC = () => {
         }
       };
       reader.readAsText(file);
-      if(event.target) { // Reset file input to allow re-uploading the same file
-        event.target.value = "";
-      }
+      if(event.target) { event.target.value = ""; }
     }
   };
 
-  if (isUuidLoading) {
-    return <div>Loading libraries...</div>;
-  }
-  if (error) {
-    return <div style={{ color: 'red', padding: '20px', border: '1px solid red' }}>Error: {error}</div>;
-  }
+  if (isUuidLoading) return <div>Loading libraries...</div>;
+  if (error) return <div style={{ color: 'red', padding: '20px', border: '1px solid red' }}>Error: {error}</div>;
 
   return (
     <div className="analyze-container">
@@ -194,26 +202,6 @@ const CloseReadingAnalyzer: React.FC = () => {
           <ReconstructedPassage analysisData={analysisData} />
         </div>
         <div className="left-column-controls">
-          <button
-            type="button"
-            id="add-paragraph-btn"
-            className="control-button"
-            onClick={handleAddParagraph}
-            disabled={!uuidv4Func}
-          >
-            <Plus size={16} />
-            New Paragraph
-          </button>
-          <button
-            type="button"
-            id="add-sentence-btn"
-            className="control-button"
-            onClick={handleAddSentenceToLastParagraph}
-            disabled={!uuidv4Func || analysisData.length === 0}
-          >
-            <Type size={16} />
-            New Sentence
-          </button>
           <button
             type="button"
             id="export-json-btn"
@@ -246,14 +234,33 @@ const CloseReadingAnalyzer: React.FC = () => {
       <main id="right-column" className="right-column">
         <div id="analysis-forms-container">
           {analysisData.map((p, index) => (
-            <Paragraph
-              key={p.id}
-              paragraph={p}
-              index={index}
-              onUpdateSentence={handleUpdateSentence}
-              onRemoveSentence={handleRemoveSentence}
-            />
+            <React.Fragment key={p.id + '-group'}>
+              <Paragraph
+                paragraph={p}
+                index={index}
+                onUpdateSentence={handleUpdateSentence}
+                onRemoveSentence={handleRemoveSentence}
+                onAddSentenceHere={handleAddSentenceToSpecificParagraph}
+              />
+              <div className="add-paragraph-after-button-container">
+                <button
+                  type="button"
+                  className="control-button control-button-subtle add-paragraph-after-btn"
+                  onClick={() => handleAddParagraphAfter(p.id)}
+                  disabled={!uuidv4Func}
+                  title="Add a new paragraph after this one"
+                >
+                  <PlusSquare size={18} />
+                  Add Paragraph Here
+                </button>
+              </div>
+            </React.Fragment>
           ))}
+           {analysisData.length === 0 && uuidv4Func && !isUuidLoading && (
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <p>Your document is currently empty.</p>
+            </div>
+          )}
         </div>
       </main>
     </div>

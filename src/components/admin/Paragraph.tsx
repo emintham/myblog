@@ -1,15 +1,15 @@
 // src/components/admin/Paragraph.tsx
-// (Adjust path as needed in your Astro project)
 import React from 'react';
 import Sentence from './Sentence';
-import type { ParagraphData, SentenceData } from '../../types/admin.d.ts';
+import type { ParagraphData, SentenceData } from '../../types/admin';
+import { PlusCircle } from 'lucide-react';
 
 interface ParagraphProps {
   paragraph: ParagraphData;
   index: number;
   onUpdateSentence: (paragraphId: string, sentenceId: string, updatedSentence: SentenceData) => void;
   onRemoveSentence: (paragraphId: string, sentenceId: string) => void;
-  // onRemoveParagraph?: (paragraphId: string) => void; // Optional: if you add paragraph removal
+  onAddSentenceHere: (paragraphId: string) => void;
 }
 
 const Paragraph: React.FC<ParagraphProps> = ({
@@ -17,6 +17,7 @@ const Paragraph: React.FC<ParagraphProps> = ({
   index,
   onUpdateSentence,
   onRemoveSentence,
+  onAddSentenceHere,
 }) => {
   return (
     <div className="paragraph-group" data-paragraph-id={paragraph.id}>
@@ -35,10 +36,25 @@ const Paragraph: React.FC<ParagraphProps> = ({
             />
           </React.Fragment>
         ))}
+        {paragraph.sentences.length === 0 && (
+          <div style={{ padding: '10px', color: '#777', textAlign: 'center' }}>
+            This paragraph is empty. Click "Add Sentence" below to begin.
+          </div>
+        )}
+      </div>
+      <div className="add-sentence-to-paragraph-container" style={{ textAlign: 'center', paddingTop: '10px' }}>
+        <button
+          type="button"
+          className="control-button control-button-small"
+          onClick={() => onAddSentenceHere(paragraph.id)}
+          title="Add sentence to this paragraph"
+        >
+          <PlusCircle size={16} />
+          Add Sentence
+        </button>
       </div>
     </div>
   );
 };
 
 export default Paragraph;
-
