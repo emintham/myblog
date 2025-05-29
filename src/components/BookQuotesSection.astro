@@ -30,7 +30,6 @@ const { quotes, bookAuthor } = Astro.props;
             <li class="quote-item">
               <blockquote class="quote-text">
                 <p set:html={quote.text.replace(/\n/g, "<br />")} />{" "}
-                {/* Preserve line breaks in quote text */}
                 {(quote.quoteAuthor ||
                   quote.quoteSource ||
                   (quote.tags && quote.tags.length > 0)) && (

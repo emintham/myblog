@@ -1,9 +1,10 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import PostForm from "../../components/admin/PostForm"; // Removed .tsx extension
+import PostForm from "../../components/admin/PostForm";
 import { SITE_TITLE } from "../../siteConfig";
-import { getUniqueTagNames } from "../../utils/tagUtils"; // Import the utility
-import "../../styles/admin.css"; // Import admin styles
+import { getUniqueTagNames } from "../../utils/tagUtils";
+import "../../styles/admin.css";
+import AdminFormFeedbackHandler from "../../components/admin/AdminFormFeedbackHandler.tsx"; // Import the new component
 
 if (import.meta.env.PROD) {
   return new Response(null, { status: 404, statusText: "Not Found" });
@@ -47,5 +48,6 @@ const pageTitle = `Create New Post - ${SITE_TITLE}`;
     <p id="feedbackMessage"></p>
   </div>
 
-  <script src="/scripts/adminFormHandler.js" is:inline></script>
+  <AdminFormFeedbackHandler client:load formId="createPostForm" /> {/* Add the new component */}
+  {/* <script src="/scripts/adminFormHandler.js" is:inline></script> REMOVE THIS LINE */}
 </BaseLayout>

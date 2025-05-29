@@ -1,33 +1,16 @@
 ---
 // src/components/ContextToggle.astro
-import { BookOpen, PencilLine } from "lucide-react";
-import "../styles/context-toggle.css"; // Import the new stylesheet
+import ContextToggleReactComponent from "./admin/ContextToggle.tsx"; // Path to the new React component
+import { ADMIN_PATH_PREFIX } from "../siteConfig.ts";
 
 const isDev = import.meta.env.DEV;
-const { initialContext = "reader", adminPathPrefix } = Astro.props;
 ---
 
 {
   isDev && (
-    <div class="context-toggle-container">
-      <button
-        id="devContextToggle"
-        class="context-toggle-pill"
-        type="button"
-        aria-live="polite"
-        data-context={initialContext}
-        data-admin-path-prefix={adminPathPrefix}
-      >
-        <span class="toggle-label toggle-reader">
-          <BookOpen width="14" height="14" viewBox="0 0 24 24" />
-          Reader
-        </span>
-        <span class="toggle-slider" />
-        <span class="toggle-label toggle-author">
-          <PencilLine width="14" height="14" viewBox="0 0 24 24" />
-          Author
-        </span>
-      </button>
-    </div>
+    <ContextToggleReactComponent
+      client:only="react"
+      adminPathPrefix={ADMIN_PATH_PREFIX}
+    />
   )
 }

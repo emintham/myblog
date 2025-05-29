@@ -319,6 +319,41 @@ body.admin-scope .inline-quotes-manager .button-add-quote {
   margin-top: var(--spacing-md-admin);
 }
 
+/* Styles for individual quote items within the manager */
+body.admin-scope .inline-quotes-manager .quote-item {
+  background-color: var(--color-background-admin); /* Match admin background */
+  padding: var(--spacing-lg-admin);
+  border-radius: var(--border-radius-admin);
+  /* border: 1px solid var(--color-border-admin-subtle); */ /* Keep or remove based on preference */
+  margin-bottom: var(--spacing-lg-admin); /* Space between quote items */
+  position: relative; /* For the pseudo-element divider */
+}
+
+/* Add a fading divider above each quote item, except the first one */
+body.admin-scope .inline-quotes-manager .quote-item:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--spacing-lg-admin) * -0.5); /* Position it in the middle of the margin */
+  left: 5%; /* Start after a small gap */
+  right: 5%; /* End before a small gap */
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-border-admin-subtle) 20%,
+    var(--color-border-admin-subtle) 80%,
+    transparent
+  );
+}
+
+/* Ensure the main label for "Inline Quotes" has some space below it */
+body.admin-scope .inline-quotes-manager > .inline-quotes-label {
+  margin-bottom: var(--spacing-lg-admin);
+}
+
+/* Optional: if you want a border around each quote item, uncomment the border property above */
+/* and adjust padding if necessary. The current setup focuses on the divider. */
+
 /* -------------------------------------------------------------------------- */
 
 /* Feedback Messages (Scoped to Admin)                                        */

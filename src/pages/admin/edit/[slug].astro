@@ -1,15 +1,16 @@
 ---
 export const prerender = false;
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import PostForm from "../../../components/admin/PostForm"; // Removed .tsx extension
+import PostForm from "../../../components/admin/PostForm";
 import { SITE_TITLE } from "../../../siteConfig";
 import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
-import yaml from "js-yaml"; // Import js-yaml
-import "../../../styles/admin.css"; // Import admin styles
-import type { PostSourceData, Quote } from "../../../types/admin"; // Import Quote type
-import { getUniqueTagNames } from "../../../utils/tagUtils"; // Import the utility
+import yaml from "js-yaml";
+import "../../../styles/admin.css";
+import type { PostSourceData, Quote } from "../../../types/admin";
+import { getUniqueTagNames } from "../../../utils/tagUtils";
+import AdminFormFeedbackHandler from "../../../components/admin/AdminFormFeedbackHandler.tsx"; // Import the new component
 
 if (import.meta.env.PROD) {
   return new Response(null, {
@@ -115,9 +116,14 @@ const allQuoteTags = await getUniqueTagNames(
 
 const pageTitleDisplay = postToEdit?.title || slug || "Post";
 const pageTitle = `Edit: ${pageTitleDisplay} - ${SITE_TITLE}`;
+const pageDescription = `Edit the post: ${pageTitleDisplay}. This page is available in development mode only.`;
 ---
 
-<BaseLayout title={pageTitle} isAdminPage={true}>
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  isAdminPage={true}
+>
   <div class="page-detail-header">
     <h1>
       {
@@ -131,16 +137,12 @@ const pageTitle = `Edit: ${pageTitleDisplay} - ${SITE_TITLE}`;
   </div>
 
   {
-    errorMessage && !postToEdit && (
-      <div class="form-feedback-container error-message visible">
+    errorMessage && (
+      <div class="error-message-container">
         <p>{errorMessage}</p>
-        <a href="/admin/manage-posts/" class="button-edit">
-          Back to Manage Posts
-        </a>
       </div>
     )
   }
-
   {
     postToEdit && !errorMessage && (
       <form
@@ -149,8 +151,6 @@ const pageTitle = `Edit: ${pageTitleDisplay} - ${SITE_TITLE}`;
         data-form-type="edit"
         data-original-slug={postToEdit.originalSlug}
       >
-        {/* Hidden fields are still useful for initial state if JS fails or for non-JS scenarios,
-          but adminFormHandler.js will also update them if slug changes. */}
         <input
           type="hidden"
           name="originalSlug"
@@ -185,12 +185,7 @@ const pageTitle = `Edit: ${pageTitleDisplay} - ${SITE_TITLE}`;
 
   <div id="formFeedback" class="form-feedback-container">
     <p id="feedbackMessage"></p>
-    <a id="viewPostLink" href="#" class="button-edit">View Post</a>
-    {/* style="display:none;" removed, CSS/JS will handle visibility */}
-    <a href="/admin/manage-posts/" class="button-edit manage-posts-link"
-      >Back to Manage Posts</a
-    >
-    {/* style removed, class added */}
+    <a id="viewPostLink" href="#" class="button-edit" style="display:none;">View Post</a>
   </div>
-  <script src="/scripts/adminFormHandler.js" is:inline></script>
+  <AdminFormFeedbackHandler client:load formId="editPostForm" />
 </BaseLayout>
