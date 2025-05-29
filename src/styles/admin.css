@@ -12,6 +12,7 @@ body.admin-scope {
   --color-text-admin-secondary: #8c8c8c; /* Lighter, muted gray */
   --color-accent-admin: #a3b1a1; /* Desaturated, earthy green */
   --color-border-admin-subtle: #ededed; /* Very light gray for subtle lines/borders */
+  --color-admin-fieldset-border: #C8CFC7; /* New unified fieldset border color */
   --color-focus-admin: #93a191; /* Slightly darker accent for focus */
   --color-success-admin: #5a7d5a; /* Muted green for success text/icon */
   --color-error-admin: #b7564f; /* Muted red for error text/icon */
@@ -113,33 +114,63 @@ body.admin-scope textarea:focus {
 /* Typography (Scoped to Admin)                                               */
 
 /* -------------------------------------------------------------------------- */
+
+/* General styles for admin headings */
 body.admin-scope h1,
 body.admin-scope h2,
 body.admin-scope h3,
 body.admin-scope h4,
 body.admin-scope h5,
-body.admin-scope h6,
-body.admin-scope .page-detail-header h1,
+body.admin-scope h6 {
+  font-family: var(--font-sans);
+  color: var(--color-text-admin-primary);
+  font-weight: 600; /* Bolder for headings */
+  line-height: 1.3;
+  margin-top: var(--spacing-lg-admin); /* Default top margin */
+  margin-bottom: var(--spacing-md-admin); /* Default bottom margin */
+}
+
+/* Specifics for H1 in the page-detail-header */
+body.admin-scope .page-detail-header h1 {
+  font-size: 2rem; /* Or your preferred size for admin page titles */
+  font-weight: 600; /* Consistent with other headings */
+  color: var(--color-text-admin-primary);
+  margin-top: 0; /* Usually no top margin if it's the first element in its container */
+  margin-bottom: 0; /* The .page-detail-header div handles bottom spacing */
+  line-height: 1.3;
+  position: static; /* Ensure it's in normal flow, overriding any accidental absolute positioning */
+}
+
+/* Styles for H2 */
+body.admin-scope h2 {
+  font-size: 1.5rem;
+}
+
+/* Styles for legend, including the overlapping border effect */
 body.admin-scope legend {
   font-family: var(--font-sans);
   color: var(--color-text-admin-primary);
-  margin-top: var(--spacing-lg-admin);
-  margin-bottom: var(--spacing-md-admin);
-  line-height: 1.3;
-  font-weight: 500;
+  font-weight: 500; /* Slightly less bold than main headings */
+  font-size: 1.5rem; /* Matches h2 for consistency in this design */
+  line-height: 1; /* Crucial for predictable height calculation for positioning */
+  position: absolute;
+  top: calc(-1.5rem * 0.5 * 1); /* Half of its font-size, moving it up */
+  left: var(--spacing-md-admin); /* Indent from fieldset edge */
+  background: var(--color-background-admin); /* Match page background to "cut" the border */
+  padding: 0 var(--spacing-sm-admin); /* Horizontal padding for the legend text */
+  margin: 0; /* Reset existing margins */
 }
 
-body.admin-scope h1,
-body.admin-scope .page-detail-header h1 {
-  font-size: 2rem;
-  margin-top: 0;
-  margin-bottom: var(--spacing-xl-admin);
+/* You can add specific font sizes for other heading levels if needed */
+body.admin-scope h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
 }
-
-body.admin-scope h2,
-body.admin-scope legend {
-  font-size: 1.5rem;
+body.admin-scope h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
 }
+/* ... and so on for h5, h6 */
 
 body.admin-scope label,
 body.admin-scope .inline-quotes-label {
@@ -193,9 +224,25 @@ body.admin-scope .admin-actions {
 
 /* -------------------------------------------------------------------------- */
 body.admin-scope fieldset {
-  border: none;
-  padding: 0;
+  /* border: none; */ /* Replaced */
+  /* padding: 0; */ /* Replaced */
   margin: 0 0 var(--spacing-xl-admin) 0;
+  border: 1px solid var(--color-admin-fieldset-border); /* Use new unified color */
+  padding: var(--spacing-xl-admin) var(--spacing-lg-admin) var(--spacing-lg-admin); /* Adjusted padding, especially top */
+  position: relative; /* For legend positioning */
+  border-radius: var(--border-radius-admin); /* Added for consistency */
+}
+
+/* Ensure .book-note-fields within admin also uses the unified styles */
+body.admin-scope .post-form .book-note-fields {
+  border-color: var(--color-admin-fieldset-border); /* Use new unified border color */
+}
+
+body.admin-scope .post-form .book-note-fields legend {
+  color: var(--color-text-admin-primary); /* Match other admin legends */
+  /* Ensure other legend styles (positioning, background) are inherited or consistent */
+  /* The existing legend rule should cover positioning if specificity is right. */
+  /* If not, copy relevant properties from the main legend rule. */
 }
 
 body.admin-scope .form-field {
