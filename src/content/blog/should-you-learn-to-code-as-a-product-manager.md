@@ -1,11 +1,19 @@
 ---
-title: "Should You Learn to Code (as a Product Manager)?"
-pubDate: 2024-08-26
-description: "My thoughts on learning to code if you are a product manager"
-tags: ["opinion", "technical", "guide", "product management", "software engineering", "learning", "career development"]
-series: "Software Engineering"
-postType: "standard"
-
+title: Should You Learn to Code (as a Product Manager)?
+pubDate: 2024-08-26T00:00:00.000Z
+author: Emin Tham
+postType: standard
+draft: false
+description: My thoughts on learning to code if you are a product manager
+tags:
+  - opinion
+  - technical
+  - guide
+  - product management
+  - software engineering
+  - learning
+  - career development
+series: Software Engineering
 ---
 
 (This is a re-post and revision of a post I wrote in 2024. I have since added

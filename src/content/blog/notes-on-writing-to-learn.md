@@ -1,23 +1,28 @@
 ---
-title: "Notes on Writing to Learn"
-pubDate: 2025-05-20
-description: "In this reflection on William Zinsser's \"Writing to Learn\", I connect his core idea of writing as thinking to my own lifelong writing journey. It's my take on his concepts, including some critiques on some ideas that I feel were not well thought out."
-tags: ["writing"]
+title: Notes on Writing to Learn
+pubDate: 2025-05-20T00:00:00.000Z
+author: Emin Tham
+postType: bookNote
 draft: false
-postType: "bookNote"
-
-bookTitle: "Writing to Learn"
-bookAuthor: "William Zinsser"
-bookTags:
-  - "non-fiction"
-  - "writing"
-  - "reference"
-  - "education"
+description: >-
+  In this reflection on William Zinsser's "Writing to Learn", I connect his core
+  idea of writing as thinking to my own lifelong writing journey. It's my take
+  on his concepts, including some critiques on some ideas that I feel were not
+  well thought out.
+tags:
+  - writing
+bookTitle: Writing to Learn
+bookAuthor: William Zinsser
 bookCover:
-  imageName: "writing-to-learn"
-  alt: "Cover of Writing to Learn by William Zinsser"
+  imageName: writing-to-learn
+  alt: Cover for Writing to Learn
   originalWidth: 1693
-quotesRef: "notes-on-writing-to-learn-quotes"
+quotesRef: notes-on-writing-to-learn-quotes
+bookTags:
+  - non-fiction
+  - writing
+  - reference
+  - education
 ---
 
 I've had this book on my reading list for some time now but never prioritized it

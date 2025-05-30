@@ -1,11 +1,20 @@
 ---
-title: "How I Write RFCs"
-pubDate: 2025-05-23
-description: "A guide on how I write RFCs using AI assistants."
-tags: ["guide", "assistant", "technical", "productivity", "writing", "rfc", "software engineering", "documentation"]
-series: "Software Engineering"
-postType: "standard"
-
+title: How I Write RFCs
+pubDate: 2025-05-23T00:00:00.000Z
+author: Emin Tham
+postType: standard
+draft: false
+description: A guide on how I write RFCs using AI assistants.
+tags:
+  - guide
+  - assistant
+  - technical
+  - productivity
+  - writing
+  - rfc
+  - software engineering
+  - documentation
+series: Software Engineering
 ---
 
 [Request For Comments](https://en.m.wikipedia.org/wiki/Request_for_Comments) (RFC)
@@ -26,7 +35,7 @@ discussion and feedback as I am always looking for ways to improve myself.
 
 When I say "AI assistant" in this post, I am referring in particular
 to thinking models that are similar to or more powerful than [Gemini 2.5 Pro](https://gemini.google.com).
-You will may or may not get the same results with a less capable assistant. I have
+You may or may not get the same results with a less capable assistant. I have
 not done experiments to see if the AI's achievement in coding benchmarks
 translates to better design thinking. If anyone has done such experiments,
 please let me know in the comments below.

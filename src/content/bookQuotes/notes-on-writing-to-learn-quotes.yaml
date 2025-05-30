@@ -1,76 +1,156 @@
-bookSlug: "notes-on-writing-to-learn" # Matches the slug of the .md file
+bookSlug: notes-on-writing-to-learn
 quotes:
-  - text: "What keeps us from trying is fear; the engineer is as frightened of my language (writing) as I am of his. Scared away by the probable difficulty of learning the language, we never get to its literature— the purpose it was created for."
-    # quoteAuthor: "William Zinsser" # Optional: Uncomment and set if different from the book's main author
-    # quoteSource: "Chapter 1, Page 10" # Optional: E.g., "As cited by X", "Interview Y"
+  - text: >-
+      What keeps us from trying is fear; the engineer is as frightened of my
+      language (writing) as I am of his. Scared away by the probable difficulty
+      of learning the language, we never get to its literature— the purpose it
+      was created for.
+    quoteAuthor: ''
     tags:
-      - "growth"
-      - "mental blocks"
-  - text: "Other people’s rules are shackles on the mind."
-    # quoteAuthor: "A Character"
-    # quoteSource: "Dialogue"
+      - growth
+      - mental blocks
+    quoteSource: ''
+  - text: Other people’s rules are shackles on the mind.
+    quoteAuthor: ''
     tags:
-      - "growth"
-      - "mental blocks"
-  - text: "Clear writing is the logical arrangement of thought; a scientist who thinks clearly can write as well as the best writer."
+      - growth
+      - mental blocks
+    quoteSource: ''
+  - text: >-
+      Clear writing is the logical arrangement of thought; a scientist who
+      thinks clearly can write as well as the best writer.
+    quoteAuthor: ''
     tags:
-      - "writing"
-  - text: "[W]e write to find out what we know and what we want to say."
+      - writing
+    quoteSource: ''
+  - text: '[W]e write to find out what we know and what we want to say.'
+    quoteAuthor: ''
     tags:
-      - "writing"
-      - "thinking"
-  - text: "I thought of how often the act of writing even the simplest document—a letter, for instance—had clarified my half-formed ideas. Writing and thinking and learning were the same process."
+      - writing
+      - thinking
+    quoteSource: ''
+  - text: >-
+      I thought of how often the act of writing even the simplest document—a
+      letter, for instance—had clarified my half-formed ideas. Writing and
+      thinking and learning were the same process.
+    quoteAuthor: ''
     tags:
-      - "writing"
-      - "thinking"
-  - text: "Writing is thinking on paper. Anyone who thinks clearly should be able to write clearly—about any subject at all."
+      - writing
+      - thinking
+    quoteSource: ''
+  - text: >-
+      Writing is thinking on paper. Anyone who thinks clearly should be able to
+      write clearly—about any subject at all.
+    quoteAuthor: ''
     tags:
-      - "writing"
-      - "thinking"
-  - text: "A piece of writing must be viewed as a constantly evolving organism."
+      - writing
+      - thinking
+    quoteSource: ''
+  - text: A piece of writing must be viewed as a constantly evolving organism.
+    quoteAuthor: ''
     tags:
-      - "writing"
-  - text: "[Emphasis] where it should have been all along: on the successive rewritings and rethinkings that mold an act of writing into the best possible form."
+      - writing
+    quoteSource: ''
+  - text: >-
+      [Emphasis] where it should have been all along: on the successive
+      rewritings and rethinkings that mold an act of writing into the best
+      possible form.
+    quoteAuthor: ''
     tags:
-      - "writing"
-  - text: "Writing organizes and clarifies our thoughts. Writing is how we think our way into a subject and make it our own. Writing enables us to find out what we know—and what we don’t know—about whatever we’re trying to learn. Putting an idea into written words is like defrosting the windshield: The idea, so vague out there in the murk, slowly begins to gather itself into a sensible shape. Whatever we write—a memo, a letter, a note to the baby-sitter—all of us know this moment of finding out what we really want to say by trying in writing to say it."
+      - writing
+    quoteSource: ''
+  - text: >-
+      Writing organizes and clarifies our thoughts. Writing is how we think our
+      way into a subject and make it our own. Writing enables us to find out
+      what we know—and what we don’t know—about whatever we’re trying to learn.
+      Putting an idea into written words is like defrosting the windshield: The
+      idea, so vague out there in the murk, slowly begins to gather itself into
+      a sensible shape. Whatever we write—a memo, a letter, a note to the
+      baby-sitter—all of us know this moment of finding out what we really want
+      to say by trying in writing to say it.
+    quoteAuthor: ''
     tags:
-      - "writing"
-      - "thinking"
-      - "writing examples"
-  - text: "It’s by writing about a subject we’re trying to learn that we reason our way to what it means. Reasoning is a lost skill of the children of the TV generation, with their famously short attention span. Writing can help them get it back."
+      - writing
+      - thinking
+      - writing examples
+    quoteSource: ''
+  - text: >-
+      It’s by writing about a subject we’re trying to learn that we reason our
+      way to what it means. Reasoning is a lost skill of the children of the TV
+      generation, with their famously short attention span. Writing can help
+      them get it back.
+    quoteAuthor: ''
     tags:
-      - "writing"
-      - "thinking"
-      - "attention"
-  - text: "What we study, ultimately, is not texts but the ways in which people from time out of mind have regularly come together to express those values that they have found to serve them best in their own struggle to survive."
-    quoteAuthor: "Aidan Kavanagh"
+      - writing
+      - thinking
+      - attention
+    quoteSource: ''
+  - text: >-
+      What we study, ultimately, is not texts but the ways in which people from
+      time out of mind have regularly come together to express those values that
+      they have found to serve them best in their own struggle to survive.
+    quoteAuthor: Aidan Kavanagh
     tags:
-      - "writing"
-      - "thinking"
-  - text: "[W]riting becomes woven through the entire class and lab experience. If they fall into a pitfall they can explain how they got there, and that’s education. The process also enables me to see how their mind worked. By having them describe how they arrived at a result I can comment on it, and they can make use of my comment when they go back to the experiment. There’s a feedback that isn’t possible when the teacher just grades from numerical answers. Revising helps the students to rethink."
-    quoteAuthor: "Lawrence W. Potts"
+      - writing
+      - thinking
+    quoteSource: ''
+  - text: >-
+      [W]riting becomes woven through the entire class and lab experience. If
+      they fall into a pitfall they can explain how they got there, and that’s
+      education. The process also enables me to see how their mind worked. By
+      having them describe how they arrived at a result I can comment on it, and
+      they can make use of my comment when they go back to the experiment.
+      There’s a feedback that isn’t possible when the teacher just grades from
+      numerical answers. Revising helps the students to rethink.
+    quoteAuthor: Lawrence W. Potts
     tags:
-      - "writing"
-      - "thinking"
-      - "education"
-  - text: "Through the writing of our students we are reminded of their individuality."
+      - writing
+      - thinking
+      - education
+    quoteSource: ''
+  - text: >-
+      Through the writing of our students we are reminded of their
+      individuality.
+    quoteAuthor: ''
     tags:
-      - "writing"
-      - "thinking"
-      - "education"
-  - text: "It compels us by the repeated effort of language to go after those thoughts and to organize them and present them clearly. It forces us to keep asking, “Am I saying what I want to say?” Very often the answer is “No.”"
+      - writing
+      - thinking
+      - education
+    quoteSource: ''
+  - text: >-
+      It compels us by the repeated effort of language to go after those
+      thoughts and to organize them and present them clearly. It forces us to
+      keep asking, “Am I saying what I want to say?” Very often the answer is
+      “No.”
+    quoteAuthor: ''
     tags:
-      - "writing"
-      - "thinking"
-  - text: "Nonfiction writing should always have a point: It should leave the reader with a set of facts, or an idea, or a point of view, that he didn’t have before he started reading. Writers may write for any number of good personal reasons—ego, therapy, recollection, validation of their lives. But what they produce will have a validity of its own to the extent that it’s useful to somebody else."
+      - writing
+      - thinking
+    quoteSource: ''
+  - text: >-
+      Nonfiction writing should always have a point: It should leave the reader
+      with a set of facts, or an idea, or a point of view, that he didn’t have
+      before he started reading. Writers may write for any number of good
+      personal reasons—ego, therapy, recollection, validation of their lives.
+      But what they produce will have a validity of its own to the extent that
+      it’s useful to somebody else.
+    quoteAuthor: ''
     tags:
-      - "writing"
-      - "opinions on writing"
-  - text: "[W]hen we write we put some part of our self on paper for other people to judge."
+      - writing
+      - opinions on writing
+    quoteSource: ''
+  - text: >-
+      [W]hen we write we put some part of our self on paper for other people to
+      judge.
+    quoteAuthor: ''
     tags:
-      - "writing"
-  - text: "[T]he subject—what a book is about—isn’t as important as the qualities of mind or personality that the writer brings to it."
+      - writing
+    quoteSource: ''
+  - text: >-
+      [T]he subject—what a book is about—isn’t as important as the qualities of
+      mind or personality that the writer brings to it.
+    quoteAuthor: ''
     tags:
-      - "writing"
-      - "opinions on writing"
+      - writing
+      - opinions on writing
+    quoteSource: ''
