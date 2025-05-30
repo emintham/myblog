@@ -123,7 +123,7 @@ flow of the information. A likely wrinkle is that an author may be writing
 for a different audience than the usual one they are used to, which may require
 them to *explore* and explain the information to the new audience in the right way.
 
-Ultimately, this book was a worthwhile read despite the flaws mentioned above.
+Ultimately, this [book](https://amzn.to/4dEL3xF) was a worthwhile read despite the flaws mentioned above.
 To me, a good *non-fiction* book is like a Hydra on Mount TBR: slicing one off
 the list often leads to more good books from its references. I have duly added several
 to my reading list-- books I would have overlooked otherwise.

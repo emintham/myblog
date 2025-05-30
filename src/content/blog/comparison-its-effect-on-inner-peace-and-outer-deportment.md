@@ -1,10 +1,22 @@
 ---
-title: "Comparison: Its Effect on Inner Peace and Outer Deportment"
-pubDate: 2025-05-17
-description: "We discuss how to critically examine the values that drive our comparisons and cultivate a mindful approach, so this inevitable human act leads to greater self-awareness and genuine freedom."
-tags: ["lessons", "family", "Jay", "philosophy", "mental health"]
-series: "Lessons for Jay"
+title: 'Comparison: Its Effect on Inner Peace and Outer Deportment'
+pubDate: 2025-05-17T00:00:00.000Z
+author: Emin Tham
+postType: standard
+draft: false
+description: >-
+  We discuss how to critically examine the values that drive our comparisons and
+  cultivate a mindful approach, so this inevitable human act leads to greater
+  self-awareness and genuine freedom.
+tags:
+  - lessons
+  - family
+  - Jay
+  - philosophy
+  - mental health
+series: Lessons for Jay
 ---
+
 Dear Jay,
 
 To compare is human; to compare wisely, freedom. We covet that we do not own and
@@ -139,8 +151,8 @@ mind, and the impulse to voice it can be immediate, often bypassing any
 conscious consideration. Again, mindfulness will help here. Not all idioms and
 sayings are wise in every situation but in these cases, "praise in public,
 criticize in private", and in the latter, do so sparingly. I share here
-with you an interesting excerpt from the excellent Autobiography of Benjamin
-Franklin [^5] that illustrates this point. Franklin’s transformation, from a
+with you an interesting excerpt from the excellent [Autobiography of Benjamin
+Franklin](https://www.gutenberg.org/files/20203/20203-h/20203-h.htm) [^5] that illustrates this point. Franklin’s transformation, from a
 "positive arguer" to a "humble inquirer" is a testament to the strength found
 in intellectual modesty and the art of gentle persuasiveness [^6].
 
@@ -172,10 +184,10 @@ and without being a jerk about it.
         core principles and convictions will help you make the choice that
         you can live with, even if it may cause the ire of your loved ones.
 [^2]: I'm told by my friendly [editor](https://deepmind.google/technologies/gemini/pro/) that using it this way (in the Dawkins sense) is rather niche. In case it isn't clear, this is synonymous with "cultural scripts" or "prevailing ideas".
-[^3]: The book [Supersurvivors](https://leekravetz.com/supersurvivors) by Lee Kravetz offers stories of people who have experienced this and thrived. If this resonates with you, I suggest availing yourself of this resource.
+[^3]: The book [Supersurvivors](https://amzn.to/3ZGrDme) by Lee Kravetz offers stories of people who have experienced this and thrived. If this resonates with you, I suggest availing yourself of this resource.
 [^4]: A contest, I might add, where the chief prize is often merely indigestion!
 [^5]: A book I wholeheartedly recommend, by the way.
 [^6]: You may perhaps be interested in reminding yourself of Aesop's fable of the North Wind and the Sun.
 [^7]: Utilitarianism is, of course, a value you may or not may ascribe to but we will leave that aside for the moment.
-[^8]: See Adam Grant's [Give and Take](https://adamgrant.net/book/give-and-take/) for a more extended elaboration of this.
+[^8]: See Adam Grant's [Give and Take](https://amzn.to/3SNof5z) for a more extended elaboration of this.
 [^daoyou]: translation: partner along the Path or fellow traveler.

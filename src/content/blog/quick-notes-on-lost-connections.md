@@ -1,26 +1,27 @@
 ---
-title: "Quick Notes on Lost Connections"
-pubDate: 2024-09-05
-description: "My quick summary of Lost Connections by Johann Hari"
-tags: ["summary", "notes"]
-# series: ""
-postType: "bookNote"
-
-# --- Book Note Specific Fields (only used if postType is 'bookNote') ---
-bookTitle: "Lost Connections"
-bookAuthor: "Johann Hari"
+title: Quick Notes on Lost Connections
+pubDate: 2024-09-05T00:00:00.000Z
+author: Emin Tham
+postType: bookNote
+draft: false
+description: My quick summary of Lost Connections by Johann Hari
+tags:
+  - summary
+  - notes
+bookTitle: Lost Connections
+bookAuthor: Johann Hari
 bookCover:
-  imageName: "lost-connections"
-  alt: "Cover of Lost Connections"
+  imageName: lost-connections
+  alt: Cover for Lost Connections
   originalWidth: 1000
+quotesRef: quick-notes-on-lost-connections-quotes
 bookTags:
-  - "non-fiction"
-  - "psychology"
-  - "depression" # E.g., ["non-fiction", "psychology"]
-quotesRef: "quick-notes-on-lost-connections-quotes"
+  - non-fiction
+  - psychology
+  - depression
 ---
 
-In this book, Hari debunks the popular view of a broken brain causing depression.
+In this [book](https://amzn.to/3T5bDXf), Hari debunks the popular view of a broken brain causing depression.
 i.e. the serotonin theory of depression. Hari posits that the general scientific
 consensus does not agree with this theory and that this theory is propagated by
 big pharmaceutical companies as an effort to market its lucrative antidepressants.

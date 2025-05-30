@@ -52,14 +52,14 @@ with your development team. Show genuine curiosity, and perhaps schedule brief,
 dedicated times for these discussions.
 
 If the above feels unsatisfactory and you wish to go deeper, another option is
-a book like [Tech Simplified for PMs and Entrepreneurs](https://www.amazon.ca/Tech-Simplified-Entrepreneurs-Deepak-Singh/dp/9355664990)
+a book like [Tech Simplified for PMs and Entrepreneurs](https://amzn.to/4dERDV3)
 that covers the broad basics. Another good option is to go through [System Design
-Interview](https://www.amazon.ca/System-Design-Interview-insiders-Second/dp/B08CMF2CQF/ref=asc_df_B08CMF2CQF?mcid=3ef49e4e65613020abf3398d3598d155&tag=googleshopc0c-20&linkCode=df0&hvadid=706840526768&hvpos=&hvnetw=g&hvrand=3661384844743060318&hvpone=&hvptwo=&hvqmt=&hvdev=t&hvdvcmdl=&hvlocint=&hvlocphy=9001491&hvtargid=pla-934212337151&psc=1&gad_source=1).
+Interview](https://amzn.to/4dLDYM6).
 This book in particular builds up a modern distributed
 system from a simple starting point and proceeds to scale different parts of
 the architecture, thereby providing you
 the perspective and motivation for many of the changes your developer team may be
-proposing. If you wish to go deeper still, [Designing Data-Intensive Applications](https://dataintensive.net/) [^new-book]
+proposing. If you wish to go deeper still, [Designing Data-Intensive Applications](https://amzn.to/450IHHf) [^new-book]
 is the last resource I'll highlight. Note that this last book goes
 very deep in certain sections but has the benefit of also being very wide. I
 suggest just skimming each section as it’s very easy to get lost in the extraneous
