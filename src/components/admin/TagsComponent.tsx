@@ -200,6 +200,7 @@ const TagsComponent: React.FC<TagsComponentProps> = ({
       </label>
       <CreatableSelect
         inputId={id}
+        instanceId={id} // Add this line
         isMulti
         options={suggestionOptions}
         value={currentTagOptions}
