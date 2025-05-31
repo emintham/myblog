@@ -63,7 +63,7 @@ readily able to transfer my English writing skills to. My mother enrolled me int
 class during the period of Grades 3-5 (roughly) and while it helped, I never did
 quite achieved the level I wished. At Grade 6, however, worried for my [standardized
 exams](https://en.m.wikipedia.org/wiki/Primary_School_Achievement_Test_(Malaysia)),
-my mother procured a collection of award-winning esssays and stories from
+my mother procured a collection of award-winning essays and stories from
 China written by students my age. *That* was eye-opening.
 
 The essays in that collection opened my eyes to what the possibilities could be.
