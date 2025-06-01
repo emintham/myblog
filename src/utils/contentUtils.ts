@@ -78,7 +78,7 @@ export async function getUniqueTagNames(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   filterPredicate?: (entry: CollectionEntry<any>) => boolean
 ): Promise<string[]> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const allEntries = await getCollection(
     collectionName as any,
     filterPredicate as any
