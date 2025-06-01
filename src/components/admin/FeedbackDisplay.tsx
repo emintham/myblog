@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 
 interface FeedbackDisplayProps {
   formId: string;
@@ -7,10 +7,12 @@ interface FeedbackDisplayProps {
 const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
   const formRef = useRef<HTMLFormElement | null>(null);
   const submitButtonRef = useRef<HTMLButtonElement | null>(null);
-  const feedbackDivRef = useRef<HTMLDivElement | null>(null);
-  const feedbackMessageRef = useRef<HTMLParagraphElement | null>(null);
-  const viewPostLinkRef = useRef<HTMLAnchorElement | null>(null);
   const formTypeRef = useRef<string>('create');
+
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackType, setFeedbackType] = useState<'success' | 'error' | 'warning' | null>(null);
+  const [isFeedbackVisible, setIsFeedbackVisible] = useState<boolean>(false);
+  const [viewPostHref, setViewPostHref] = useState<string | null>(null);
 
   useEffect(() => {
     const formElement = document.getElementById(formId) as HTMLFormElement;
@@ -23,28 +25,18 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
         console.warn(`[FeedbackDisplay] Form with ID "${formId}" not found.`);
       }
     }
-
-    feedbackDivRef.current = document.getElementById("formFeedback") as HTMLDivElement;
-    feedbackMessageRef.current = document.getElementById("feedbackMessage") as HTMLParagraphElement;
-    viewPostLinkRef.current = document.getElementById("viewPostLink") as HTMLAnchorElement | null;
-
+    // No longer need to find feedbackDiv, feedbackMessage, or viewPostLink by ID here
   }, [formId]);
 
   const showFeedback = useCallback((message: string, type: 'success' | 'error' | 'warning') => {
-    const feedbackMessageEl = feedbackMessageRef.current;
-    const feedbackDivEl = feedbackDivRef.current;
-    const viewPostLinkEl = viewPostLinkRef.current;
+    setFeedbackMessage(message);
+    setFeedbackType(type);
+    setIsFeedbackVisible(true);
 
-    if (feedbackMessageEl && feedbackDivEl) {
-      feedbackMessageEl.textContent = message;
-      feedbackDivEl.className = `form-feedback-container ${type}-message visible`;
-
-      if (viewPostLinkEl && type !== 'success') {
-        viewPostLinkEl.style.display = 'none';
-      }
+    if (type !== 'success') {
+      setViewPostHref(null); // Hide view post link for non-success messages
     }
-  }, []);
-
+  }, []); // Setters from useState are stable
 
   const handlePostFormSubmitting = useCallback((event: Event) => {
     const customEvent = event as CustomEvent<{ isSubmitting: boolean }>;
@@ -60,7 +52,7 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
         button.textContent = isSubmitting ? "Updating..." : "Update Post";
       }
     }
-  }, []);
+  }, []); // Depends on submitButtonRef.current and formTypeRef.current, which are stable after initial setup
 
   const handlePostFormError = useCallback((event: Event) => {
     const customEvent = event as CustomEvent<{ error: any; actionType: 'create' | 'update' }>;
@@ -79,7 +71,6 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
     const customEvent = event as CustomEvent<{ result: any; actionType: 'create' | 'update' }>;
     const { result, actionType } = customEvent.detail;
     const formElement = formRef.current;
-    const viewPostLinkEl = viewPostLinkRef.current;
 
     if (actionType === "create") {
       if (result?.newSlug && typeof result.newSlug === "string" && result.newSlug.trim() !== "") {
@@ -87,6 +78,7 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
           (result.message || "Post created successfully!") + " Redirecting to edit page...",
           "success"
         );
+        setViewPostHref(null); // No view link when redirecting
         // Prevent feedback from being cleared by navigation
         setTimeout(() => {
             window.location.href = `/admin/edit/${result.newSlug}`;
@@ -106,16 +98,18 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
     } else if (actionType === "update" && formElement) {
       showFeedback(result?.message || "Post updated successfully!", "success");
 
-      if (viewPostLinkEl && result?.path) {
-        viewPostLinkEl.href = result.path;
-        viewPostLinkEl.style.display = "inline-block";
+      if (result?.path) {
+        setViewPostHref(result.path);
+      } else {
+        setViewPostHref(null);
       }
 
+      // External DOM manipulations remain
       const pageH1 = document.querySelector(".page-detail-header h1") as HTMLHeadingElement;
       if (pageH1 && result?.newSlug && formElement.dataset.originalSlug && result.newSlug !== formElement.dataset.originalSlug) {
         const newTitleDisplay = result.title || result.newSlug.replace(/-/g, " ").replace(/\b\w/g, (l:string) => l.toUpperCase());
         pageH1.textContent = `Edit Post: "${newTitleDisplay}"`;
-        formElement.dataset.originalSlug = result.newSlug;
+        formElement.dataset.originalSlug = result.newSlug; // Update data attribute
       }
 
       const originalSlugInput = formElement.querySelector('input[name="originalSlug"]') as HTMLInputElement;
@@ -142,7 +136,29 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
     };
   }, [handlePostFormSubmitting, handlePostFormError, handlePostFormSuccess]);
 
-  return null;
+  if (!isFeedbackVisible) {
+    return null;
+  }
+
+  return (
+    <div
+      id="formFeedback" // Keep ID if any external CSS targets it, or remove if styles are self-contained/class-based
+      className={`form-feedback-container ${feedbackType}-message visible`}
+      role="alert"
+      aria-live="assertive"
+    >
+      <p id="feedbackMessage">{feedbackMessage}</p>
+      {viewPostHref && feedbackType === 'success' && (
+        <a 
+          id="viewPostLink" // Keep ID if any external CSS targets it
+          href={viewPostHref} 
+          style={{ display: 'inline-block', marginLeft: '10px' }}
+        >
+          View Post
+        </a>
+      )}
+    </div>
+  );
 };
 
 export default FeedbackDisplay;
