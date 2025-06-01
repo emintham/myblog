@@ -55,7 +55,6 @@ const PostForm: React.FC<PostFormProps> = ({
   allBookTags,
   allQuoteTags,
 }) => {
-  // console.log('[PostForm] React version:', React.version); // Remove this line
   const {
     register, // register might not be needed for controlled fields like TagsComponent
     handleSubmit,
