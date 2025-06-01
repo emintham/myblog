@@ -10,7 +10,7 @@ import yaml from "js-yaml";
 import "../../../styles/admin.css";
 import type { PostSourceData, Quote } from "../../../types/admin";
 import { getUniqueTagNames } from "../../../utils/tagUtils";
-import AdminFormFeedbackHandler from "../../../components/admin/AdminFormFeedbackHandler.tsx"; // Import the new component
+import FeedbackDisplay from "../../../components/admin/FeedbackDisplay";
 
 if (import.meta.env.PROD) {
   return new Response(null, {
@@ -187,5 +187,5 @@ const pageDescription = `Edit the post: ${pageTitleDisplay}. This page is availa
     <p id="feedbackMessage"></p>
     <a id="viewPostLink" href="#" class="button-edit" style="display:none;">View Post</a>
   </div>
-  <AdminFormFeedbackHandler client:load formId="editPostForm" />
+  <FeedbackDisplay client:only="react" formId="editPostForm" /> {/* Changed to client:only="react" */}
 </BaseLayout>

@@ -1,12 +1,10 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 
-interface AdminFormFeedbackHandlerProps {
+interface FeedbackDisplayProps {
   formId: string;
 }
 
-const AdminFormFeedbackHandler: React.FC<AdminFormFeedbackHandlerProps> = ({
-  formId,
-}) => {
+const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
   const formRef = useRef<HTMLFormElement | null>(null);
   const submitButtonRef = useRef<HTMLButtonElement | null>(null);
   const feedbackDivRef = useRef<HTMLDivElement | null>(null);
@@ -22,7 +20,7 @@ const AdminFormFeedbackHandler: React.FC<AdminFormFeedbackHandlerProps> = ({
       formTypeRef.current = formElement.dataset.formType || 'create';
     } else {
       if (import.meta.env.DEV) {
-        console.warn(`[AdminFormFeedbackHandler] Form with ID "${formId}" not found.`);
+        console.warn(`[FeedbackDisplay] Form with ID "${formId}" not found.`);
       }
     }
 
@@ -73,7 +71,7 @@ const AdminFormFeedbackHandler: React.FC<AdminFormFeedbackHandlerProps> = ({
       "error"
     );
     if (import.meta.env.DEV) {
-      console.error(`[AdminFormFeedbackHandler] Error during ${actionType} post:`, error);
+      console.error(`[FeedbackDisplay] Error during ${actionType} post:`, error);
     }
   }, [showFeedback]);
 
@@ -96,7 +94,7 @@ const AdminFormFeedbackHandler: React.FC<AdminFormFeedbackHandlerProps> = ({
       } else {
         if (import.meta.env.DEV) {
           console.warn(
-            "[AdminFormFeedbackHandler] Create post success, but newSlug is missing or invalid for redirect. Result:",
+            "[FeedbackDisplay] Create post success, but newSlug is missing or invalid for redirect. Result:",
             result
           );
         }
@@ -147,4 +145,4 @@ const AdminFormFeedbackHandler: React.FC<AdminFormFeedbackHandlerProps> = ({
   return null;
 };
 
-export default AdminFormFeedbackHandler;
+export default FeedbackDisplay;

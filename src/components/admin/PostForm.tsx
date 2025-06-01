@@ -51,10 +51,11 @@ const defaultValues: PostFormData = {
 const PostForm: React.FC<PostFormProps> = ({
   postData,
   formId,
-  allPostTags, // Destructure new props
+  allPostTags,
   allBookTags,
   allQuoteTags,
 }) => {
+  // console.log('[PostForm] React version:', React.version); // Remove this line
   const {
     register, // register might not be needed for controlled fields like TagsComponent
     handleSubmit,
@@ -74,7 +75,7 @@ const PostForm: React.FC<PostFormProps> = ({
   const { submitPost, isSubmitting: isSubmittingHook } = usePostSubmission({
     existingPostData: postData,
     resetForm: reset,
-    defaultFormValues: defaultValues,
+    defaultFormValues: defaultValues, // Changed from defaultV
   });
 
   // Expose isSubmitting state from the hook if needed by parent or other parts of this component
