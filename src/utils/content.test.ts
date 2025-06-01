@@ -114,6 +114,6 @@ No p tags here.`);
       data: {},
       body: '<p class="foo" id="bar">Paragraph with attributes.</p><p>Next one.</p>',
     };
-    expect(extractPreviewContent(post)).toBe('<p>Next one.</p>');
+    expect(extractPreviewContent(post)).toBe('<p class="foo" id="bar">Paragraph with attributes.</p>');
   });
 });
