@@ -371,10 +371,12 @@ body.admin-scope .button-remove-quote:focus {
 }
 
 body.admin-scope .button-delete {
-  /* Copied from the shared group */
+  /* Base properties - explicitly defined */
   font-family: var(--font-sans);
-  font-size: 0.9375rem;
-  padding: var(--spacing-md-admin) var(--spacing-lg-admin);
+  /* ---- MODIFIED ---- */
+  font-size: 0.875rem; /* Smaller font size, matches .button-remove-quote */
+  padding: var(--spacing-sm-admin) var(--spacing-md-admin); /* Smaller padding, matches .button-remove-quote */
+  /* ---- END MODIFIED ---- */
   border-radius: var(--border-radius-admin);
   cursor: pointer;
   text-decoration: none;
@@ -385,21 +387,25 @@ body.admin-scope .button-delete {
     color 0.2s ease-in-out,
     border-color 0.2s ease-in-out,
     opacity 0.2s ease-in-out;
-  font-weight: 500;
-  box-sizing: border-box; /* Added for consistent sizing */
+  font-weight: 500; /* Standard weight, can be adjusted if needed */
+  box-sizing: border-box;
 
-  /* Specific overrides for delete button appearance */
-  background-color: transparent; /* Ensures no solid background (not opaque) */
-  color: var(--color-error-admin);
-  border: 1px solid var(--color-error-admin); /* Explicitly set border style and color */
+  /* Specific appearance for delete button */
+  background-color: transparent; /* Ensures no solid background */
+  /* ---- MODIFIED: New Muted Reddish Color ---- */
+  color: #c78c86; /* Placeholder for a muted, dusty rose / kinfolk red */
+  border: 1px solid #c78c86; /* Same muted red for the border */
+  /* ---- END MODIFIED ---- */
 }
 
 body.admin-scope .button-delete:hover,
 body.admin-scope .button-delete:focus {
-  background-color: rgba(183, 86, 79, 0.05); /* Light transparent red based on #b7564f */
-  color: var(--color-error-admin);
-  border-color: var(--color-error-admin); /* Border remains consistent on hover */
-  /* text-decoration: none; /* Ensure no underline on hover unless desired */
+  /* ---- MODIFIED: Hover state for new muted red ---- */
+  background-color: rgba(199, 140, 134, 0.05); /* Very light transparent version of #c78c86 */
+  color: #af746e; /* Slightly darker/desaturated version of #c78c86 for hover text */
+  border-color: #af746e; /* Slightly darker/desaturated version of #c78c86 for hover border */
+  /* ---- END MODIFIED ---- */
+  text-decoration: none;
 }
 
 /* Spacing for the delete button when it follows an edit button in the admin post list */
