@@ -47,7 +47,6 @@ body.admin-scope .admin-content-wrapper {
 
 /* Base button styles - shared by all button variants */
 body.admin-scope .button-base,
-body.admin-scope .button-delete, /* Added .button-delete here */
 body.admin-scope .button-primary,
 body.admin-scope .button-edit,
 body.admin-scope .button-remove-quote,
@@ -372,16 +371,35 @@ body.admin-scope .button-remove-quote:focus {
 }
 
 body.admin-scope .button-delete {
-  background-color: transparent;
+  /* Copied from the shared group */
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  padding: var(--spacing-md-admin) var(--spacing-lg-admin);
+  border-radius: var(--border-radius-admin);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    opacity 0.2s ease-in-out;
+  font-weight: 500;
+  box-sizing: border-box; /* Added for consistent sizing */
+
+  /* Specific overrides for delete button appearance */
+  background-color: transparent; /* Ensures no solid background (not opaque) */
   color: var(--color-error-admin);
-  border-color: var(--color-error-admin);
+  border: 1px solid var(--color-error-admin); /* Explicitly set border style and color */
 }
 
 body.admin-scope .button-delete:hover,
 body.admin-scope .button-delete:focus {
   background-color: rgba(183, 86, 79, 0.05); /* Light transparent red based on #b7564f */
   color: var(--color-error-admin);
-  border-color: var(--color-error-admin);
+  border-color: var(--color-error-admin); /* Border remains consistent on hover */
+  /* text-decoration: none; /* Ensure no underline on hover unless desired */
 }
 
 /* Spacing for the delete button when it follows an edit button in the admin post list */
