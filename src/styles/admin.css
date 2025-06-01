@@ -575,3 +575,18 @@ body.admin-scope .form-feedback-container.success-message {
 body.admin-scope .form-feedback-container.error-message {
   border-left-color: var(--color-error-admin);
 }
+
+/* -------------------------------------------------------------------------- */
+/* Responsive Adjustments for Admin Buttons                                   */
+/* -------------------------------------------------------------------------- */
+
+/* Media query for smaller screens (e.g., tablets and mobile devices) */
+@media (max-width: 768px) {
+  /* Reduce padding and font size for admin buttons to fit smaller screens */
+  body.admin-scope .button-edit,
+  body.admin-scope .button-delete,
+  body.admin-scope .button-remove-quote {
+    padding: var(--spacing-xs-admin) var(--spacing-sm-admin); /* 4px 8px */
+    font-size: 0.75rem; /* Adjusted font size for better fit */
+  }
+}
