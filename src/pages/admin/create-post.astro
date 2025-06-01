@@ -2,7 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PostForm from "../../components/admin/PostForm"; // Removed .tsx extension
 import { SITE_TITLE } from "../../siteConfig";
-import { getUniqueTagNames } from "../../utils/tagUtils"; // Import the utility
+import { getUniqueTagNames, getUniqueSeriesNames } from "../../utils/contentUtils"; // Updated path
 import FeedbackDisplay from "../../components/admin/FeedbackDisplay";
 import "../../styles/admin.css"; // Import admin styles
 

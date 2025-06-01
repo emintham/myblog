@@ -1,7 +1,6 @@
 // src/utils/tagUtils.ts
-import { getCollection, type CollectionEntry } from "astro:content";
-
-type TagExtractor<DataType> = (data: DataType) => string[] | string | undefined;
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 
 export interface TagWithCount {
   tag: string;
@@ -18,7 +17,7 @@ export interface TagWithCount {
  */
 export async function getUniqueTagsWithCounts<C extends "blog" | "bookQuotes">(
   collectionName: C,
-  extractTagsFn: TagExtractor<CollectionEntry<C>["data"]>,
+  extractTagsFn: (data: CollectionEntry<C>["data"]) => string[] | string | undefined,
   filterPredicate?: (entry: CollectionEntry<C>) => boolean
 ): Promise<TagWithCount[]> {
   const allEntries = await getCollection(collectionName, filterPredicate);
@@ -70,18 +69,41 @@ export async function getUniqueTagsWithCounts<C extends "blog" | "bookQuotes">(
  * @returns A promise that resolves to a sorted array of unique, normalized (lowercase) tag names,
  *          sorted alphabetically.
  */
-export async function getUniqueTagNames<C extends "blog" | "bookQuotes">(
-  collectionName: C,
-  extractTagsFn: TagExtractor<CollectionEntry<C>["data"]>,
-  filterPredicate?: (entry: CollectionEntry<C>) => boolean
+export async function getUniqueTagNames(
+  collectionName: "blog" | "bookQuotes",
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  tagExtractor: (data: any) => string[] | undefined,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  filterPredicate?: (entry: CollectionEntry<any>) => boolean
 ): Promise<string[]> {
-  const tagsWithCounts = await getUniqueTagsWithCounts(
-    collectionName,
-    extractTagsFn,
-    filterPredicate
-  );
-  // Return only tag names, sorted alphabetically
-  return tagsWithCounts
-    .map((item) => item.tag)
-    .sort((a, b) => a.localeCompare(b));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const allEntries = await getCollection(collectionName as any, filterPredicate as any);
+  const tagSet = new Set<string>();
+
+  allEntries.forEach((entry) => {
+    const tags = tagExtractor(entry.data);
+    if (tags && Array.isArray(tags)) {
+      tags.forEach((tag) => {
+        if (typeof tag === "string" && tag.trim() !== "") {
+          tagSet.add(tag.trim());
+        }
+      });
+    }
+  });
+  return Array.from(tagSet).sort((a, b) => a.localeCompare(b));
+}
+
+export async function getUniqueSeriesNames(): Promise<string[]> {
+  const allPosts = await getCollection("blog", ({ data }) => {
+    // Include all posts, draft or not, for series suggestions
+    return true; 
+  });
+  const seriesSet = new Set<string>();
+
+  allPosts.forEach((post) => {
+    if (post.data.series && typeof post.data.series === "string" && post.data.series.trim() !== "") {
+      seriesSet.add(post.data.series.trim());
+    }
+  });
+  return Array.from(seriesSet).sort((a, b) => a.localeCompare(b));
 }

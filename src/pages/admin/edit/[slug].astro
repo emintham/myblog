@@ -9,7 +9,7 @@ import matter from "gray-matter";
 import yaml from "js-yaml";
 import "../../../styles/admin.css";
 import type { PostSourceData, Quote } from "../../../types/admin";
-import { getUniqueTagNames } from "../../../utils/tagUtils";
+import { getUniqueTagNames, getUniqueSeriesNames } from "../../../utils/contentUtils"; // Updated path
 import FeedbackDisplay from "../../../components/admin/FeedbackDisplay";
 
 if (import.meta.env.PROD) {
