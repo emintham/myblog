@@ -47,6 +47,7 @@ body.admin-scope .admin-content-wrapper {
 
 /* Base button styles - shared by all button variants */
 body.admin-scope .button-base,
+body.admin-scope .button-delete, /* Added .button-delete here */
 body.admin-scope .button-primary,
 body.admin-scope .button-edit,
 body.admin-scope .button-remove-quote,
@@ -368,6 +369,24 @@ body.admin-scope .button-remove-quote:focus {
   color: var(--color-error-admin);
   border-color: var(--color-error-admin);
   background-color: rgb(183 86 79 / 5%);
+}
+
+body.admin-scope .button-delete {
+  background-color: transparent;
+  color: var(--color-error-admin);
+  border-color: var(--color-error-admin);
+}
+
+body.admin-scope .button-delete:hover,
+body.admin-scope .button-delete:focus {
+  background-color: rgba(183, 86, 79, 0.05); /* Light transparent red based on #b7564f */
+  color: var(--color-error-admin);
+  border-color: var(--color-error-admin);
+}
+
+/* Spacing for the delete button when it follows an edit button in the admin post list */
+body.admin-scope .admin-post-list .list-item-entry .button-edit + .button-delete {
+  margin-left: var(--spacing-sm-admin);
 }
 
 body.admin-scope #formFeedback a.button-edit {
