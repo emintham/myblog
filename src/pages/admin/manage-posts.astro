@@ -69,9 +69,115 @@ const pageDescription =
             >
               Edit
             </a>
+            <button
+              type="button"
+              class="button-delete"
+              data-slug={post.slug}
+              data-post-title={post.data.title}
+              data-quotes-ref={post.data.postType === 'bookNote' && post.data.quotesRef ? post.data.quotesRef : ''}
+            >
+              Delete
+            </button>
           </li>
         ))}
       </ul>
     )
   }
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const deleteButtons = document.querySelectorAll('.button-delete');
+
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', async (event) => {
+        event.preventDefault();
+
+        const slug = button.dataset.slug;
+        const postTitle = button.dataset.postTitle || 'this post'; // Fallback title
+        // quotesRef is not directly needed for the delete call itself to the new handler,
+        // as the handler derives it from the slug's post data.
+        // However, it was added to the button, so it's available if requirements change.
+
+        if (!slug) {
+          alert('Error: Could not find post slug for deletion.');
+          return;
+        }
+
+        const confirmation = window.confirm(
+          `Are you sure you want to delete the post titled "${postTitle}"? This action cannot be undone.`
+        );
+
+        if (confirmation) {
+          try {
+            const response = await fetch('/api/delete-post-handler', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ slug: slug }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+              alert(result.message || 'Post deleted successfully!');
+              // Remove the list item from the DOM
+              const listItem = button.closest('li.list-item-entry');
+              if (listItem) {
+                listItem.remove();
+              } else {
+                // Fallback if structure is different, or to force reload
+                window.location.reload();
+              }
+            } else {
+              alert(`Error deleting post: ${result.message || 'Unknown error'}`);
+            }
+          } catch (error) {
+            console.error('Failed to delete post:', error);
+            alert('An error occurred while trying to delete the post. See console for details.');
+          }
+        }
+      });
+    });
+  });
+</script>
 </BaseLayout>
+
+<style>
+  /* Consistent with .button-edit but with a different color for delete */
+  .button-delete {
+    /* Inherit general button styles if you have a base class, otherwise replicate from .button-edit */
+    padding: 0.5em 1em;
+    border-radius: 0.25em;
+    text-decoration: none;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid transparent; /* Base border */
+    transition: background-color 0.2s ease, border-color 0.2s ease,
+      color 0.2s ease;
+
+    /* Specific delete button colors */
+    background-color: #dc2626; /* Red-600 from Tailwind palette */
+    color: white;
+    border-color: #b91c1c; /* Red-700 for border */
+  }
+
+  .button-delete:hover,
+  .button-delete:focus {
+    background-color: #b91c1c; /* Darker red on hover/focus */
+    border-color: #991b1b; /* Even darker for border */
+    color: white;
+  }
+
+  /* Adjustments for alignment if necessary, assuming flex is used in parent */
+  .list-item-entry {
+    display: flex; /* Ensuring parent is flex for easy alignment */
+    justify-content: space-between;
+    align-items: center;
+  }
+  .list-item-entry .button-edit,
+  .list-item-entry .button-delete {
+    margin-left: 0.5em; /* Add some space between buttons */
+  }
+</style>
