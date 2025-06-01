@@ -69,15 +69,16 @@ const pageDescription =
             >
               Edit
             </a>
-            <button
-              type="button"
+            <a
+              href="#"
+              role="button"
               class="button-delete"
               data-slug={post.slug}
               data-post-title={post.data.title}
               data-quotes-ref={post.data.postType === 'bookNote' && post.data.quotesRef ? post.data.quotesRef : ''}
             >
               Delete
-            </button>
+            </a>
           </li>
         ))}
       </ul>
