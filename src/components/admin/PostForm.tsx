@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useForm, type UseFormReturn, Controller } from "react-hook-form"; // Import Controller
-import type { PostSourceData, PostFormData, Quote } from "../../types/admin"; // Added Quote
+import React, { useEffect, useState, useCallback, useRef } from "react"; // Added useRef
+import { useForm, type UseFormReturn, Controller } from "react-hook-form";
+import type { PostSourceData, PostFormData, Quote } from "../../types/admin";
 import { usePostSubmission } from "../../hooks/usePostSubmission";
-import InlineQuotesManager from "./InlineQuotesManager"; // Import the new component
-import TagsComponent from "./TagsComponent"; // Import TagsComponent
+import InlineQuotesManager from "./InlineQuotesManager";
+import TagsComponent from "./TagsComponent";
 
 export interface PostFormProps {
   postData?: PostSourceData; // Data from source, optional for create mode. Now includes optional inlineQuotes.
@@ -15,6 +15,7 @@ export interface PostFormProps {
 
 const POST_TYPES = ["standard", "fleeting", "bookNote"];
 const TODAY_ISO = new Date().toISOString().split("T")[0];
+const AUTO_SAVE_INTERVAL_MS = 10000; // For auto-save interval
 
 const formatDateForInput = (date?: string | Date): string => {
   if (!date) return TODAY_ISO;
@@ -56,39 +57,44 @@ const PostForm: React.FC<PostFormProps> = ({
   allQuoteTags,
 }) => {
   const {
-    register, // register might not be needed for controlled fields like TagsComponent
+    register,
     handleSubmit,
     watch,
     reset,
-    getValues, // Add getValues
-    setValue, // Add setValue
-    control, // Add control for Controller
+    getValues,
+    setValue,
+    control,
     formState: { errors },
   }: UseFormReturn<PostFormData> = useForm<PostFormData>({
-    defaultValues, // Default values now have tags and bookTags as []
-    mode: "onSubmit", // Validate on submit
-    reValidateMode: "onChange", // Re-validate on change after first submission attempt
+    defaultValues,
+    mode: "onSubmit",
+    reValidateMode: "onChange",
   });
 
-  // Use the new hook
+  const bodyContentRef = useRef<HTMLTextAreaElement | null>(null); // Ref for bodyContent textarea
+
+  // State to manage the current details of the post, especially after a new post is created.
+  const [currentPostDetails, setCurrentPostDetails] = useState<PostSourceData | undefined>(postData);
+
+  useEffect(() => {
+    // Sync currentPostDetails if the postData prop changes from parent.
+    setCurrentPostDetails(postData);
+  }, [postData]);
+
   const { submitPost, isSubmitting: isSubmittingHook } = usePostSubmission({
-    existingPostData: postData,
+    existingPostData: currentPostDetails, // Use state for existing data context
     resetForm: reset,
-    defaultFormValues: defaultValues, // Changed from defaultV
+    defaultFormValues: defaultValues,
   });
-
-  // Expose isSubmitting state from the hook if needed by parent or other parts of this component
-  // For now, PostForm itself doesn't directly use isSubmittingLocal for UI changes,
-  // as that's handled by the event listeners in Astro pages.
-  // If PostForm needed to change its own UI based on submission state, use isSubmittingHook.
 
   const watchedPostType = watch("postType", defaultValues.postType);
-  const watchedBookTitle = watch("bookTitle"); // Watch bookTitle for dynamic alt text
+  const watchedBookTitle = watch("bookTitle");
   const [showBookNoteFieldsUI, setShowBookNoteFieldsUI] = useState(
     watchedPostType === "bookNote"
   );
-  const [inlineQuotes, setInlineQuotes] = useState<Quote[]>([]); // Initialize empty, will be set by useEffect
-  const [isQuotesRefReadOnly, setIsQuotesRefReadOnly] = useState(false); // State for quotesRef read-only status
+  const [inlineQuotes, setInlineQuotes] = useState<Quote[]>([]);
+  const [isQuotesRefReadOnly, setIsQuotesRefReadOnly] = useState(false);
+  const [lastSavedBodyContent, setLastSavedBodyContent] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     setShowBookNoteFieldsUI(watchedPostType === "bookNote");
@@ -96,12 +102,8 @@ const PostForm: React.FC<PostFormProps> = ({
 
   useEffect(() => {
     if (postData && postData.originalSlug) {
-      // If postData includes inlineQuotes (from Astro page loading them), use those.
-      // Otherwise, use the default (empty array).
       const initialQuotes =
         postData.inlineQuotes || defaultValues.inlineQuotes || [];
-
-      // Helper to process tags from PostSourceData to string[]
       const processSourceTags = (tags?: string | string[]): string[] => {
         if (Array.isArray(tags))
           return tags.map((tag) => String(tag).trim()).filter(Boolean);
@@ -118,7 +120,7 @@ const PostForm: React.FC<PostFormProps> = ({
         pubDate: formatDateForInput(postData.pubDate),
         description: postData.description || "",
         postType: postData.postType || "standard",
-        tags: processSourceTags(postData.tags), // Use new processing logic
+        tags: processSourceTags(postData.tags),
         series: postData.series || "",
         draft: postData.hasOwnProperty("draft") ? !!postData.draft : false,
         bodyContent: postData.bodyContent || "",
@@ -127,17 +129,16 @@ const PostForm: React.FC<PostFormProps> = ({
         bookCoverImageName: postData.bookCover?.imageName || "",
         bookCoverAlt: postData.bookCover?.alt || "",
         quotesRef: postData.quotesRef || "",
-        bookTags: processSourceTags(postData.bookTags), // Use new processing logic
-        inlineQuotes: initialQuotes, // Use loaded or default quotes
+        bookTags: processSourceTags(postData.bookTags),
+        inlineQuotes: initialQuotes,
         originalSlug: postData.originalSlug,
         originalFilePath: postData.originalFilePath,
         originalExtension: postData.originalExtension,
       };
       reset(transformedData);
       setInlineQuotes(initialQuotes);
+      setLastSavedBodyContent(transformedData.bodyContent); 
 
-      // If quotesRef has a value (meaning it's an existing book note with a ref,
-      // potentially with loaded quotes), make the input read-only.
       if (postData.quotesRef && postData.postType === "bookNote") {
         setIsQuotesRefReadOnly(true);
       } else {
@@ -147,10 +148,86 @@ const PostForm: React.FC<PostFormProps> = ({
       reset(defaultValues);
       setInlineQuotes(defaultValues.inlineQuotes || []);
       setIsQuotesRefReadOnly(false);
+      setLastSavedBodyContent(defaultValues.bodyContent); 
     }
   }, [postData, reset]);
 
-  // Handlers for InlineQuotesManager
+  // Effect to update lastSavedBodyContent and currentPostDetails on successful submission
+  useEffect(() => {
+    const handleSuccessfulUpdate = (event: Event) => {
+      // Assuming customEvent.detail.result is of type PostSourceData
+      const customEvent = event as CustomEvent<{ result: PostSourceData; actionType: 'create' | 'update' }>;
+
+      if (customEvent.detail.actionType === 'update' || customEvent.detail.actionType === 'create') {
+        const currentBodyContent = getValues("bodyContent");
+        setLastSavedBodyContent(currentBodyContent);
+
+        if (customEvent.detail.actionType === 'create' && customEvent.detail.result) {
+          // If a new post was created, update currentPostDetails.
+          // This ensures usePostSubmission is re-initialized with the new post's context.
+          setCurrentPostDetails(customEvent.detail.result);
+          // usePostSubmission's resetForm should have already updated RHF's state.
+        }
+
+        if (import.meta.env.DEV) {
+          console.log(`[PostForm] Post ${customEvent.detail.actionType}: lastSavedBodyContent updated.`);
+        }
+
+        // Attempt to refocus on bodyContent after any successful save
+        if (bodyContentRef.current) {
+          // Ensure focus happens after potential re-renders due to state updates
+          setTimeout(() => bodyContentRef.current?.focus(), 0);
+        }
+      }
+    };
+
+    window.addEventListener('postFormSuccess', handleSuccessfulUpdate);
+    return () => {
+      window.removeEventListener('postFormSuccess', handleSuccessfulUpdate);
+    };
+  }, [getValues, setCurrentPostDetails]); // bodyContentRef is stable
+
+  // Auto-save useEffect
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | undefined = undefined;
+
+    const attemptAutoSave = async () => {
+      if (isSubmittingHook) { // Don't save if already submitting from another action
+        return;
+      }
+
+      const currentBodyContent = getValues("bodyContent");
+      const currentTitle = getValues("title");
+
+      // Auto-save if title exists and body content has changed since last save/load
+      if (currentBodyContent !== lastSavedBodyContent && currentTitle && currentTitle.trim() !== "") {
+        if (import.meta.env.DEV) {
+          console.log("[PostForm] Auto-saving: Detected bodyContent change with title. Attempting save...");
+        }
+        const formData = getValues();
+        // submitPost is derived from usePostSubmission, which uses currentPostDetails.
+        // It will correctly perform a create or update.
+        // The usePostSubmission hook is responsible for calling resetForm with new data on create.
+        await submitPost({ ...formData, inlineQuotes });
+      }
+    };
+
+    // Set up interval for auto-save, regardless of new/existing post.
+    intervalId = setInterval(attemptAutoSave, AUTO_SAVE_INTERVAL_MS);
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [
+    isSubmittingHook,
+    getValues,
+    lastSavedBodyContent,
+    submitPost, // submitPost will be a new function if currentPostDetails changes, re-triggering effect
+    inlineQuotes,
+  ]);
+
   const handleAddQuote = useCallback(() => {
     setInlineQuotes((prevQuotes) => [
       ...prevQuotes,
@@ -183,7 +260,6 @@ const PostForm: React.FC<PostFormProps> = ({
     []
   );
 
-  // Effect to automatically set bookCoverAlt based on bookTitle
   useEffect(() => {
     if (watchedBookTitle) {
       setValue("bookCoverAlt", `Cover for ${watchedBookTitle}`, {
@@ -199,19 +275,16 @@ const PostForm: React.FC<PostFormProps> = ({
     }
   }, [watchedBookTitle, setValue]);
 
-  // The submitPost function from the hook is stable due to useCallback.
-  // It's used within the custom submit handler attached to the parent form.
-
   useEffect(() => {
     const parentForm = document.getElementById(formId);
     if (parentForm && parentForm instanceof HTMLFormElement) {
       const formSubmitWrapper = async (event: SubmitEvent) => {
         event.preventDefault();
-        // Manually trigger RHF validation and then call submitPost with all form data, including inlineQuotes.
-        const isValid = await handleSubmit((formData) =>
-          submitPost({ ...formData, inlineQuotes })
-        )();
-        // handleSubmit(callback)() calls the callback if validation passes.
+        handleSubmit(async (data) => {
+          // submitPost will trigger 'postFormSuccess' on success,
+          // which updates lastSavedBodyContent.
+          await submitPost({ ...data, inlineQuotes });
+        })();
       };
 
       parentForm.addEventListener("submit", formSubmitWrapper);
@@ -219,7 +292,10 @@ const PostForm: React.FC<PostFormProps> = ({
         parentForm.removeEventListener("submit", formSubmitWrapper);
       };
     }
-  }, [formId, handleSubmit, submitPost, getValues, inlineQuotes]); // Added inlineQuotes to dependencies
+  }, [formId, handleSubmit, submitPost, inlineQuotes]);
+
+  // Prepare registration for bodyContent to combine with local ref
+  const { ref: bodyContentRHFRef, ...bodyContentRestProps } = register("bodyContent");
 
   return (
     <>
@@ -380,7 +456,11 @@ const PostForm: React.FC<PostFormProps> = ({
           <label htmlFor="bodyContent">Post Body (Markdown)</label>
           <textarea
             id="bodyContent"
-            {...register("bodyContent")}
+            {...bodyContentRestProps} // Spread other props from register
+            ref={(e) => {
+              bodyContentRHFRef(e); // Call React Hook Form's ref function
+              bodyContentRef.current = e as HTMLTextAreaElement | null; // Assign to your local ref
+            }}
             rows={15}
             placeholder="Start writing your Markdown content here..."
           ></textarea>

@@ -36,17 +36,14 @@ export function usePostSubmission({
       let apiEndpoint = "";
       let actionType: ActionType = "create";
 
-      // Start with formData and cast to PostApiPayload for manipulation
       const payload: PostApiPayload = { ...formData };
 
-      // Transform bookCover from flat to nested if present
       if (formData.bookCoverImageName || formData.bookCoverAlt) {
         payload.bookCover = {
           imageName: formData.bookCoverImageName,
           alt: formData.bookCoverAlt,
         };
       }
-      // Remove the flat properties as they are not part of PostApiPayload in this form
       delete (payload as any).bookCoverImageName;
       delete (payload as any).bookCoverAlt;
 
@@ -59,7 +56,6 @@ export function usePostSubmission({
       } else {
         actionType = "create";
         apiEndpoint = "/api/create-post-handler";
-        // Ensure these are not present for create
         delete payload.originalSlug;
         delete payload.originalFilePath;
         delete payload.originalExtension;
@@ -82,7 +78,7 @@ export function usePostSubmission({
           body: JSON.stringify(payload),
         });
 
-        const result = await response.json();
+        const result = await response.json(); // API response, e.g., { title, newSlug, newFilePath, newExtension, quotesRef? }
 
         if (import.meta.env.DEV) {
           console.log(
@@ -95,14 +91,41 @@ export function usePostSubmission({
         }
 
         if (response.ok) {
+          // Construct the state that reflects the successfully saved form data,
+          // including any server-generated/confirmed fields.
+          const finalFormState: PostFormData = {
+            ...formData, // Start with the data that was submitted
+            title: result.title, // Use title from API response
+            // Add/overwrite with identifiers from API result
+            originalSlug: result.newSlug,
+            originalFilePath: result.newFilePath,
+            originalExtension: result.newExtension,
+            quotesRef: result.quotesRef !== undefined ? result.quotesRef : formData.quotesRef,
+          };
+
+          // Reset react-hook-form's state with this complete, saved data.
+          resetForm(finalFormState);
+
+          // Prepare a PostSourceData-compatible object for the event,
+          // as PostForm uses this for its currentPostDetails state.
+          const eventDataForResult: PostSourceData = {
+            ...finalFormState, // Spread the updated form state
+            // Ensure bookCover is in the nested structure expected by PostSourceData
+            bookCover: {
+              imageName: finalFormState.bookCoverImageName,
+              alt: finalFormState.bookCoverAlt,
+              // originalWidth is not in finalFormState, this is fine for this context
+            },
+            // inlineQuotes are already part of finalFormState from formData
+          };
+          delete (eventDataForResult as any).bookCoverImageName;
+          delete (eventDataForResult as any).bookCoverAlt;
+
           window.dispatchEvent(
             new CustomEvent("postFormSuccess", {
-              detail: { result, actionType },
+              detail: { result: eventDataForResult, actionType },
             })
           );
-          if (actionType === "create") {
-            resetForm(defaultFormValues); // Reset form with default values on successful creation
-          }
         } else {
           if (import.meta.env.DEV) {
             console.error(
@@ -141,7 +164,7 @@ export function usePostSubmission({
         );
       }
     },
-    [existingPostData, resetForm, defaultFormValues]
+    [existingPostData, resetForm, defaultFormValues] // defaultFormValues is no longer directly used for reset on create success
   );
 
   return { submitPost, isSubmitting };
