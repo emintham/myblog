@@ -5,10 +5,8 @@ import fs from 'node:fs/promises'; // Import fs for mocking its methods
 import { getEntryBySlug } from 'astro:content'; // Import for mocking
 
 // Mock 'astro:content'
-vi.mock('astro:content', async () => {
-  const actualContent = await vi.importActual('astro:content');
+vi.mock('astro:content', () => {
   return {
-    ...actualContent, // Spread actual content to keep other exports if any
     getEntryBySlug: vi.fn(),
   };
 });
@@ -16,17 +14,21 @@ vi.mock('astro:content', async () => {
 // Mock 'node:fs/promises'
 // The handler uses `import fs from "node:fs/promises";` and then `fs.access`, `fs.unlink`.
 // So we mock the default export which is an object containing these methods.
-vi.mock('node:fs/promises', () => {
-  return {
+// The actual default export of 'node:fs/promises' is an object with methods like access, unlink, etc.
+
+vi.mock('node:fs/promises', () => ({
+  // This structure is crucial for default imports (`import fs from '...'`)
+  // The `fs` variable in the code under test (and in this test file via import)
+    // will point to this `default` object.
     default: {
       access: vi.fn(),
       unlink: vi.fn(),
+      // Add other fs methods here if the handler starts using them,
+      // otherwise they will be undefined if called by the handler.
+      // For this handler, only access and unlink are used.
     },
-    // If the handler used named exports like `import { access } from ...`, they would be mocked here:
-    // access: vi.fn(),
-    // unlink: vi.fn(),
-  };
-});
+    // If the handler used named exports like `import { access } from ...`, they would be mocked here.
+}));
 
 // Helper to create a mock APIContext
 const createMockAPIContext = (requestBody: any): Partial<APIContext> => ({
@@ -51,11 +53,14 @@ const createMockAPIContext = (requestBody: any): Partial<APIContext> => ({
 
 
 describe('API Route: delete-post-handler', () => {
-  // Typecast the mocked fs to easily access its mocked methods
-  const mockedFs = fs as vi.Mocked<typeof fs>;
 
   beforeEach(() => {
-    vi.resetAllMocks(); // Reset mocks before each test
+    // Resetting all mocks ensures that mock call counts and implementations
+    // are fresh for each test.
+    vi.resetAllMocks();
+    // `fs` itself should be the object { access: vi.fn(), unlink: vi.fn() }
+    // The mock factory provides new vi.fn() instances.
+
     // Set default environment for tests (dev mode)
     import.meta.env.PROD = false;
     import.meta.env.DEV = true;
@@ -100,7 +105,8 @@ describe('API Route: delete-post-handler', () => {
       slug: 'my-post',
       data: { postType: 'standard', title: 'My Post' },
     });
-    mockedFs.default.access.mockRejectedValue(new Error('File not found')); // Simulate fs.access failing
+    // Access the mock function through the imported fs module
+    (fs.access as vi.Mock).mockRejectedValue(new Error('File not found'));
 
     const mockContext = createMockAPIContext({ slug: 'my-post' }) as APIContext;
     const response = await deletePostHandler(mockContext);
@@ -116,8 +122,8 @@ describe('API Route: delete-post-handler', () => {
       slug: 'standard-post',
       data: { postType: 'standard', title: 'Standard Post' },
     });
-    mockedFs.default.access.mockResolvedValue(undefined); // File exists
-    mockedFs.default.unlink.mockResolvedValue(undefined); // Deletion successful
+    (fs.access as vi.Mock).mockResolvedValue(undefined); // File exists
+    (fs.unlink as vi.Mock).mockResolvedValue(undefined); // Deletion successful
 
     const mockContext = createMockAPIContext({ slug: 'standard-post' }) as APIContext;
     const response = await deletePostHandler(mockContext);
@@ -125,8 +131,8 @@ describe('API Route: delete-post-handler', () => {
     expect(response.status).toBe(200);
     const json = await response.json();
     expect(json.message).toBe("Post 'standard-post' deleted successfully.");
-    expect(mockedFs.default.unlink).toHaveBeenCalledTimes(1);
-    expect(mockedFs.default.unlink).toHaveBeenCalledWith(expect.stringContaining('standard-post.mdx'));
+    expect(fs.unlink).toHaveBeenCalledTimes(1);
+    expect(fs.unlink).toHaveBeenCalledWith(expect.stringContaining('standard-post.mdx'));
   });
 
   it('should successfully delete a bookNote and its quotes file', async () => {
@@ -139,8 +145,8 @@ describe('API Route: delete-post-handler', () => {
         quotesRef: 'book-note-post-quotes',
       },
     });
-    mockedFs.default.access.mockResolvedValue(undefined); // Both files exist
-    mockedFs.default.unlink.mockResolvedValue(undefined); // Deletions successful
+    (fs.access as vi.Mock).mockResolvedValue(undefined); // Both files exist
+    (fs.unlink as vi.Mock).mockResolvedValue(undefined); // Deletions successful
 
     const mockContext = createMockAPIContext({ slug: 'book-note-post' }) as APIContext;
     const response = await deletePostHandler(mockContext);
@@ -150,9 +156,9 @@ describe('API Route: delete-post-handler', () => {
     expect(json.message).toBe(
       "Post 'book-note-post' deleted successfully. Also deleted associated quotes file: book-note-post-quotes.yaml"
     );
-    expect(mockedFs.default.unlink).toHaveBeenCalledTimes(2);
-    expect(mockedFs.default.unlink).toHaveBeenCalledWith(expect.stringContaining('book-note-post.md'));
-    expect(mockedFs.default.unlink).toHaveBeenCalledWith(expect.stringContaining('book-note-post-quotes.yaml'));
+    expect(fs.unlink).toHaveBeenCalledTimes(2);
+    expect(fs.unlink).toHaveBeenCalledWith(expect.stringContaining('book-note-post.md'));
+    expect(fs.unlink).toHaveBeenCalledWith(expect.stringContaining('book-note-post-quotes.yaml'));
   });
 
   it('should delete a bookNote even if its quotes file is not found (access fails for quotes file)', async () => {
@@ -166,10 +172,10 @@ describe('API Route: delete-post-handler', () => {
       },
     });
     // First fs.access (for post file) resolves, second (for quotes file) rejects
-    mockedFs.default.access
+    (fs.access as vi.Mock)
       .mockResolvedValueOnce(undefined) // Post file exists
       .mockRejectedValueOnce(new Error('Quotes file not found')); // Quotes file does not exist
-    mockedFs.default.unlink.mockResolvedValue(undefined); // Post deletion successful
+    (fs.unlink as vi.Mock).mockResolvedValue(undefined); // Post deletion successful
 
     const mockContext = createMockAPIContext({ slug: 'bn-no-qfile' }) as APIContext;
     const response = await deletePostHandler(mockContext);
@@ -178,8 +184,8 @@ describe('API Route: delete-post-handler', () => {
     const json = await response.json();
     expect(json.message).toContain("Post 'bn-no-qfile' deleted successfully.");
     expect(json.message).toContain("Could not delete associated quotes file: bn-no-qfile-quotes.yaml");
-    expect(mockedFs.default.unlink).toHaveBeenCalledTimes(1);
-    expect(mockedFs.default.unlink).toHaveBeenCalledWith(expect.stringContaining('bn-no-qfile.md'));
+    expect(fs.unlink).toHaveBeenCalledTimes(1);
+    expect(fs.unlink).toHaveBeenCalledWith(expect.stringContaining('bn-no-qfile.md'));
   });
 
   it('should handle JSON parsing error in request if request.json() fails', async () => {
@@ -204,8 +210,8 @@ describe('API Route: delete-post-handler', () => {
       slug: 'error-post',
       data: { postType: 'standard', title: 'Error Post' },
     });
-    mockedFs.default.access.mockResolvedValue(undefined); // File access is fine
-    mockedFs.default.unlink.mockRejectedValueOnce(new Error('Disk full')); // Simulate fs.unlink failing for the post file
+    (fs.access as vi.Mock).mockResolvedValue(undefined); // File access is fine
+    (fs.unlink as vi.Mock).mockRejectedValueOnce(new Error('Disk full')); // Simulate fs.unlink failing for the post file
 
     const mockContext = createMockAPIContext({ slug: 'error-post' }) as APIContext;
     const response = await deletePostHandler(mockContext);
@@ -225,8 +231,8 @@ describe('API Route: delete-post-handler', () => {
         quotesRef: 'book-err-qdelete-quotes',
       },
     });
-    mockedFs.default.access.mockResolvedValue(undefined); // Both files initially accessible
-    mockedFs.default.unlink
+    (fs.access as vi.Mock).mockResolvedValue(undefined); // Both files initially accessible
+    (fs.unlink as vi.Mock)
       .mockResolvedValueOnce(undefined) // Main post file deletes fine
       .mockRejectedValueOnce(new Error('Permission issue on quotes')); // Quotes file deletion fails
 
@@ -236,8 +242,8 @@ describe('API Route: delete-post-handler', () => {
     const json = await response.json();
     expect(json.message).toContain("Post 'book-err-qdelete' deleted successfully.");
     expect(json.message).toContain("Could not delete associated quotes file: book-err-qdelete-quotes.yaml");
-    expect(mockedFs.default.unlink).toHaveBeenCalledTimes(2); // Attempted twice
-    expect(mockedFs.default.unlink).toHaveBeenCalledWith(expect.stringContaining('book-err-qdelete.md'));
-    expect(mockedFs.default.unlink).toHaveBeenCalledWith(expect.stringContaining('book-err-qdelete-quotes.yaml'));
+    expect(fs.unlink).toHaveBeenCalledTimes(2); // Attempted twice
+    expect(fs.unlink).toHaveBeenCalledWith(expect.stringContaining('book-err-qdelete.md'));
+    expect(fs.unlink).toHaveBeenCalledWith(expect.stringContaining('book-err-qdelete-quotes.yaml'));
   });
 });
