@@ -3,6 +3,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 import { SITE_TITLE } from "../../siteConfig";
+import "../../styles/admin.css";
 
 if (!import.meta.env.DEV) {
   return new Response(null, { status: 404, statusText: "Not Found" });
@@ -69,9 +70,77 @@ const pageDescription =
             >
               Edit
             </a>
+            <a
+              href="#"
+              role="button"
+              class="button-delete"
+              data-slug={post.slug}
+              data-post-title={post.data.title}
+              data-quotes-ref={post.data.postType === 'bookNote' && post.data.quotesRef ? post.data.quotesRef : ''}
+            >
+              Delete
+            </a>
           </li>
         ))}
       </ul>
     )
   }
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const deleteButtons = document.querySelectorAll('.button-delete');
+
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', async (event) => {
+        event.preventDefault();
+
+        const slug = button.dataset.slug;
+        const postTitle = button.dataset.postTitle || 'this post'; // Fallback title
+        // quotesRef is not directly needed for the delete call itself to the new handler,
+        // as the handler derives it from the slug's post data.
+        // However, it was added to the button, so it's available if requirements change.
+
+        if (!slug) {
+          alert('Error: Could not find post slug for deletion.');
+          return;
+        }
+
+        const confirmation = window.confirm(
+          `Are you sure you want to delete the post titled "${postTitle}"? This action cannot be undone.`
+        );
+
+        if (confirmation) {
+          try {
+            const response = await fetch('/api/delete-post-handler', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ slug: slug }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+              alert(result.message || 'Post deleted successfully!');
+              // Remove the list item from the DOM
+              const listItem = button.closest('li.list-item-entry');
+              if (listItem) {
+                listItem.remove();
+              } else {
+                // Fallback if structure is different, or to force reload
+                window.location.reload();
+              }
+            } else {
+              alert(`Error deleting post: ${result.message || 'Unknown error'}`);
+            }
+          } catch (error) {
+            console.error('Failed to delete post:', error);
+            alert('An error occurred while trying to delete the post. See console for details.');
+          }
+        }
+      });
+    });
+  });
+</script>
 </BaseLayout>
