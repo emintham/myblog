@@ -49,6 +49,7 @@
   transform: translateX(
     -50%
   ); /* Shift the element left by half its own width */
+
   box-sizing: border-box; /* Ensures padding/border are included in the 100vw width */
 }
 
@@ -59,6 +60,7 @@
     --color-background-admin,
     #faf8f5
   ); /* Use existing background color */
+
   padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
@@ -320,6 +322,7 @@
   top: calc(
     var(--spacing-md) * -0.5
   ); /* Default for non-first-child sections, results in -8px */
+
   right: calc(var(--spacing-md) * -0.25); /* Results in -4px */
   z-index: 10; /* Ensure it's above form fields */
 }

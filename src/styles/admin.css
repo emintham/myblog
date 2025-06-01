@@ -159,6 +159,7 @@ body.admin-scope legend {
   background: var(
     --color-background-admin
   ); /* Match page background to "cut" the border */
+
   padding: 0 var(--spacing-sm-admin); /* Horizontal padding for the legend text */
   margin: 0; /* Reset existing margins */
 }
@@ -168,10 +169,12 @@ body.admin-scope h3 {
   font-size: 1.25rem;
   font-weight: 600;
 }
+
 body.admin-scope h4 {
   font-size: 1.1rem;
   font-weight: 600;
 }
+
 /* ... and so on for h5, h6 */
 
 body.admin-scope label,
@@ -226,12 +229,18 @@ body.admin-scope .admin-actions {
 
 /* -------------------------------------------------------------------------- */
 body.admin-scope fieldset {
-  /* border: none; */ /* Replaced */
-  /* padding: 0; */ /* Replaced */
+  /* border: none; */
+
+ /* Replaced */
+
+  /* padding: 0; */
+
+ /* Replaced */
   margin: 0 0 var(--spacing-xl-admin) 0;
   border: 1px solid var(--color-admin-fieldset-border); /* Use new unified color */
   padding: var(--spacing-xl-admin) var(--spacing-lg-admin)
     var(--spacing-lg-admin); /* Adjusted padding, especially top */
+
   position: relative; /* For legend positioning */
   border-radius: var(--border-radius-admin); /* Added for consistency */
 }
@@ -245,8 +254,11 @@ body.admin-scope .post-form .book-note-fields {
 
 body.admin-scope .post-form .book-note-fields legend {
   color: var(--color-text-admin-primary); /* Match other admin legends */
+
   /* Ensure other legend styles (positioning, background) are inherited or consistent */
+
   /* The existing legend rule should cover positioning if specificity is right. */
+
   /* If not, copy relevant properties from the main legend rule. */
 }
 
@@ -376,7 +388,10 @@ body.admin-scope .inline-quotes-manager .quote-item {
   background-color: var(--color-background-admin); /* Match admin background */
   padding: var(--spacing-lg-admin);
   border-radius: var(--border-radius-admin);
-  /* border: 1px solid var(--color-border-admin-subtle); */ /* Keep or remove based on preference */
+
+  /* border: 1px solid var(--color-border-admin-subtle); */
+
+ /* Keep or remove based on preference */
   margin-bottom: var(--spacing-lg-admin); /* Space between quote items */
   position: relative; /* For the pseudo-element divider */
 }
@@ -388,6 +403,7 @@ body.admin-scope .inline-quotes-manager .quote-item:not(:first-child)::before {
   top: calc(
     var(--spacing-lg-admin) * -0.5
   ); /* Position it in the middle of the margin */
+
   left: 5%; /* Start after a small gap */
   right: 5%; /* End before a small gap */
   height: 1px;
@@ -406,6 +422,7 @@ body.admin-scope .inline-quotes-manager > .inline-quotes-label {
 }
 
 /* Optional: if you want a border around each quote item, uncomment the border property above */
+
 /* and adjust padding if necessary. The current setup focuses on the divider. */
 
 /* -------------------------------------------------------------------------- */
