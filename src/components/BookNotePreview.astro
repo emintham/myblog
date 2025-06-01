@@ -27,11 +27,11 @@ const { post } = Astro.props;
 const frontmatter = post.data;
 
 // Determine the link for the preview.
-const isLink = frontmatter.postType !== "fleeting"; 
+const isLink = frontmatter.postType !== "fleeting";
 const href = isLink ? `/blog/${post.slug}/` : null;
 
 // Define widths for preview images - these should be smaller than detail page images
-const previewImageWidths = [100, 150, 200]; 
+const previewImageWidths = [100, 150, 200];
 const previewDefaultWidth = previewImageWidths.includes(100)
   ? 100
   : previewImageWidths[0];
@@ -42,9 +42,9 @@ const previewDefaultWidth = previewImageWidths.includes(100)
     {
       frontmatter.bookCover && frontmatter.bookCover.imageName && (
         <div class="cover-container">
-          <PreviewLinkWrapper 
-            isLink={isLink} 
-            href={href} 
+          <PreviewLinkWrapper
+            isLink={isLink}
+            href={href}
             ariaLabel={`Read notes on ${frontmatter.bookTitle || frontmatter.title}`}
           >
             <ResponsiveImage
@@ -134,7 +134,8 @@ const previewDefaultWidth = previewImageWidths.includes(100)
     grid-column: 1 / -1;
   }
 
-  .book-note-preview .preview-title { /* h3 */
+  .book-note-preview .preview-title {
+    /* h3 */
     font-size: 1.6rem; /* Specific font size */
     font-weight: 600; /* Specific font weight */
     margin-bottom: 0.25rem; /* Specific margin */
@@ -188,7 +189,8 @@ const previewDefaultWidth = previewImageWidths.includes(100)
     .book-note-preview .description {
       -webkit-line-clamp: 2; /* Show fewer lines on mobile */
     }
-    .book-note-preview .preview-title { /* h3 */
+    .book-note-preview .preview-title {
+      /* h3 */
       /* Potentially adjust title size for mobile if needed */
     }
   }

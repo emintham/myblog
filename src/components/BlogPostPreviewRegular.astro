@@ -8,7 +8,9 @@ const contentToDisplay = extractPreviewContent(post);
 ---
 
 <article class="post-preview">
-  <h2 class="preview-title"><a href={`/blog/${post.slug}/`}>{post.data.title}</a></h2>
+  <h2 class="preview-title">
+    <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
+  </h2>
   <PostMeta pubDate={post.data.pubDate} author={post.data.author} />
   <div class="preview-content preview-text-content">
     <Fragment set:html={contentToDisplay} />
@@ -19,13 +21,14 @@ const contentToDisplay = extractPreviewContent(post);
 <style>
   /* Styles for REGULAR post previews */
 
-  .post-preview .preview-title { /* h2 */
+  .post-preview .preview-title {
+    /* h2 */
     font-size: 1.9rem;
     margin-bottom: 0.35rem;
   }
 
   .preview-content {
-    margin-bottom: 1rem; 
+    margin-bottom: 1rem;
   }
 
   .read-more {
@@ -34,13 +37,15 @@ const contentToDisplay = extractPreviewContent(post);
 
   /* --- Mobile Adjustments for Regular Posts --- */
   @media (max-width: 768px) {
-    .post-preview .preview-title { /* h2 */
+    .post-preview .preview-title {
+      /* h2 */
       font-size: 1.6rem;
     }
   }
 
   @media (max-width: 480px) {
-    .post-preview .preview-title { /* h2 */
+    .post-preview .preview-title {
+      /* h2 */
       font-size: 1.4rem;
     }
   }

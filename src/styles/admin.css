@@ -1,29 +1,29 @@
 /* src/styles/admin.css - Kinfolk Inspired Minimalism Redesign (Reconciled) */
 
 /* -------------------------------------------------------------------------- */
+
 /* Admin Scope Base Styles & Variables                                        */
+
 /* -------------------------------------------------------------------------- */
 body.admin-scope {
   /* Admin-specific Color Palette & Theme Variables */
-  --color-background-admin: #FAF8F5; /* Warm off-white */
-  --color-text-admin-primary: #4A4A4A; /* Dark, soft gray */
-  --color-text-admin-secondary: #8C8C8C; /* Lighter, muted gray */
-  --color-accent-admin: #A3B1A1; /* Desaturated, earthy green */
-  --color-border-admin-subtle: #EDEDED; /* Very light gray for subtle lines/borders */
-  --color-focus-admin: #93A191; /* Slightly darker accent for focus */
-
-  --color-success-admin: #5A7D5A; /* Muted green for success text/icon */
-  --color-error-admin: #B7564F;   /* Muted red for error text/icon */
-  --color-warning-admin: #B28A3E; /* Muted yellow/brown for warning text/icon */
-
+  --color-background-admin: #faf8f5; /* Warm off-white */
+  --color-text-admin-primary: #4a4a4a; /* Dark, soft gray */
+  --color-text-admin-secondary: #8c8c8c; /* Lighter, muted gray */
+  --color-accent-admin: #a3b1a1; /* Desaturated, earthy green */
+  --color-border-admin-subtle: #ededed; /* Very light gray for subtle lines/borders */
+  --color-admin-fieldset-border: #c8cfc7; /* New unified fieldset border color */
+  --color-focus-admin: #93a191; /* Slightly darker accent for focus */
+  --color-success-admin: #5a7d5a; /* Muted green for success text/icon */
+  --color-error-admin: #b7564f; /* Muted red for error text/icon */
+  --color-warning-admin: #b28a3e; /* Muted yellow/brown for warning text/icon */
   --spacing-unit-admin: 8px;
-  --spacing-xs-admin: calc(var(--spacing-unit-admin) * 0.5);  /* 4px */
-  --spacing-sm-admin: var(--spacing-unit-admin);             /* 8px */
-  --spacing-md-admin: calc(var(--spacing-unit-admin) * 2);   /* 16px */
-  --spacing-lg-admin: calc(var(--spacing-unit-admin) * 3);   /* 24px */
-  --spacing-xl-admin: calc(var(--spacing-unit-admin) * 4);   /* 32px */
-  --spacing-xxl-admin: calc(var(--spacing-unit-admin) * 6);  /* 48px */
-
+  --spacing-xs-admin: calc(var(--spacing-unit-admin) * 0.5); /* 4px */
+  --spacing-sm-admin: var(--spacing-unit-admin); /* 8px */
+  --spacing-md-admin: calc(var(--spacing-unit-admin) * 2); /* 16px */
+  --spacing-lg-admin: calc(var(--spacing-unit-admin) * 3); /* 24px */
+  --spacing-xl-admin: calc(var(--spacing-unit-admin) * 4); /* 32px */
+  --spacing-xxl-admin: calc(var(--spacing-unit-admin) * 6); /* 48px */
   --border-radius-admin: 3px;
 
   /* Base styles for admin pages */
@@ -40,51 +40,158 @@ body.admin-scope .admin-content-wrapper {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Typography (Scoped to Admin)                                               */
+
+/* Shared Component Styles - DRYed from repetitive patterns                   */
+
 /* -------------------------------------------------------------------------- */
+
+/* Base button styles - shared by all button variants */
+body.admin-scope .button-base,
+body.admin-scope .button-primary,
+body.admin-scope .button-edit,
+body.admin-scope .button-remove-quote,
+body.admin-scope .button-add-quote {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  padding: var(--spacing-md-admin) var(--spacing-lg-admin);
+  border-radius: var(--border-radius-admin);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    opacity 0.2s ease-in-out;
+  border: 1px solid transparent;
+  font-weight: 500;
+}
+
+/* Input field base styles */
+body.admin-scope .input-base,
+body.admin-scope input[type="text"],
+body.admin-scope input[type="date"],
+body.admin-scope input[type="email"],
+body.admin-scope input[type="password"],
+body.admin-scope input[type="search"],
+body.admin-scope input[type="tel"],
+body.admin-scope input[type="url"],
+body.admin-scope select,
+body.admin-scope textarea {
+  width: 100%;
+  padding: var(--spacing-md-admin);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--color-text-admin-primary);
+  background-color: var(--color-background-admin);
+  border: 1px solid var(--color-border-admin-subtle);
+  border-radius: var(--border-radius-admin);
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+  appearance: none;
+}
+
+body.admin-scope .input-base:focus,
+body.admin-scope input[type="text"]:focus,
+body.admin-scope input[type="date"]:focus,
+body.admin-scope input[type="email"]:focus,
+body.admin-scope input[type="password"]:focus,
+body.admin-scope input[type="search"]:focus,
+body.admin-scope input[type="tel"]:focus,
+body.admin-scope input[type="url"]:focus,
+body.admin-scope select:focus,
+body.admin-scope textarea:focus {
+  outline: none;
+  border-color: var(--color-focus-admin);
+  box-shadow: 0 0 0 2px rgb(163 177 161 / 20%);
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Typography (Scoped to Admin)                                               */
+
+/* -------------------------------------------------------------------------- */
+
+/* General styles for admin headings */
 body.admin-scope h1,
 body.admin-scope h2,
 body.admin-scope h3,
 body.admin-scope h4,
 body.admin-scope h5,
-body.admin-scope h6,
-body.admin-scope .page-detail-header h1,
-body.admin-scope legend {
-  font-family: var(--font-serif); /* Uses global Lora */
+body.admin-scope h6 {
+  font-family: var(--font-sans);
   color: var(--color-text-admin-primary);
-  margin-top: var(--spacing-lg-admin);
-  margin-bottom: var(--spacing-md-admin);
+  font-weight: 600; /* Bolder for headings */
   line-height: 1.3;
-  font-weight: 500; /* Lora medium */
+  margin-top: var(--spacing-lg-admin); /* Default top margin */
+  margin-bottom: var(--spacing-md-admin); /* Default bottom margin */
 }
 
-body.admin-scope h1,
+/* Specifics for H1 in the page-detail-header */
 body.admin-scope .page-detail-header h1 {
-  font-size: 2rem; /* ~32px */
-  margin-top: 0;
-  margin-bottom: var(--spacing-xl-admin);
+  font-size: 2rem; /* Or your preferred size for admin page titles */
+  font-weight: 600; /* Consistent with other headings */
+  color: var(--color-text-admin-primary);
+  margin-top: 0; /* Usually no top margin if it's the first element in its container */
+  margin-bottom: 0; /* The .page-detail-header div handles bottom spacing */
+  line-height: 1.3;
+  position: static; /* Ensure it's in normal flow, overriding any accidental absolute positioning */
 }
 
-body.admin-scope h2,
-body.admin-scope legend {
-  font-size: 1.5rem; /* ~24px */
+/* Styles for H2 */
+body.admin-scope h2 {
+  font-size: 1.5rem;
 }
+
+/* Styles for legend, including the overlapping border effect */
+body.admin-scope legend {
+  font-family: var(--font-sans);
+  color: var(--color-text-admin-primary);
+  font-weight: 500; /* Slightly less bold than main headings */
+  font-size: 1.5rem; /* Matches h2 for consistency in this design */
+  line-height: 1; /* Crucial for predictable height calculation for positioning */
+  position: absolute;
+  top: calc(-1.5rem * 0.5 * 1); /* Half of its font-size, moving it up */
+  left: var(--spacing-md-admin); /* Indent from fieldset edge */
+  background: var(
+    --color-background-admin
+  ); /* Match page background to "cut" the border */
+
+  padding: 0 var(--spacing-sm-admin); /* Horizontal padding for the legend text */
+  margin: 0; /* Reset existing margins */
+}
+
+/* You can add specific font sizes for other heading levels if needed */
+body.admin-scope h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+body.admin-scope h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* ... and so on for h5, h6 */
 
 body.admin-scope label,
 body.admin-scope .inline-quotes-label {
-  font-family: var(--font-sans); /* Uses global Montserrat */
+  font-family: var(--font-sans);
   color: var(--color-text-admin-primary);
-  font-weight: 500; /* Slightly bolder for labels */
+  font-weight: 500;
   display: block;
   margin-bottom: var(--spacing-sm-admin);
-  font-size: 0.9375rem; /* ~15px */
+  font-size: 0.9375rem;
 }
 
 body.admin-scope small,
 body.admin-scope .post-meta-details {
-  font-family: var(--font-sans); /* Uses global Montserrat */
+  font-family: var(--font-sans);
   color: var(--color-text-admin-secondary);
-  font-size: 0.875rem; /* ~14px */
+  font-size: 0.875rem;
 }
 
 body.admin-scope a {
@@ -92,6 +199,7 @@ body.admin-scope a {
   text-decoration: none;
   transition: color 0.2s ease-in-out;
 }
+
 body.admin-scope a:hover,
 body.admin-scope a:focus {
   color: var(--color-focus-admin);
@@ -99,9 +207,11 @@ body.admin-scope a:focus {
 }
 
 /* -------------------------------------------------------------------------- */
+
 /* Layout & Spacing (Scoped to Admin)                                         */
+
 /* -------------------------------------------------------------------------- */
-body.admin-scope .page-detail-header { /* Ensure admin version overrides global */
+body.admin-scope .page-detail-header {
   margin-bottom: var(--spacing-xxl-admin);
   text-align: left;
   border-bottom: none;
@@ -114,67 +224,46 @@ body.admin-scope .admin-actions {
 }
 
 /* -------------------------------------------------------------------------- */
+
 /* Form Elements (Scoped to Admin)                                            */
+
 /* -------------------------------------------------------------------------- */
-body.admin-scope .post-form {
-}
+body.admin-scope fieldset {
+  /* border: none; */
 
-body.admin-scope fieldset { /* Override global .post-form fieldset */
-  border: none;
-  padding: 0;
+ /* Replaced */
+
+  /* padding: 0; */
+
+ /* Replaced */
   margin: 0 0 var(--spacing-xl-admin) 0;
+  border: 1px solid var(--color-admin-fieldset-border); /* Use new unified color */
+  padding: var(--spacing-xl-admin) var(--spacing-lg-admin)
+    var(--spacing-lg-admin); /* Adjusted padding, especially top */
+
+  position: relative; /* For legend positioning */
+  border-radius: var(--border-radius-admin); /* Added for consistency */
 }
 
-body.admin-scope legend { /* Override global .post-form legend */
-  font-family: var(--font-serif);
-  font-weight: 500;
-  font-size: 1.5rem;
-  color: var(--color-text-admin-primary);
-  padding: 0;
-  margin-bottom: var(--spacing-lg-admin);
-  width: 100%;
+/* Ensure .book-note-fields within admin also uses the unified styles */
+body.admin-scope .post-form .book-note-fields {
+  border-color: var(
+    --color-admin-fieldset-border
+  ); /* Use new unified border color */
+}
+
+body.admin-scope .post-form .book-note-fields legend {
+  color: var(--color-text-admin-primary); /* Match other admin legends */
+
+  /* Ensure other legend styles (positioning, background) are inherited or consistent */
+
+  /* The existing legend rule should cover positioning if specificity is right. */
+
+  /* If not, copy relevant properties from the main legend rule. */
 }
 
 body.admin-scope .form-field {
   margin-bottom: var(--spacing-lg-admin);
-}
-
-body.admin-scope input[type="text"],
-body.admin-scope input[type="date"],
-body.admin-scope input[type="email"],
-body.admin-scope input[type="password"],
-body.admin-scope input[type="search"],
-body.admin-scope input[type="tel"],
-body.admin-scope input[type="url"],
-body.admin-scope select,
-body.admin-scope textarea {
-  width: 100%;
-  padding: var(--spacing-md-admin);
-  font-family: var(--font-sans); /* Uses global Montserrat */
-  font-size: 1rem; /* ~16px */
-  color: var(--color-text-admin-primary);
-  background-color: var(--color-background-admin);
-  border: 1px solid var(--color-border-admin-subtle);
-  border-radius: var(--border-radius-admin);
-  box-sizing: border-box;
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-body.admin-scope input[type="text"]:focus,
-body.admin-scope input[type="date"]:focus,
-body.admin-scope input[type="email"]:focus,
-body.admin-scope input[type="password"]:focus,
-body.admin-scope input[type="search"]:focus,
-body.admin-scope input[type="tel"]:focus,
-body.admin-scope input[type="url"]:focus,
-body.admin-scope select:focus,
-body.admin-scope textarea:focus {
-  outline: none;
-  border-color: var(--color-focus-admin);
-  box-shadow: 0 0 0 2px rgba(163, 177, 161, 0.2);
 }
 
 body.admin-scope select {
@@ -190,8 +279,9 @@ body.admin-scope textarea {
   resize: vertical;
   line-height: 1.6;
 }
-body.admin-scope .post-form #bodyContent { /* From global, ensure it's styled for admin */
-   min-height: 200px;
+
+body.admin-scope .post-form #bodyContent {
+  min-height: 200px;
 }
 
 body.admin-scope input[type="checkbox"] {
@@ -200,15 +290,18 @@ body.admin-scope input[type="checkbox"] {
   width: auto;
   vertical-align: middle;
 }
+
 body.admin-scope .form-field input[type="checkbox"] + label {
   display: inline-block;
   font-weight: normal;
   margin-bottom: 0;
 }
+
 body.admin-scope .form-field label input[type="checkbox"] {
-   margin-right: var(--spacing-sm-admin);
-   width: auto;
+  margin-right: var(--spacing-sm-admin);
+  width: auto;
 }
+
 body.admin-scope .form-field label > span {
   vertical-align: middle;
 }
@@ -221,36 +314,23 @@ body.admin-scope .form-field .field-error-message {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Buttons (Scoped to Admin - Overrides global .button-primary, .button-edit) */
-/* -------------------------------------------------------------------------- */
-body.admin-scope .button-primary,
-body.admin-scope .button-edit,
-body.admin-scope .button-remove-quote,
-body.admin-scope .button-add-quote {
-  font-family: var(--font-sans); /* Uses global Montserrat */
-  font-size: 0.9375rem; /* ~15px */
-  padding: var(--spacing-md-admin) var(--spacing-lg-admin);
-  border-radius: var(--border-radius-admin);
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
-  border: 1px solid transparent;
-  font-weight: 500;
-}
 
+/* Button Variants - Using base styles                                        */
+
+/* -------------------------------------------------------------------------- */
 body.admin-scope .button-primary {
   background-color: var(--color-text-admin-primary);
   color: var(--color-background-admin);
   border-color: var(--color-text-admin-primary);
 }
+
 body.admin-scope .button-primary:hover,
 body.admin-scope .button-primary:focus {
   background-color: var(--color-focus-admin);
   border-color: var(--color-focus-admin);
   color: var(--color-background-admin);
 }
+
 body.admin-scope .button-primary:disabled {
   background-color: var(--color-border-admin-subtle);
   border-color: var(--color-border-admin-subtle);
@@ -259,26 +339,18 @@ body.admin-scope .button-primary:disabled {
   opacity: 0.7;
 }
 
-body.admin-scope .button-edit {
-  background-color: transparent;
-  color: var(--color-accent-admin);
-  border-color: var(--color-accent-admin);
-}
-body.admin-scope .button-edit:hover,
-body.admin-scope .button-edit:focus {
-  background-color: rgba(163, 177, 161, 0.1);
-  border-color: var(--color-focus-admin);
-  color: var(--color-focus-admin);
-}
-
+body.admin-scope .button-edit,
 body.admin-scope .button-add-quote {
   background-color: transparent;
   color: var(--color-accent-admin);
   border-color: var(--color-accent-admin);
 }
+
+body.admin-scope .button-edit:hover,
+body.admin-scope .button-edit:focus,
 body.admin-scope .button-add-quote:hover,
 body.admin-scope .button-add-quote:focus {
-  background-color: rgba(163, 177, 161, 0.1);
+  background-color: rgb(163 177 161 / 10%);
   border-color: var(--color-focus-admin);
   color: var(--color-focus-admin);
 }
@@ -290,17 +362,19 @@ body.admin-scope .button-remove-quote {
   padding: var(--spacing-sm-admin) var(--spacing-md-admin);
   font-size: 0.875rem;
 }
+
 body.admin-scope .button-remove-quote:hover,
 body.admin-scope .button-remove-quote:focus {
   color: var(--color-error-admin);
   border-color: var(--color-error-admin);
-  background-color: rgba(183, 86, 79, 0.05);
+  background-color: rgb(183 86 79 / 5%);
 }
 
 body.admin-scope #formFeedback a.button-edit {
   margin-top: var(--spacing-md-admin);
   margin-right: var(--spacing-md-admin);
 }
+
 body.admin-scope #formFeedback a.button-edit:last-of-type {
   margin-right: 0;
 }
@@ -309,16 +383,60 @@ body.admin-scope .inline-quotes-manager .button-add-quote {
   margin-top: var(--spacing-md-admin);
 }
 
+/* Styles for individual quote items within the manager */
+body.admin-scope .inline-quotes-manager .quote-item {
+  background-color: var(--color-background-admin); /* Match admin background */
+  padding: var(--spacing-lg-admin);
+  border-radius: var(--border-radius-admin);
+
+  /* border: 1px solid var(--color-border-admin-subtle); */
+
+ /* Keep or remove based on preference */
+  margin-bottom: var(--spacing-lg-admin); /* Space between quote items */
+  position: relative; /* For the pseudo-element divider */
+}
+
+/* Add a fading divider above each quote item, except the first one */
+body.admin-scope .inline-quotes-manager .quote-item:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: calc(
+    var(--spacing-lg-admin) * -0.5
+  ); /* Position it in the middle of the margin */
+
+  left: 5%; /* Start after a small gap */
+  right: 5%; /* End before a small gap */
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-border-admin-subtle) 20%,
+    var(--color-border-admin-subtle) 80%,
+    transparent
+  );
+}
+
+/* Ensure the main label for "Inline Quotes" has some space below it */
+body.admin-scope .inline-quotes-manager > .inline-quotes-label {
+  margin-bottom: var(--spacing-lg-admin);
+}
+
+/* Optional: if you want a border around each quote item, uncomment the border property above */
+
+/* and adjust padding if necessary. The current setup focuses on the divider. */
+
 /* -------------------------------------------------------------------------- */
+
 /* Feedback Messages (Scoped to Admin)                                        */
+
 /* -------------------------------------------------------------------------- */
-body.admin-scope .form-feedback-container { /* Overrides global #formFeedback if any */
+body.admin-scope .form-feedback-container {
   margin-top: var(--spacing-lg-admin);
   padding: var(--spacing-md-admin);
   border-radius: var(--border-radius-admin);
   display: none;
   border-left: 3px solid transparent;
-  background-color: rgba(237, 237, 237, 0.3);
+  background-color: rgb(237 237 237 / 30%);
 }
 
 body.admin-scope .form-feedback-container.visible {
@@ -333,171 +451,7 @@ body.admin-scope .form-feedback-container p {
 body.admin-scope .form-feedback-container.success-message {
   border-left-color: var(--color-success-admin);
 }
-body.admin-scope .form-feedback-container.success-message p {
-  color: var(--color-success-admin);
-}
 
 body.admin-scope .form-feedback-container.error-message {
   border-left-color: var(--color-error-admin);
-}
-body.admin-scope .form-feedback-container.error-message p {
-  color: var(--color-error-admin);
-}
-
-body.admin-scope .form-feedback-container.warning-message {
-  border-left-color: var(--color-warning-admin);
-}
-body.admin-scope .form-feedback-container.warning-message p {
-  color: var(--color-warning-admin);
-}
-
-/* -------------------------------------------------------------------------- */
-/* List Page (manage-posts.astro - Scoped to Admin)                           */
-/* -------------------------------------------------------------------------- */
-body.admin-scope .item-list-container.admin-post-list { /* More specific for admin post list */
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-body.admin-scope .admin-post-list .list-item-entry { /* Overrides global .list-item-entry */
-  display: flex;
-  justify-content: space-between;
-  align-items: center; /* Kinfolk: prefer center alignment over baseline for list items */
-  padding: var(--spacing-lg-admin) 0;
-  border-bottom: 1px solid var(--color-border-admin-subtle);
-}
-body.admin-scope .admin-post-list .list-item-entry:last-child {
-  border-bottom: none;
-}
-
-body.admin-scope .admin-post-list .post-info-column {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  margin-right: var(--spacing-lg-admin);
-  justify-content: center;
-}
-
-body.admin-scope .admin-post-list .title-line {
-  display: flex;
-  align-items: baseline;
-  margin-bottom: var(--spacing-xs-admin);
-}
-
-body.admin-scope .admin-post-list .list-item-name { /* Overrides global .list-item-name */
-  font-family: var(--font-serif); /* Uses global Lora */
-  font-size: 1.125rem; /* ~18px */
-  font-weight: 500;
-  color: var(--color-text-admin-primary);
-  text-decoration: none;
-}
-body.admin-scope .admin-post-list .list-item-name:hover,
-body.admin-scope .admin-post-list .list-item-name:focus {
-  color: var(--color-accent-admin);
-  text-decoration: none;
-}
-
-body.admin-scope .status-draft-badge { /* Overrides global .status-draft-badge */
-  font-family: var(--font-sans); /* Uses global Montserrat */
-  color: var(--color-text-admin-secondary);
-  background-color: transparent; /* Kinfolk: more subtle */
-  font-size: 0.8125rem; /* ~13px */
-  margin-right: var(--spacing-sm-admin);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 0;
-  font-weight: normal;
-  border-radius: 0;
-  line-height: inherit;
-  display: inline;
-}
-body.admin-scope .admin-post-list .title-with-draft-badge {
-}
-
-body.admin-scope .admin-post-list .post-meta-details {
-  font-size: 0.875rem; /* ~14px */
-  color: var(--color-text-admin-secondary);
-  margin-top: var(--spacing-xs-admin);
-}
-body.admin-scope .admin-post-list .post-meta-details span {
-  margin-left: var(--spacing-sm-admin);
-}
-body.admin-scope .admin-post-list .post-meta-details span:first-of-type {
-  margin-left: 0;
-}
-
-body.admin-scope .empty-state-message { /* Overrides global .empty-state-message */
-  margin-top: var(--spacing-xl-admin);
-  text-align: center;
-  font-style: italic;
-  font-family: var(--font-serif);
-  color: var(--color-text-admin-secondary);
-  font-size: 1rem;
-  padding: var(--spacing-xl-admin) 0;
-}
-
-/* -------------------------------------------------------------------------- */
-/* Inline Quotes Manager (Scoped to Admin)                                    */
-/* -------------------------------------------------------------------------- */
-body.admin-scope .inline-quotes-manager {
-  margin-top: var(--spacing-xl-admin);
-  padding-top: var(--spacing-lg-admin);
-  border-top: 1px solid var(--color-border-admin-subtle);
-}
-
-body.admin-scope .inline-quotes-manager > .inline-quotes-label {
-  font-family: var(--font-serif); /* Uses global Lora */
-  font-size: 1.25rem; /* ~20px */
-  font-weight: 500;
-  color: var(--color-text-admin-primary);
-  margin-bottom: var(--spacing-lg-admin);
-}
-
-body.admin-scope .inline-quotes-manager .quote-item {
-  padding: var(--spacing-lg-admin) 0;
-  margin-bottom: var(--spacing-lg-admin);
-  border-bottom: 1px dashed var(--color-border-admin-subtle);
-}
-body.admin-scope .inline-quotes-manager .quote-item:last-of-type {
-  border-bottom: none;
-  margin-bottom: 0;
-}
-
-body.admin-scope .inline-quotes-manager .quote-item .form-field {
-  margin-bottom: var(--spacing-md-admin);
-}
-
-body.admin-scope .inline-quotes-manager .quote-item .form-field label {
-  font-size: 0.875rem;
-  font-weight: normal;
-  color: var(--color-text-admin-secondary);
-}
-
-body.admin-scope .inline-quotes-manager .quote-item .form-field textarea,
-body.admin-scope .inline-quotes-manager .quote-item .form-field input[type="text"] {
-  font-size: 0.9375rem;
-  padding: var(--spacing-sm-admin) var(--spacing-md-admin);
-}
-body.admin-scope .inline-quotes-manager .quote-item .form-field textarea {
-  min-height: 80px;
-}
-
-body.admin-scope .inline-quotes-manager .quote-item .tags-field-container {
-  margin-bottom: var(--spacing-md-admin);
-}
-
-/* -------------------------------------------------------------------------- */
-/* Tags Component (react-select) - Global overrides if needed (Scoped)        */
-/* -------------------------------------------------------------------------- */
-body.admin-scope .tags-component-field .tags-component-label {
-}
-
-/* -------------------------------------------------------------------------- */
-/* Utility & Cleanup                                                          */
-/* -------------------------------------------------------------------------- */
-/* .book-note-fields specific styling from global.css is handled by admin fieldset/legend styles. */
-body.admin-scope .post-form .book-note-fields {
-}
-body.admin-scope .post-form .book-note-fields legend {
 }

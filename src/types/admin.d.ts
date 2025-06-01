@@ -56,7 +56,7 @@ export interface PostFormData {
   bookTitle: string;
   bookAuthor: string;
   bookCoverImageName: string; // Flat structure for form input
-  bookCoverAlt: string;       // Flat structure for form input
+  bookCoverAlt: string; // Flat structure for form input
   quotesRef: string;
   bookTags: string[]; // Changed from string to string[]
 
@@ -85,7 +85,7 @@ export interface PostApiPayload {
   bookTitle?: string;
   bookAuthor?: string;
   bookCoverImageName?: string; // This is sent from client
-  bookCoverAlt?: string;       // This is sent from client
+  bookCoverAlt?: string; // This is sent from client
   // API will enrich bookCover with originalWidth before saving to frontmatter
   bookCover?: { imageName?: string; alt?: string; originalWidth?: number }; // Added originalWidth
   quotesRef?: string;
@@ -118,3 +118,31 @@ export interface FrontmatterObject {
   quotesRef?: string;
   bookTags?: string[]; // Stored as an array of strings
 }
+
+export interface SentenceData {
+  id: string;
+  text: string;
+  summary: string;
+  purposeKey: string;
+  ties: string;
+}
+
+export interface ParagraphData {
+  id: string;
+  sentences: SentenceData[];
+}
+
+export interface AnalysisData extends Array<ParagraphData> {}
+
+export interface RhetoricalPurpose {
+  name: string;
+  color: string;
+  isPlaceholder?: boolean;
+}
+
+export interface RhetoricalPurposesMap {
+  [key: string]: RhetoricalPurpose;
+}
+
+// Type for the uuid v4 function, if you want to type it explicitly
+export type UuidV4Function = () => string;

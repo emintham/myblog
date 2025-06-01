@@ -1,12 +1,16 @@
-import React from 'react';
-import type { Quote } from '../../types/admin';
-import TagsComponent from './TagsComponent'; // Import TagsComponent
+import React from "react";
+import type { Quote } from "../../types/admin";
+import TagsComponent from "./TagsComponent"; // Import TagsComponent
 
 interface InlineQuotesManagerProps {
   quotes: Quote[];
   onAddQuote: () => void;
   onRemoveQuote: (id: string) => void;
-  onUpdateQuoteField: <K extends keyof Omit<Quote, 'id'>>(id: string, field: K, value: Quote[K]) => void;
+  onUpdateQuoteField: <K extends keyof Omit<Quote, "id">>(
+    id: string,
+    field: K,
+    value: Quote[K]
+  ) => void;
   allQuoteTags?: string[]; // Optional: All unique quote tags for suggestions
 }
 
@@ -21,16 +25,15 @@ const InlineQuotesManager: React.FC<InlineQuotesManagerProps> = ({
     <div className="form-field inline-quotes-manager">
       <label className="inline-quotes-label">Inline Quotes</label>
       {quotes.map((quote) => (
-        <div
-          key={quote.id}
-          className="quote-item"
-        >
+        <div key={quote.id} className="quote-item">
           <div className="form-field">
             <label htmlFor={`quote-text-${quote.id}`}>Text*</label>
             <textarea
               id={`quote-text-${quote.id}`}
               value={quote.text}
-              onChange={(e) => onUpdateQuoteField(quote.id, 'text', e.target.value)}
+              onChange={(e) =>
+                onUpdateQuoteField(quote.id, "text", e.target.value)
+              }
               rows={2}
               required
             />
@@ -40,8 +43,10 @@ const InlineQuotesManager: React.FC<InlineQuotesManagerProps> = ({
             <input
               type="text"
               id={`quote-author-${quote.id}`}
-              value={quote.quoteAuthor || ''}
-              onChange={(e) => onUpdateQuoteField(quote.id, 'quoteAuthor', e.target.value)}
+              value={quote.quoteAuthor || ""}
+              onChange={(e) =>
+                onUpdateQuoteField(quote.id, "quoteAuthor", e.target.value)
+              }
             />
           </div>
           <div className="form-field">
@@ -49,8 +54,10 @@ const InlineQuotesManager: React.FC<InlineQuotesManagerProps> = ({
             <input
               type="text"
               id={`quote-source-${quote.id}`}
-              value={quote.quoteSource || ''}
-              onChange={(e) => onUpdateQuoteField(quote.id, 'quoteSource', e.target.value)}
+              value={quote.quoteSource || ""}
+              onChange={(e) =>
+                onUpdateQuoteField(quote.id, "quoteSource", e.target.value)
+              }
             />
           </div>
           <div className="form-field tags-field-container">
@@ -60,7 +67,9 @@ const InlineQuotesManager: React.FC<InlineQuotesManagerProps> = ({
               id={`quote-tags-${quote.id}`}
               label="Tags"
               value={quote.tags || []} // Quote.tags is already string[]
-              onChange={(newTags) => onUpdateQuoteField(quote.id, 'tags', newTags)}
+              onChange={(newTags) =>
+                onUpdateQuoteField(quote.id, "tags", newTags)
+              }
               suggestions={allQuoteTags} // Prop passed from PostForm
               placeholder="Add quote tags"
               // onBlur is not strictly needed here unless RHF validation is directly on this sub-field
@@ -75,11 +84,7 @@ const InlineQuotesManager: React.FC<InlineQuotesManagerProps> = ({
           </button>
         </div>
       ))}
-      <button
-        type="button"
-        onClick={onAddQuote}
-        className="button-add-quote"
-      >
+      <button type="button" onClick={onAddQuote} className="button-add-quote">
         + Add Quote
       </button>
     </div>

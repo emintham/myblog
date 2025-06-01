@@ -40,3 +40,10 @@
 
 - Jules cleaned up CSS and some components.
 - Big update: Added support for dev mode authoring.
+
+## May 31
+
+- Big update: separate modes for author/reader
+- Refactors.
+- Tests.
+- V1 of close reading function.

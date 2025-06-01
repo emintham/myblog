@@ -1,0 +1,16 @@
+---
+// src/components/ContextToggle.astro
+import ContextToggleReactComponent from "./admin/ContextToggle.tsx"; // Path to the new React component
+import { ADMIN_PATH_PREFIX } from "../siteConfig.ts";
+
+const isDev = import.meta.env.DEV;
+---
+
+{
+  isDev && (
+    <ContextToggleReactComponent
+      client:only="react"
+      adminPathPrefix={ADMIN_PATH_PREFIX}
+    />
+  )
+}

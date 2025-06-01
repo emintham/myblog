@@ -7,16 +7,14 @@
   --font-sans: "Montserrat", sans-serif;
   --font-display-title: "Spectral", serif;
   --font-fleeting-title: "Corinthia", cursive;
-
   --color-background: #faf9f6; /* Creamy off-white */
-  --color-text: #333333; /* Dark grey */
+  --color-text: #333; /* Dark grey */
   --color-accent: #5d7a88; /* Muted blue-grey */
-  --color-meta: #777777; /* For dates, subtle info */
-  --color-border-subtle: #eeeeee;
+  --color-meta: #777; /* For dates, subtle info */
+  --color-border-subtle: #eee;
   --color-note-paper: #fbfaf9; /* Example: extremely close to page background */
   --color-code-background: #f4f4f4; /* For <pre> blocks */
   --color-accent-secondary: #f7a76c;
-
   --content-max-width: 720px; /* Adjust for optimal line length */
 }
 
@@ -48,9 +46,11 @@ h6 {
 h1 {
   font-size: 2.5rem;
 }
+
 h2 {
   font-size: 2rem;
 }
+
 h3 {
   font-size: 1.5rem;
 }
@@ -90,6 +90,7 @@ pre {
 }
 
 /* == Common Page Section Title == */
+
 /* Used for: "Latest Writings", "All Tags", "All Series", "About" titles */
 .section-title {
   font-size: 1.2rem;
@@ -103,6 +104,7 @@ pre {
 }
 
 /* == Common Page Introductory Text == */
+
 /* Used for descriptive text below a .section-title */
 .page-intro-text {
   font-family: var(--font-serif);
@@ -110,11 +112,12 @@ pre {
   color: var(--color-text);
   text-align: center;
   max-width: 60ch;
-  margin: 0 auto 2.5rem auto; /* Centering and space below */
+  margin: 0 auto 2.5rem; /* Centering and space below */
   line-height: 1.6;
 }
 
 /* == Common Item Listing Styles == */
+
 /* Used for lists on Tags page, Series page */
 .item-list-container {
   list-style: none;
@@ -140,6 +143,7 @@ pre {
   font-size: 1.1rem;
   color: var(--color-accent);
   text-decoration: none;
+
   /* text-transform: capitalize; /* Apply this locally if needed per page */
 }
 
@@ -155,6 +159,7 @@ pre {
 }
 
 /* == Common Detail Page Header == */
+
 /* For headers on individual tag/series pages */
 .page-detail-header {
   text-align: left; /* Default, can be overridden locally if needed */
@@ -210,7 +215,8 @@ pre {
   margin-bottom: 0;
 }
 
-.preview-title { /* Applied to h2 or h3 in previews */
+.preview-title {
+  /* Applied to h2 or h3 in previews */
   font-family: var(--font-display-title);
   font-weight: 700; /* Base weight, can be adjusted per component if truly needed */
   line-height: 1.3;
@@ -227,14 +233,16 @@ pre {
   color: var(--color-accent);
 }
 
-.meta { /* Common class for meta text (date, author) */
+.meta {
+  /* Common class for meta text (date, author) */
   font-family: var(--font-sans);
   font-size: 0.85rem; /* Standardized size */
   color: var(--color-meta);
   margin-bottom: 1rem; /* Standardized margin */
 }
 
-.preview-text-content p { /* For paragraphs within preview content areas */
+.preview-text-content p {
+  /* For paragraphs within preview content areas */
   font-size: 1rem;
   line-height: 1.65;
   color: var(--color-text);
@@ -245,7 +253,8 @@ pre {
   margin-bottom: 0;
 }
 
-.read-more { /* Common class for read-more links */
+.read-more {
+  /* Common class for read-more links */
   font-family: var(--font-sans);
   font-size: 0.8rem; /* Base size, can be fine-tuned in component if needed */
   text-transform: uppercase;
@@ -253,6 +262,7 @@ pre {
   color: var(--color-accent);
   text-decoration: none;
   display: inline-block;
+
   /* margin-top can be specific to the component */
 }
 
@@ -273,15 +283,20 @@ pre {
   font-size: 0.9rem;
   border: 1px solid var(--color-accent);
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
 }
+
 .button-primary:hover {
   background-color: var(--color-text);
   border-color: var(--color-text);
   color: var(--color-background, #fff);
 }
 
-.button-edit { /* Style for edit buttons, e.g., on manage-posts page */
+.button-edit {
+  /* Style for edit buttons, e.g., on manage-posts page */
   display: inline-block;
   padding: 0.5em 1em;
   background-color: transparent;
@@ -292,9 +307,13 @@ pre {
   font-family: var(--font-sans);
   font-size: 0.85rem;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
   white-space: nowrap; /* Prevents button text from wrapping */
 }
+
 .button-edit:hover {
   background-color: var(--color-accent);
   color: var(--color-background, #fff);
@@ -347,7 +366,9 @@ pre {
   background-color: var(--color-background);
   color: var(--color-text);
   box-sizing: border-box; /* Important for 100% width + padding */
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition:
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
 }
 
 .post-form .form-field input[type="text"]:focus,
@@ -359,12 +380,14 @@ pre {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 25%, transparent); /* Subtle focus ring */
 }
 
-.post-form .form-field textarea { /* General textarea in form */
+.post-form .form-field textarea {
+  /* General textarea in form */
   min-height: 80px;
   line-height: 1.6;
 }
 
 /* Specific styling for the main body content textarea using its ID */
+
 /* Ensure this ID is unique per page if PostForm is ever used multiple times on one page (not current scenario) */
 .post-form #bodyContent {
   min-height: 200px;
@@ -377,13 +400,15 @@ pre {
 
 /* Ensures label containing checkbox doesn't force 100% width on the checkbox input itself */
 .post-form .form-field label input[type="checkbox"] {
-   width: auto;
+  width: auto;
 }
 
 /* Styles for the 'Book Note Details' fieldset */
+
 /* The React component PostForm.tsx uses className="book-note-fields" for this fieldset */
 .post-form .book-note-fields {
   border-color: var(--color-accent);
+
   /* margin-top is already handled by fieldset's general margin-bottom */
 }
 
@@ -392,7 +417,8 @@ pre {
 }
 
 #generatedOutput,
-#formFeedback { /* Assuming formFeedback uses similar styling */
+#formFeedback {
+  /* Assuming formFeedback uses similar styling */
   background-color: color-mix(in srgb, var(--color-background) 95%, black);
   padding: 1.5rem;
   border-radius: 4px;
@@ -400,7 +426,8 @@ pre {
 }
 
 #generatedOutput h2,
-#formFeedback h2 { /* If formFeedback were to have an h2 */
+#formFeedback h2 {
+  /* If formFeedback were to have an h2 */
   margin-top: 0;
   font-family: var(--font-sans);
   font-size: 1.5rem;
@@ -420,7 +447,10 @@ pre {
 
 /* Status badge for drafts, potentially reusable in admin areas */
 .status-draft-badge {
-  background-color: var(--color-accent-secondary); /* Example: a muted yellow/orange */
+  background-color: var(
+    --color-accent-secondary
+  ); /* Example: a muted yellow/orange */
+
   border-radius: 3px;
   color: var(--color-background, #fff);
   display: inline-block;

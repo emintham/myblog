@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { generateSlug } from "../../utils/slugify";
-import { getUniqueTagsWithCounts } from "../../utils/tagUtils"; // Updated import
+import { getUniqueTagsWithCounts } from "../../utils/contentUtils"; // Updated path
 
 // Fetch all unique tags with their counts, filtering out drafts in production
 const sortedTags = await getUniqueTagsWithCounts(

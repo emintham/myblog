@@ -1,42 +1,58 @@
 ---
 // src/components/Navigation.astro
-import { SITE_TITLE } from "../siteConfig.ts";
+import { SITE_TITLE, ADMIN_PATH_PREFIX } from "../siteConfig.ts";
 
 const baseNavLinks = [
   { href: "/", label: "Home" },
-  { href: "/book-notes", label: "Book Notes" }, // Added Book Notes link
+  { href: "/book-notes", label: "Book Notes" },
   { href: "/tags", label: "Tags" },
   { href: "/series", label: "Series" },
   { href: "/about", label: "About" },
 ];
-// Conditionally add the "Edit Content" link only in DEV mode
+
+// Add admin link in development mode
+const devLinks = [
+  { href: "/admin/manage-posts", label: "Manage" },
+  { href: "/admin/analyze", label: "Analyze" },
+];
 const navLinks = import.meta.env.DEV
-  ? [...baseNavLinks, { href: "/admin/manage-posts", label: "Manage" }]
+  ? [...baseNavLinks, ...devLinks]
   : baseNavLinks;
+
+function isActiveLink(href: string, pathname: string): boolean {
+  return pathname === href || (href !== "/" && pathname.startsWith(href + "/"));
+}
+
+// Determine if we're on an admin page for initial rendering
+const isAdminPage = Astro.url.pathname.startsWith(ADMIN_PATH_PREFIX);
+const initialContext = isAdminPage ? "author" : "reader";
 ---
 
-<nav>
+<nav data-initial-context={initialContext}>
   <div class="nav-container">
     <div class="blog-title">
       <a href="/">{SITE_TITLE}</a>
     </div>
     <ul class="nav-links">
       {
-        navLinks.map((link) => (
-          <li>
-            <a
-              href={link.href}
-              class:list={{
-                "is-active":
-                  Astro.url.pathname === link.href ||
-                  (link.href !== "/" &&
-                    Astro.url.pathname.startsWith(link.href + "/")),
-              }}
-            >
-              {link.label}
-            </a>
-          </li>
-        ))
+        navLinks.map((link) => {
+          const isAdminLink = link.href.startsWith(ADMIN_PATH_PREFIX);
+          const shouldHide =
+            initialContext === "author" ? !isAdminLink : isAdminLink;
+
+          return (
+            <li style={shouldHide ? "display: none;" : ""}>
+              <a
+                href={link.href}
+                class:list={{
+                  "is-active": isActiveLink(link.href, Astro.url.pathname),
+                }}
+              >
+                {link.label}
+              </a>
+            </li>
+          );
+        })
       }
     </ul>
   </div>
@@ -45,14 +61,14 @@ const navLinks = import.meta.env.DEV
 <style>
   nav {
     padding: 1.5rem 0;
-    border-bottom: 1px solid var(--color-border-subtle, #e0e0e0); /* Added fallback for var */
-    margin-bottom: 1rem; /* Or adjust as per BaseLayout needs */
+    border-bottom: 1px solid var(--color-border-subtle, #e0e0e0);
+    margin-bottom: 1rem;
   }
 
   .nav-container {
     max-width: var(--content-max-width, 720px);
     margin: 0 auto;
-    padding: 0 1rem; /* Keeps content from touching edges on small screens */
+    padding: 0 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -89,6 +105,7 @@ const navLinks = import.meta.env.DEV
 
   .nav-links li {
     text-align: center;
+    transition: opacity 0.2s ease-in-out;
   }
 
   .nav-links li a {
@@ -101,28 +118,26 @@ const navLinks = import.meta.env.DEV
     padding: 0.5rem 0.1rem;
     display: inline-block;
     transition: color 0.2s ease-in-out;
-    border-bottom: 2px solid transparent; /* For active state indication */
+    border-bottom: 2px solid transparent;
   }
 
   .nav-links li a:hover,
   .nav-links li a.is-active {
-    /* Style for active link */
     color: var(--color-text);
-    border-bottom-color: var(--color-accent); /* Or var(--color-text) */
+    border-bottom-color: var(--color-accent);
   }
 
   /* Responsive adjustments */
   @media (max-width: 480px) {
     .blog-title a {
-      font-size: 1.8rem; /* Adjusted for better fit */
+      font-size: 1.8rem;
     }
     .nav-links {
-      /* Consider justify-content: space-around or center for very small screens if space-between is too sparse */
       justify-content: space-around;
     }
     .nav-links li a {
-      font-size: 0.8rem; /* Slightly smaller font for links */
-      padding: 0.5rem 0.2rem; /* Adjust padding for small screens */
+      font-size: 0.8rem;
+      padding: 0.5rem 0.2rem;
       letter-spacing: 0.04em;
     }
   }
