@@ -17,6 +17,10 @@ interface UsePostSubmissionProps {
 
 type ActionType = "create" | "update";
 
+// Define an augmented type for the event result
+type PostSuccessEventResult = PostSourceData & { message?: string; path?: string; newSlug?: string };
+
+
 export function usePostSubmission({
   existingPostData,
   resetForm,
@@ -78,7 +82,7 @@ export function usePostSubmission({
           body: JSON.stringify(payload),
         });
 
-        const result = await response.json(); // API response, e.g., { title, newSlug, newFilePath, newExtension, quotesRef? }
+        const apiResult = await response.json(); // API response
 
         if (import.meta.env.DEV) {
           console.log(
@@ -86,37 +90,33 @@ export function usePostSubmission({
           );
           console.log(
             `[usePostSubmission:${actionType.toUpperCase()}] Parsed API Response:`,
-            result
+            apiResult
           );
         }
 
         if (response.ok) {
-          // Construct the state that reflects the successfully saved form data,
-          // including any server-generated/confirmed fields.
           const finalFormState: PostFormData = {
-            ...formData, // Start with the data that was submitted
-            title: result.title, // Use title from API response
-            // Add/overwrite with identifiers from API result
-            originalSlug: result.newSlug,
-            originalFilePath: result.newFilePath,
-            originalExtension: result.newExtension,
-            quotesRef: result.quotesRef !== undefined ? result.quotesRef : formData.quotesRef,
+            ...formData,
+            title: apiResult.title,
+            originalSlug: apiResult.newSlug,
+            originalFilePath: apiResult.newFilePath,
+            originalExtension: apiResult.newExtension,
+            quotesRef: apiResult.quotesRef !== undefined ? apiResult.quotesRef : formData.quotesRef,
           };
 
-          // Reset react-hook-form's state with this complete, saved data.
-          resetForm(finalFormState);
-
-          // Prepare a PostSourceData-compatible object for the event,
-          // as PostForm uses this for its currentPostDetails state.
-          const eventDataForResult: PostSourceData = {
-            ...finalFormState, // Spread the updated form state
-            // Ensure bookCover is in the nested structure expected by PostSourceData
+          resetForm(actionType === "create" ? defaultFormValues : finalFormState);
+          
+          const eventDataForResult: PostSuccessEventResult = {
+            ...finalFormState,
             bookCover: {
               imageName: finalFormState.bookCoverImageName,
               alt: finalFormState.bookCoverAlt,
-              // originalWidth is not in finalFormState, this is fine for this context
             },
-            // inlineQuotes are already part of finalFormState from formData
+            // Add relevant fields from API response for consumers like FeedbackDisplay
+            message: apiResult.message,
+            path: apiResult.path,
+            // Ensure newSlug is also directly available if needed, though originalSlug holds it post-creation/update
+            newSlug: apiResult.newSlug, 
           };
           delete (eventDataForResult as any).bookCoverImageName;
           delete (eventDataForResult as any).bookCoverAlt;
@@ -130,13 +130,13 @@ export function usePostSubmission({
           if (import.meta.env.DEV) {
             console.error(
               `[usePostSubmission:${actionType.toUpperCase()}] API Error:`,
-              result.message || response.statusText,
-              result
+              apiResult.message || response.statusText,
+              apiResult
             );
           }
           window.dispatchEvent(
             new CustomEvent("postFormError", {
-              detail: { error: result, actionType },
+              detail: { error: apiResult, actionType },
             })
           );
         }

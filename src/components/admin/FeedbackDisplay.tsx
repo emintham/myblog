@@ -4,6 +4,20 @@ interface FeedbackDisplayProps {
   formId: string;
 }
 
+// Define an augmented type for the event result, matching usePostSubmission
+interface PostSuccessEventResult {
+  originalSlug?: string;
+  newSlug?: string; // Can be used as a direct alias from API
+  title?: string;
+  message?: string;
+  path?: string;
+  originalFilePath?: string;
+  originalExtension?: string;
+  // Include other properties from PostSourceData if needed by FeedbackDisplay directly
+  [key: string]: any; // Allow other properties
+}
+
+
 const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
   const formRef = useRef<HTMLFormElement | null>(null);
   const submitButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -68,58 +82,67 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
   }, [showFeedback]);
 
   const handlePostFormSuccess = useCallback((event: Event) => {
-    const customEvent = event as CustomEvent<{ result: any; actionType: 'create' | 'update' }>;
+    const customEvent = event as CustomEvent<{ result: PostSuccessEventResult; actionType: 'create' | 'update' }>;
     const { result, actionType } = customEvent.detail;
     const formElement = formRef.current;
 
+    const apiMessage = result?.message;
+
     if (actionType === "create") {
-      if (result?.newSlug && typeof result.newSlug === "string" && result.newSlug.trim() !== "") {
+      // For redirect, the new slug is in result.originalSlug (from finalFormState)
+      // or result.newSlug (directly from API via augmented event data)
+      const slugForRedirect = result?.newSlug || result?.originalSlug; 
+
+      if (slugForRedirect && typeof slugForRedirect === "string" && slugForRedirect.trim() !== "") {
         showFeedback(
-          (result.message || "Post created successfully!") + " Redirecting to edit page...",
+          (apiMessage || "Post created successfully!") + " Redirecting to edit page...",
           "success"
         );
         setViewPostHref(null); // No view link when redirecting
-        // Prevent feedback from being cleared by navigation
         setTimeout(() => {
-            window.location.href = `/admin/edit/${result.newSlug}`;
+            window.location.href = `/admin/edit/${slugForRedirect}`;
         }, 100); // Short delay
       } else {
         if (import.meta.env.DEV) {
           console.warn(
-            "[FeedbackDisplay] Create post success, but newSlug is missing or invalid for redirect. Result:",
+            "[FeedbackDisplay] Create post success, but slugForRedirect is missing or invalid. Result:",
             result
           );
         }
         showFeedback(
-          result?.message || "Post created, but issue with redirect data.",
+          apiMessage || "Post created, but issue with redirect data.",
           "warning"
         );
       }
     } else if (actionType === "update" && formElement) {
-      showFeedback(result?.message || "Post updated successfully!", "success");
+      showFeedback(apiMessage || "Post updated successfully!", "success");
 
-      if (result?.path) {
-        setViewPostHref(result.path);
+      const viewPath = result?.path;
+      if (viewPath) {
+        setViewPostHref(viewPath);
       } else {
         setViewPostHref(null);
       }
 
-      // External DOM manipulations remain
       const pageH1 = document.querySelector(".page-detail-header h1") as HTMLHeadingElement;
-      if (pageH1 && result?.newSlug && formElement.dataset.originalSlug && result.newSlug !== formElement.dataset.originalSlug) {
-        const newTitleDisplay = result.title || result.newSlug.replace(/-/g, " ").replace(/\b\w/g, (l:string) => l.toUpperCase());
-        pageH1.textContent = `Edit Post: "${newTitleDisplay}"`;
-        formElement.dataset.originalSlug = result.newSlug; // Update data attribute
+      // For H1 update, new slug is in result.newSlug or result.originalSlug, title is in result.title
+      const newSlugForH1 = result?.newSlug || result?.originalSlug;
+      const newTitleForH1 = result?.title;
+
+      if (pageH1 && newSlugForH1 && formElement.dataset.originalSlug && newSlugForH1 !== formElement.dataset.originalSlug) {
+        const newTitleDisplay = newTitleForH1 || newSlugForH1.replace(/-/g, " ").replace(/\b\w/g, (l:string) => l.toUpperCase());
+        pageH1.textContent = `Edit Post: "${newTitleDisplay}"`; // Assuming this is on the edit page
+        formElement.dataset.originalSlug = newSlugForH1;
       }
 
       const originalSlugInput = formElement.querySelector('input[name="originalSlug"]') as HTMLInputElement;
-      if (originalSlugInput && result?.newSlug) originalSlugInput.value = result.newSlug;
+      if (originalSlugInput && (result?.newSlug || result?.originalSlug)) originalSlugInput.value = (result?.newSlug || result?.originalSlug)!;
 
       const originalFilePathInput = formElement.querySelector('input[name="originalFilePath"]') as HTMLInputElement;
-      if (originalFilePathInput && result?.newFilePath) originalFilePathInput.value = result.newFilePath;
+      if (originalFilePathInput && result?.originalFilePath) originalFilePathInput.value = result.originalFilePath;
 
       const originalExtensionInput = formElement.querySelector('input[name="originalExtension"]') as HTMLInputElement;
-      if (originalExtensionInput && result?.newExtension) originalExtensionInput.value = result.newExtension;
+      if (originalExtensionInput && result?.originalExtension) originalExtensionInput.value = result.originalExtension;
     }
   }, [showFeedback]);
 
