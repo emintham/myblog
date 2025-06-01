@@ -27,7 +27,7 @@ bookTags:
 
 I've had this book on my reading list for some time now but never prioritized it
 because of the title. While I was interested in both writing and learning,
-I never felt an urgent desire to explore "writing to learn" when comparing it to
+I never felt an urgent desire to explore "writing to learn" when compared to
 the other books on my list. However, as I was working on a new post
 for the blog, I chanced upon it again and decided to take a detour to read it,
 scavenging for fodder for my writing. To my utter surprise, despite the
@@ -60,7 +60,7 @@ of the story is lost to time, but I do remember the satisfaction of creating it
 ex nihilo. As I grew older, and was forced to learn Chinese [^chinese-learning],
 Chinese composition became a requirement for class and was, unfortunately, not something I was
 readily able to transfer my English writing skills to. My mother enrolled me into a Chinese essay writing
-class during the period of Grades 3-5 (roughly) and while it helped, I never did
+class during the period of Grades 3-5 (roughly) and while it helped, I never
 quite achieved the level I wished. At Grade 6, however, worried for my [standardized
 exams](https://en.m.wikipedia.org/wiki/Primary_School_Achievement_Test_(Malaysia)),
 my mother procured a collection of award-winning essays and stories from
@@ -137,4 +137,4 @@ to my reading list-- books I would have overlooked otherwise.
 [^chinese-learning]: A fact I'm ever grateful to my parents for since it allowed me to meet my wife. She wasn't part of the class, but without being able to speak Chinese, I would likely not be able to grow as close to her as I have.
 [^chocolate-chicken]: I like chocolate and I like chicken, but chocolate chicken will likely be a disaster in all but the hands of the most skillful of chefs.
 [^polite]: Perhaps out of politeness than a sincere compliment, but I will take it nonetheless.
-[^bottoms-up]: In contrast to the "bottoms-up" processing method where copious amounts of alchohol is imbibed. A processing mode that I used to employ, to great success I might add, but have since abstained from in recent years.
+[^bottoms-up]: In contrast to the "bottoms-up" processing method where copious amounts of alcohol is imbibed. A processing mode that I used to employ, to great success I might add, but have since abstained from in recent years.
