@@ -7,13 +7,15 @@ import { useAutoSave } from "../../hooks/useAutoSave";
 import { usePostFormInitialization } from "../../hooks/usePostFormInitialization"; // Import the new hook
 import InlineQuotesManager from "./InlineQuotesManager";
 import TagsComponent from "./TagsComponent";
+import SeriesComponent from "./SeriesComponent"; // IMPORT SeriesComponent
 
 export interface PostFormProps {
-  postData?: PostSourceData; // Data from source, optional for create mode. Now includes optional inlineQuotes.
-  formId: string; // ID of the parent <form> element
-  allPostTags?: string[]; // Optional: All unique post tags for suggestions
-  allBookTags?: string[]; // Optional: All unique book tags for suggestions
-  allQuoteTags?: string[]; // Optional: All unique quote tags for suggestions
+  postData?: PostSourceData; 
+  formId: string; 
+  allPostTags?: string[]; 
+  allBookTags?: string[]; 
+  allQuoteTags?: string[]; 
+  allSeriesNames?: string[]; // ADD allSeriesNames prop
 }
 
 const POST_TYPES = ["standard", "fleeting", "bookNote"];
@@ -47,6 +49,7 @@ const PostForm: React.FC<PostFormProps> = ({
   allPostTags,
   allBookTags,
   allQuoteTags,
+  allSeriesNames, // Destructure allSeriesNames
 }) => {
   const {
     register,
@@ -259,13 +262,24 @@ const PostForm: React.FC<PostFormProps> = ({
           )}
         </div>
         <div className="form-field">
-          <label htmlFor="series">Series</label>
-          <input
-            type="text"
-            id="series"
-            {...register("series")}
-            placeholder="e.g., My Learning Journey"
+          {/* REPLACE input with SeriesComponent */}
+          <Controller
+            name="series"
+            control={control}
+            defaultValue={defaultValues.series || null} // Ensure default is null or string
+            render={({ field }) => (
+              <SeriesComponent
+                id="series"
+                label="Series"
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                suggestions={allSeriesNames}
+                placeholder="e.g., My Learning Journey"
+              />
+            )}
           />
+          {/* You might want to add error handling for series if needed */}
         </div>
         <div className="form-field">
           <label>

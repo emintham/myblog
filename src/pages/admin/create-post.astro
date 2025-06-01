@@ -22,31 +22,36 @@ const allQuoteTags = await getUniqueTagNames(
   "bookQuotes",
   (data) => data.quotes?.flatMap((q) => q.tags || []) || []
 );
+const allSeriesNames = await getUniqueSeriesNames();
 
 const pageTitle = `Create New Post - ${SITE_TITLE}`;
+const pageDescription = `Admin page to create a new post on ${SITE_TITLE}`;
+const isEditMode = false; // or true, based on your logic
+const postToEdit = null; // or the post data you want to edit
 ---
 
-<BaseLayout title={pageTitle} isAdminPage={true}>
-  <div class="page-detail-header">
-    <h1>Create New Post</h1>
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <div class="admin-content-wrapper">
+    <header class="page-detail-header">
+      <h1>{isEditMode ? "Edit Post" : "Create New Post"}</h1>
+    </header>
+
+    <form id="postAdminForm" class="post-form">
+      <PostForm
+        client:load
+        postData={postToEdit}
+        formId="postAdminForm"
+        allPostTags={allPostTags}
+        allBookTags={allBookTags}
+        allQuoteTags={allQuoteTags}
+        allSeriesNames={allSeriesNames} // PASS THE PROP HERE
+      />
+      <div class="admin-actions">
+        <button type="submit" class="button-primary">
+          {isEditMode ? "Update Post" : "Create Post"}
+        </button>
+      </div>
+    </form>
+    <FeedbackDisplay client:load />
   </div>
-
-  <form id="createPostForm" class="post-form" data-form-type="create">
-    <PostForm
-      client:load
-      formId="createPostForm"
-      allPostTags={allPostTags}
-      allBookTags={allBookTags}
-      allQuoteTags={allQuoteTags}
-    />
-    <button type="submit" id="createPostSubmitButton" class="button-primary"
-      >Save New Post</button
-    >
-  </form>
-
-  <div id="formFeedback" class="form-feedback-container">
-    <p id="feedbackMessage"></p>
-  </div>
-
-  <FeedbackDisplay client:only="react" formId="createPostForm" /> {/* Changed to client:only="react" */}
 </BaseLayout>

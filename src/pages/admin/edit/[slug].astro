@@ -113,6 +113,7 @@ const allQuoteTags = await getUniqueTagNames(
   "bookQuotes",
   (data) => data.quotes?.flatMap((q) => q.tags || []) || []
 );
+const allSeriesNames = await getUniqueSeriesNames();
 
 const pageTitleDisplay = postToEdit?.title || slug || "Post";
 const pageTitle = `Edit: ${pageTitleDisplay} - ${SITE_TITLE}`;
@@ -174,6 +175,7 @@ const pageDescription = `Edit the post: ${pageTitleDisplay}. This page is availa
           allPostTags={allPostTags}
           allBookTags={allBookTags}
           allQuoteTags={allQuoteTags}
+          allSeriesNames={allSeriesNames}
         />
 
         <button type="submit" class="button-primary">
