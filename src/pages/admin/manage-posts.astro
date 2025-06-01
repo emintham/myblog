@@ -3,6 +3,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 import { SITE_TITLE } from "../../siteConfig";
+import "../../styles/admin.css";
 
 if (!import.meta.env.DEV) {
   return new Response(null, { status: 404, statusText: "Not Found" });

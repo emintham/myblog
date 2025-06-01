@@ -223,6 +223,81 @@ body.admin-scope .admin-actions {
   text-align: right;
 }
 
+/* Admin Post List Styles */
+
+body.admin-scope .item-list-container.admin-post-list {
+  list-style-type: none; /* Remove default bullet points */
+  padding-left: 0; /* Remove default ul padding */
+  margin-top: var(--spacing-lg-admin); /* Space above the list */
+}
+
+body.admin-scope .admin-post-list .list-item-entry {
+  display: flex;
+  justify-content: space-between; /* Key for alignment: pushes info left, buttons right */
+  align-items: center; /* Vertically aligns items in the middle */
+  padding: var(--spacing-md-admin) 0; /* Vertical padding for each item */
+  border-bottom: 1px solid var(--color-border-admin-subtle); /* Separator line */
+}
+
+body.admin-scope .admin-post-list .list-item-entry:last-child {
+  border-bottom: none; /* No border for the last item */
+}
+
+body.admin-scope .admin-post-list .list-item-entry .post-info-column {
+  flex-grow: 1; /* Allows this column to take up all available space on the left */
+  margin-right: var(--spacing-md-admin); /* Space between text content and the first button */
+  min-width: 0; /* Important for flex items containing text that might overflow/wrap */
+}
+
+body.admin-scope .admin-post-list .list-item-entry .post-info-column .title-line {
+  margin-bottom: var(--spacing-xs-admin); /* Small space between title and meta details */
+  display: flex; /* Helps align badge and title if badge is tall */
+  align-items: center; /* Vertically align badge and title */
+}
+
+body.admin-scope .admin-post-list .list-item-entry .post-info-column .list-item-name {
+  font-weight: 500; /* Or your preferred weight for post titles in the list */
+  color: var(--color-text-admin-primary); /* Using primary text color */
+  text-decoration: none; /* Removing underline from link */
+}
+
+body.admin-scope .admin-post-list .list-item-entry .post-info-column .list-item-name:hover {
+  color: var(--color-accent-admin); /* Standard link hover */
+  text-decoration: underline; /* Add underline on hover */
+}
+
+body.admin-scope .admin-post-list .list-item-entry .post-info-column .status-draft-badge {
+  background-color: var(--color-warning-admin); /* Using warning color for draft status */
+  color: var(--color-background-admin); /* Text color that contrasts with badge background */
+  padding: calc(var(--spacing-xs-admin) / 2) var(--spacing-xs-admin); /* Small padding */
+  border-radius: var(--border-radius-admin);
+  font-size: 0.75rem; /* Smaller font for the badge */
+  font-weight: 600;
+  margin-right: var(--spacing-sm-admin); /* Space between badge and title */
+  display: inline-block; /* Proper layout behavior */
+  line-height: 1.2; /* Adjust if vertical alignment with title text is off */
+}
+
+/* The .title-with-draft-badge class on the <a> tag might not need specific styles
+   if the badge and title align well due to flex settings on .title-line.
+   If further adjustment is needed for the title when a badge is present, you can use:
+body.admin-scope .admin-post-list .list-item-entry .post-info-column .title-line .title-with-draft-badge {
+
+}
+*/
+
+/* Ensure buttons within the list item do not shrink if space is tight */
+body.admin-scope .admin-post-list .list-item-entry .button-edit,
+body.admin-scope .admin-post-list .list-item-entry .button-delete {
+  flex-shrink: 0;
+}
+
+/* The existing margin between Edit and Delete buttons should still apply correctly:
+body.admin-scope .admin-post-list .list-item-entry .button-edit + .button-delete {
+  margin-left: var(--spacing-sm-admin);
+}
+*/
+
 /* -------------------------------------------------------------------------- */
 
 /* Form Elements (Scoped to Admin)                                            */
@@ -319,24 +394,24 @@ body.admin-scope .form-field .field-error-message {
 
 /* -------------------------------------------------------------------------- */
 body.admin-scope .button-primary {
-  background-color: var(--color-text-admin-primary);
-  color: var(--color-background-admin);
-  border-color: var(--color-text-admin-primary);
+  /* Consistent Sizing with Edit/Delete buttons */
+  padding: var(--spacing-sm-admin) var(--spacing-md-admin); /* e.g., 8px 16px */
+  font-size: 0.875rem;
+
+  /* Transparent by default, using accent color for outline */
+  background-color: transparent;
+  color: var(--color-accent-admin); /* Accent green text */
+  /* .button-base provides 'border: 1px solid transparent;',
+     so we only need to set the border-color. */
+  border-color: var(--color-accent-admin); /* Accent green border */
 }
 
 body.admin-scope .button-primary:hover,
 body.admin-scope .button-primary:focus {
-  background-color: var(--color-focus-admin);
-  border-color: var(--color-focus-admin);
-  color: var(--color-background-admin);
-}
-
-body.admin-scope .button-primary:disabled {
-  background-color: var(--color-border-admin-subtle);
-  border-color: var(--color-border-admin-subtle);
-  color: var(--color-text-admin-secondary);
-  cursor: not-allowed;
-  opacity: 0.7;
+  /* Opaque on hover - fill with accent color */
+  background-color: var(--color-accent-admin); /* Accent green background */
+  color: var(--color-background-admin); /* Light text for contrast */
+  border-color: var(--color-focus-admin); /* Slightly darker accent green border for focus, or use var(--color-accent-admin) */
 }
 
 body.admin-scope .button-edit,
@@ -344,6 +419,8 @@ body.admin-scope .button-add-quote {
   background-color: transparent;
   color: var(--color-accent-admin);
   border-color: var(--color-accent-admin);
+  padding: var(--spacing-sm-admin) var(--spacing-md-admin); /* Matches .button-delete (e.g., 8px 16px) */
+  font-size: 0.875rem; /* Matches .button-delete */
 }
 
 body.admin-scope .button-edit:hover,
