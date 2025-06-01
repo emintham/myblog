@@ -20,7 +20,6 @@ const ContextToggle: React.FC<ContextToggleProps> = ({ adminPathPrefix }) => {
     }
     return DEFAULT_CONTEXT; // Fallback for environments without window
   });
-  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   const applyContextToNavigation = useCallback(
     (context: string) => {
@@ -55,27 +54,18 @@ const ContextToggle: React.FC<ContextToggleProps> = ({ adminPathPrefix }) => {
 
   // Effect for initial setup and context application
   useEffect(() => {
-    // Apply initial context to DOM elements
     applyBodyAttribute(currentContext);
     applyContextToNavigation(currentContext);
-    
-    if (typeof window !== 'undefined') {
-        localStorage.setItem(STORAGE_KEY, currentContext);
-    }
-
-    setIsInitialized(true);
-  }, []); // Runs once on mount with initial currentContext
+  }, [currentContext, applyBodyAttribute, applyContextToNavigation]); // Added currentContext to dependencies
 
   // Effect for handling context changes (from state update or storage event)
   useEffect(() => {
-    if (!isInitialized) return; // Don't run on initial setup before state is fully set
-
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEY, currentContext);
     }
     applyBodyAttribute(currentContext);
     applyContextToNavigation(currentContext);
-  }, [currentContext, isInitialized, applyBodyAttribute, applyContextToNavigation]);
+  }, [currentContext, applyBodyAttribute, applyContextToNavigation]);
 
   // Effect for listening to storage events
   useEffect(() => {
