@@ -21,7 +21,7 @@ export function extractPreviewContent(post: Post): string {
   }
 
   if (post.body) {
-    const firstParagraphMatch = post.body.match(/<p>.*?<\/p>/s);
+    const firstParagraphMatch = post.body.match(/<p(?:\s+[^>]*)?>.*?<\/p>/is);
     if (firstParagraphMatch && firstParagraphMatch[0]) {
       return firstParagraphMatch[0];
     }
