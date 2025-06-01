@@ -146,4 +146,3 @@ export interface RhetoricalPurposesMap {
 
 // Type for the uuid v4 function, if you want to type it explicitly
 export type UuidV4Function = () => string;
-

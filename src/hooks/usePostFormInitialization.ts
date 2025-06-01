@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import type { UseFormReset } from 'react-hook-form';
-import type { PostSourceData, PostFormData, Quote } from '../types/admin';
+import { useEffect } from "react";
+import type { UseFormReset } from "react-hook-form";
+import type { PostSourceData, PostFormData, Quote } from "../types/admin";
 
 // Helper function (can be kept here or moved to a utils file if used elsewhere)
 const formatDateForInput = (date?: string | Date): string => {
@@ -16,9 +16,9 @@ const formatDateForInput = (date?: string | Date): string => {
 const processSourceTags = (tags?: string | string[]): string[] => {
   if (Array.isArray(tags))
     return tags.map((tag) => String(tag).trim()).filter(Boolean);
-  if (typeof tags === 'string')
+  if (typeof tags === "string")
     return tags
-      .split(',')
+      .split(",")
       .map((tag) => tag.trim())
       .filter(Boolean);
   return [];

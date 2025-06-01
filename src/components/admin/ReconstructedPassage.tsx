@@ -1,25 +1,31 @@
 // src/components/admin/ReconstructedPassage.tsx
 // (Adjust path as needed in your Astro project)
-import React from 'react';
-import { RHETORICAL_PURPOSES } from '../constants';
-import type { AnalysisData } from '../../types/admin.d.ts';
+import React from "react";
+import { RHETORICAL_PURPOSES } from "../constants";
+import type { AnalysisData } from "../../types/admin.d.ts";
 
 interface ReconstructedPassageProps {
   analysisData: AnalysisData;
 }
 
-const ReconstructedPassage: React.FC<ReconstructedPassageProps> = ({ analysisData }) => {
+const ReconstructedPassage: React.FC<ReconstructedPassageProps> = ({
+  analysisData,
+}) => {
   return (
     <div id="reconstructed-passage-content" className="passage-content">
       {analysisData.map((paragraph) => {
-        const hasText = paragraph.sentences.some(s => s.text && s.text.trim() !== "");
+        const hasText = paragraph.sentences.some(
+          (s) => s.text && s.text.trim() !== ""
+        );
         if (!hasText) return null;
 
         return (
           <p key={paragraph.id} className="reconstructed-paragraph">
             {paragraph.sentences.map((sentence, index) => {
               if (sentence.text && sentence.text.trim() !== "") {
-                const purpose = RHETORICAL_PURPOSES[sentence.purposeKey] || RHETORICAL_PURPOSES.NONE;
+                const purpose =
+                  RHETORICAL_PURPOSES[sentence.purposeKey] ||
+                  RHETORICAL_PURPOSES.NONE;
                 const isLastTextSentenceInParagraph = !paragraph.sentences
                   .slice(index + 1)
                   .some((s) => s.text && s.text.trim() !== "");
@@ -32,7 +38,7 @@ const ReconstructedPassage: React.FC<ReconstructedPassageProps> = ({ analysisDat
                     >
                       {sentence.text}
                     </span>
-                    {!isLastTextSentenceInParagraph && ' '}
+                    {!isLastTextSentenceInParagraph && " "}
                   </React.Fragment>
                 );
               }
@@ -46,4 +52,3 @@ const ReconstructedPassage: React.FC<ReconstructedPassageProps> = ({ analysisDat
 };
 
 export default ReconstructedPassage;
-

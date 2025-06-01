@@ -18,8 +18,11 @@ interface UsePostSubmissionProps {
 type ActionType = "create" | "update";
 
 // Define an augmented type for the event result
-type PostSuccessEventResult = PostSourceData & { message?: string; path?: string; newSlug?: string };
-
+type PostSuccessEventResult = PostSourceData & {
+  message?: string;
+  path?: string;
+  newSlug?: string;
+};
 
 export function usePostSubmission({
   existingPostData,
@@ -101,11 +104,16 @@ export function usePostSubmission({
             originalSlug: apiResult.newSlug,
             originalFilePath: apiResult.newFilePath,
             originalExtension: apiResult.newExtension,
-            quotesRef: apiResult.quotesRef !== undefined ? apiResult.quotesRef : formData.quotesRef,
+            quotesRef:
+              apiResult.quotesRef !== undefined
+                ? apiResult.quotesRef
+                : formData.quotesRef,
           };
 
-          resetForm(actionType === "create" ? defaultFormValues : finalFormState);
-          
+          resetForm(
+            actionType === "create" ? defaultFormValues : finalFormState
+          );
+
           const eventDataForResult: PostSuccessEventResult = {
             ...finalFormState,
             bookCover: {
@@ -116,7 +124,7 @@ export function usePostSubmission({
             message: apiResult.message,
             path: apiResult.path,
             // Ensure newSlug is also directly available if needed, though originalSlug holds it post-creation/update
-            newSlug: apiResult.newSlug, 
+            newSlug: apiResult.newSlug,
           };
           delete (eventDataForResult as any).bookCoverImageName;
           delete (eventDataForResult as any).bookCoverAlt;

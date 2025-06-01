@@ -1,13 +1,14 @@
-import { useEffect } from 'react';
-import type { UseFormGetValues } from 'react-hook-form';
-import type { PostFormData, Quote } from '../types/admin';
+import { useEffect } from "react";
+import type { UseFormGetValues } from "react-hook-form";
+import type { PostFormData, Quote } from "../types/admin";
 
 interface UseAutoSaveProps {
   isSubmitting: boolean;
   getValues: UseFormGetValues<PostFormData>;
   lastSavedBodyContent: string | undefined;
-  submitFn: (data: PostFormData) // submitFn now expects the complete data object
-    => Promise<void>;
+  submitFn: (
+    data: PostFormData // submitFn now expects the complete data object
+  ) => Promise<void>;
   intervalMs: number;
 }
 
@@ -58,11 +59,5 @@ export function useAutoSave({
         clearInterval(intervalId);
       }
     };
-  }, [
-    isSubmitting,
-    getValues,
-    lastSavedBodyContent,
-    submitFn,
-    intervalMs,
-  ]);
+  }, [isSubmitting, getValues, lastSavedBodyContent, submitFn, intervalMs]);
 }

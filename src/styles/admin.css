@@ -12,7 +12,7 @@ body.admin-scope {
   --color-text-admin-secondary: #8c8c8c; /* Lighter, muted gray */
   --color-accent-admin: #a3b1a1; /* Desaturated, earthy green */
   --color-border-admin-subtle: #ededed; /* Very light gray for subtle lines/borders */
-  --color-admin-fieldset-border: #C8CFC7; /* New unified fieldset border color */
+  --color-admin-fieldset-border: #c8cfc7; /* New unified fieldset border color */
   --color-focus-admin: #93a191; /* Slightly darker accent for focus */
   --color-success-admin: #5a7d5a; /* Muted green for success text/icon */
   --color-error-admin: #b7564f; /* Muted red for error text/icon */
@@ -156,7 +156,9 @@ body.admin-scope legend {
   position: absolute;
   top: calc(-1.5rem * 0.5 * 1); /* Half of its font-size, moving it up */
   left: var(--spacing-md-admin); /* Indent from fieldset edge */
-  background: var(--color-background-admin); /* Match page background to "cut" the border */
+  background: var(
+    --color-background-admin
+  ); /* Match page background to "cut" the border */
   padding: 0 var(--spacing-sm-admin); /* Horizontal padding for the legend text */
   margin: 0; /* Reset existing margins */
 }
@@ -228,14 +230,17 @@ body.admin-scope fieldset {
   /* padding: 0; */ /* Replaced */
   margin: 0 0 var(--spacing-xl-admin) 0;
   border: 1px solid var(--color-admin-fieldset-border); /* Use new unified color */
-  padding: var(--spacing-xl-admin) var(--spacing-lg-admin) var(--spacing-lg-admin); /* Adjusted padding, especially top */
+  padding: var(--spacing-xl-admin) var(--spacing-lg-admin)
+    var(--spacing-lg-admin); /* Adjusted padding, especially top */
   position: relative; /* For legend positioning */
   border-radius: var(--border-radius-admin); /* Added for consistency */
 }
 
 /* Ensure .book-note-fields within admin also uses the unified styles */
 body.admin-scope .post-form .book-note-fields {
-  border-color: var(--color-admin-fieldset-border); /* Use new unified border color */
+  border-color: var(
+    --color-admin-fieldset-border
+  ); /* Use new unified border color */
 }
 
 body.admin-scope .post-form .book-note-fields legend {
@@ -380,7 +385,9 @@ body.admin-scope .inline-quotes-manager .quote-item {
 body.admin-scope .inline-quotes-manager .quote-item:not(:first-child)::before {
   content: "";
   position: absolute;
-  top: calc(var(--spacing-lg-admin) * -0.5); /* Position it in the middle of the margin */
+  top: calc(
+    var(--spacing-lg-admin) * -0.5
+  ); /* Position it in the middle of the margin */
   left: 5%; /* Start after a small gap */
   right: 5%; /* End before a small gap */
   height: 1px;

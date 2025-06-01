@@ -1,11 +1,13 @@
-import { useState, useCallback } from 'react';
-import type { Quote } from '../types/admin';
+import { useState, useCallback } from "react";
+import type { Quote } from "../types/admin";
 
 export interface UseInlineQuotesProps {
   initialQuotes?: Quote[];
 }
 
-export function useInlineQuotes({ initialQuotes = [] }: UseInlineQuotesProps = {}) {
+export function useInlineQuotes({
+  initialQuotes = [],
+}: UseInlineQuotesProps = {}) {
   const [inlineQuotes, setInlineQuotes] = useState<Quote[]>(initialQuotes);
 
   const handleAddQuote = useCallback(() => {

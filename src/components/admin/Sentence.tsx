@@ -1,14 +1,18 @@
 // src/components/admin/Sentence.tsx
 // (Adjust path as needed in your Astro project)
-import React from 'react';
-import { X } from 'lucide-react';
-import { RHETORICAL_PURPOSES } from '../constants';
-import type { SentenceData } from '../../types/admin.d.ts';
+import React from "react";
+import { X } from "lucide-react";
+import { RHETORICAL_PURPOSES } from "../constants";
+import type { SentenceData } from "../../types/admin.d.ts";
 
 interface SentenceProps {
   sentence: SentenceData;
   paragraphId: string;
-  onUpdateSentence: (paragraphId: string, sentenceId: string, updatedSentence: SentenceData) => void;
+  onUpdateSentence: (
+    paragraphId: string,
+    sentenceId: string,
+    updatedSentence: SentenceData
+  ) => void;
   onRemoveSentence: (paragraphId: string, sentenceId: string) => void;
 }
 
@@ -23,7 +27,11 @@ const Sentence: React.FC<SentenceProps> = ({
   };
 
   return (
-    <div className="analysis-form-section" data-sentence-id={sentence.id} data-paragraph-id={paragraphId}>
+    <div
+      className="analysis-form-section"
+      data-sentence-id={sentence.id}
+      data-paragraph-id={paragraphId}
+    >
       <button
         className="remove-section-btn remove-sentence-btn"
         title="Remove this sentence"
@@ -36,7 +44,7 @@ const Sentence: React.FC<SentenceProps> = ({
           id={`sentence-text-${sentence.id}`}
           placeholder="Sentence(s) from passage"
           value={sentence.text}
-          onChange={(e) => handleInputChange('text', e.target.value)}
+          onChange={(e) => handleInputChange("text", e.target.value)}
         />
       </div>
       <div className="form-field">
@@ -44,14 +52,14 @@ const Sentence: React.FC<SentenceProps> = ({
           id={`sentence-summary-${sentence.id}`}
           placeholder="Summary of meaning/idea conveyed"
           value={sentence.summary}
-          onChange={(e) => handleInputChange('summary', e.target.value)}
+          onChange={(e) => handleInputChange("summary", e.target.value)}
         />
       </div>
       <div className="form-field">
         <select
           id={`sentence-purpose-${sentence.id}`}
           value={sentence.purposeKey}
-          onChange={(e) => handleInputChange('purposeKey', e.target.value)}
+          onChange={(e) => handleInputChange("purposeKey", e.target.value)}
         >
           {Object.entries(RHETORICAL_PURPOSES).map(([key, purp]) => (
             <option key={key} value={key} disabled={purp.isPlaceholder}>
@@ -65,7 +73,7 @@ const Sentence: React.FC<SentenceProps> = ({
           id={`sentence-ties-${sentence.id}`}
           placeholder="How it ties to the paragraph as a whole"
           value={sentence.ties}
-          onChange={(e) => handleInputChange('ties', e.target.value)}
+          onChange={(e) => handleInputChange("ties", e.target.value)}
         />
       </div>
     </div>
@@ -73,4 +81,3 @@ const Sentence: React.FC<SentenceProps> = ({
 };
 
 export default Sentence;
-

@@ -1,14 +1,17 @@
 import React from "react";
 import CreatableSelect from "react-select/creatable";
 import type { OnChangeValue } from "react-select";
-import { customReactSelectStyles, type SelectOption } from "./sharedSelectStyles"; // UPDATED import
+import {
+  customReactSelectStyles,
+  type SelectOption,
+} from "./sharedSelectStyles"; // UPDATED import
 
 interface TagsComponentProps {
   id: string;
   label: string;
-  value: string[]; 
-  onChange: (newTags: string[]) => void; 
-  suggestions?: string[]; 
+  value: string[];
+  onChange: (newTags: string[]) => void;
+  suggestions?: string[];
   placeholder?: string;
   onBlur?: () => void;
 }
@@ -16,22 +19,26 @@ interface TagsComponentProps {
 const TagsComponent: React.FC<TagsComponentProps> = ({
   id,
   label,
-  value, 
+  value,
   onChange,
   suggestions = [],
   placeholder,
-  onBlur, 
+  onBlur,
 }) => {
-  const suggestionOptions: readonly SelectOption[] = suggestions.map((s) => ({ // Use SelectOption
+  const suggestionOptions: readonly SelectOption[] = suggestions.map((s) => ({
+    // Use SelectOption
     value: s.toLowerCase(),
     label: s,
   }));
 
-  const currentTagOptions: readonly SelectOption[] = ( // Use SelectOption
-    Array.isArray(value) ? value : []
-  ).map((v) => ({ value: v.toLowerCase(), label: v }));
+  const currentTagOptions: readonly SelectOption[] = // Use SelectOption
+  (Array.isArray(value) ? value : []).map((v) => ({
+    value: v.toLowerCase(),
+    label: v,
+  }));
 
-  const handleChange = (newValue: OnChangeValue<SelectOption, true>) => { // Use SelectOption
+  const handleChange = (newValue: OnChangeValue<SelectOption, true>) => {
+    // Use SelectOption
     const newStringValues = newValue
       ? newValue.map((option) => option.value)
       : [];
@@ -47,7 +54,7 @@ const TagsComponent: React.FC<TagsComponentProps> = ({
       newTagValue,
     ]
       .map((v) => v.toLowerCase().trim())
-      .filter((v, index, self) => self.indexOf(v) === index); 
+      .filter((v, index, self) => self.indexOf(v) === index);
 
     onChange(newStringValues);
   };
@@ -59,15 +66,15 @@ const TagsComponent: React.FC<TagsComponentProps> = ({
       </label>
       <CreatableSelect
         inputId={id}
-        instanceId={id} 
+        instanceId={id}
         isMulti
         options={suggestionOptions}
         value={currentTagOptions}
         onChange={handleChange}
-        onCreateOption={handleCreate} 
+        onCreateOption={handleCreate}
         placeholder={placeholder || "Type or select tags..."}
         styles={customReactSelectStyles} // UPDATED to use imported styles
-        onBlur={onBlur} 
+        onBlur={onBlur}
         formatCreateLabel={(inputValue) => `Create "${inputValue}"`}
       />
     </div>

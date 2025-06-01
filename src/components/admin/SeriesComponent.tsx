@@ -1,7 +1,10 @@
 import React from "react";
 import Select from "react-select";
 import type { OnChangeValue } from "react-select";
-import { customReactSelectStyles, type SelectOption } from "./sharedSelectStyles";
+import {
+  customReactSelectStyles,
+  type SelectOption,
+} from "./sharedSelectStyles";
 
 interface SeriesComponentProps {
   id: string;
@@ -29,7 +32,10 @@ const SeriesComponent: React.FC<SeriesComponentProps> = ({
 
   // Find the SelectOption that matches the current string value
   const currentSeriesOption: SelectOption | null = value
-    ? suggestionOptions.find((option) => option.value === value) || { value, label: value } // Fallback if not in suggestions
+    ? suggestionOptions.find((option) => option.value === value) || {
+        value,
+        label: value,
+      } // Fallback if not in suggestions
     : null;
 
   const handleChange = (newValue: OnChangeValue<SelectOption, false>) => {

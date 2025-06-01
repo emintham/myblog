@@ -10,11 +10,11 @@ import TagsComponent from "./TagsComponent";
 import SeriesComponent from "./SeriesComponent"; // IMPORT SeriesComponent
 
 export interface PostFormProps {
-  postData?: PostSourceData; 
-  formId: string; 
-  allPostTags?: string[]; 
-  allBookTags?: string[]; 
-  allQuoteTags?: string[]; 
+  postData?: PostSourceData;
+  formId: string;
+  allPostTags?: string[];
+  allBookTags?: string[];
+  allQuoteTags?: string[];
   allSeriesNames?: string[]; // ADD allSeriesNames prop
 }
 
@@ -67,8 +67,12 @@ const PostForm: React.FC<PostFormProps> = ({
   });
 
   const bodyContentRef = useRef<HTMLTextAreaElement | null>(null);
-  const [currentPostDetails, setCurrentPostDetails] = useState<PostSourceData | undefined>(postData);
-  const [lastSavedBodyContent, setLastSavedBodyContent] = useState<string | undefined>(undefined);
+  const [currentPostDetails, setCurrentPostDetails] = useState<
+    PostSourceData | undefined
+  >(postData);
+  const [lastSavedBodyContent, setLastSavedBodyContent] = useState<
+    string | undefined
+  >(undefined);
   const [isQuotesRefReadOnly, setIsQuotesRefReadOnly] = useState(false);
 
   const {
@@ -77,7 +81,9 @@ const PostForm: React.FC<PostFormProps> = ({
     handleAddQuote,
     handleRemoveQuote,
     handleUpdateQuoteField,
-  } = useInlineQuotes({ initialQuotes: postData?.inlineQuotes || defaultValues.inlineQuotes });
+  } = useInlineQuotes({
+    initialQuotes: postData?.inlineQuotes || defaultValues.inlineQuotes,
+  });
 
   // Use the form initialization hook
   usePostFormInitialization({
@@ -112,23 +118,37 @@ const PostForm: React.FC<PostFormProps> = ({
   // Effect to update lastSavedBodyContent and currentPostDetails on successful submission
   useEffect(() => {
     const handleSuccessfulUpdate = (event: Event) => {
-      const customEvent = event as CustomEvent<{ result: PostSourceData; actionType: 'create' | 'update' }>;
+      const customEvent = event as CustomEvent<{
+        result: PostSourceData;
+        actionType: "create" | "update";
+      }>;
 
-      if (customEvent.detail.actionType === 'update' || customEvent.detail.actionType === 'create') {
+      if (
+        customEvent.detail.actionType === "update" ||
+        customEvent.detail.actionType === "create"
+      ) {
         const currentBodyContent = getValues("bodyContent");
         setLastSavedBodyContent(currentBodyContent);
 
-        if (customEvent.detail.actionType === 'create' && customEvent.detail.result) {
+        if (
+          customEvent.detail.actionType === "create" &&
+          customEvent.detail.result
+        ) {
           setCurrentPostDetails(customEvent.detail.result);
           if (customEvent.detail.result.inlineQuotes) {
             setInlineQuotes(customEvent.detail.result.inlineQuotes);
           }
-        } else if (customEvent.detail.actionType === 'update' && customEvent.detail.result?.inlineQuotes) {
-            setInlineQuotes(customEvent.detail.result.inlineQuotes);
+        } else if (
+          customEvent.detail.actionType === "update" &&
+          customEvent.detail.result?.inlineQuotes
+        ) {
+          setInlineQuotes(customEvent.detail.result.inlineQuotes);
         }
-        
+
         if (import.meta.env.DEV) {
-          console.log(`[PostForm] Post ${customEvent.detail.actionType}: lastSavedBodyContent updated.`);
+          console.log(
+            `[PostForm] Post ${customEvent.detail.actionType}: lastSavedBodyContent updated.`
+          );
         }
 
         if (bodyContentRef.current) {
@@ -137,15 +157,18 @@ const PostForm: React.FC<PostFormProps> = ({
       }
     };
 
-    window.addEventListener('postFormSuccess', handleSuccessfulUpdate);
+    window.addEventListener("postFormSuccess", handleSuccessfulUpdate);
     return () => {
-      window.removeEventListener('postFormSuccess', handleSuccessfulUpdate);
+      window.removeEventListener("postFormSuccess", handleSuccessfulUpdate);
     };
   }, [getValues, setCurrentPostDetails, setInlineQuotes]);
 
-  const autoSaveSubmitFn = useCallback(async (formDataFromAutoSave: PostFormData) => {
-    await submitPost({ ...formDataFromAutoSave, inlineQuotes });
-  }, [submitPost, inlineQuotes]);
+  const autoSaveSubmitFn = useCallback(
+    async (formDataFromAutoSave: PostFormData) => {
+      await submitPost({ ...formDataFromAutoSave, inlineQuotes });
+    },
+    [submitPost, inlineQuotes]
+  );
 
   useAutoSave({
     isSubmitting: isSubmittingHook,
@@ -175,7 +198,7 @@ const PostForm: React.FC<PostFormProps> = ({
       const formSubmitWrapper = async (event: SubmitEvent) => {
         event.preventDefault();
         handleSubmit(async (data) => {
-          await submitPost({ ...data, inlineQuotes }); 
+          await submitPost({ ...data, inlineQuotes });
         })();
       };
 
@@ -184,9 +207,10 @@ const PostForm: React.FC<PostFormProps> = ({
         parentForm.removeEventListener("submit", formSubmitWrapper);
       };
     }
-  }, [formId, handleSubmit, submitPost, inlineQuotes]); 
+  }, [formId, handleSubmit, submitPost, inlineQuotes]);
 
-  const { ref: bodyContentRHFRef, ...bodyContentRestProps } = register("bodyContent");
+  const { ref: bodyContentRHFRef, ...bodyContentRestProps } =
+    register("bodyContent");
 
   return (
     <>
@@ -242,15 +266,15 @@ const PostForm: React.FC<PostFormProps> = ({
           <Controller
             name="tags"
             control={control}
-            defaultValue={[]} 
+            defaultValue={[]}
             render={({ field }) => (
               <TagsComponent
                 id="tags"
                 label="Tags"
-                value={field.value || []} 
+                value={field.value || []}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
-                suggestions={allPostTags} 
+                suggestions={allPostTags}
                 placeholder="e.g., tech, philosophy, life"
               />
             )}
@@ -333,10 +357,10 @@ const PostForm: React.FC<PostFormProps> = ({
             )}
           </div>
           <InlineQuotesManager
-            quotes={inlineQuotes} 
+            quotes={inlineQuotes}
             onAddQuote={handleAddQuote}
             onRemoveQuote={handleRemoveQuote}
-            onUpdateQuoteField={handleUpdateQuoteField} 
+            onUpdateQuoteField={handleUpdateQuoteField}
             allQuoteTags={allQuoteTags}
           />
         </fieldset>

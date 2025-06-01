@@ -9,7 +9,10 @@ import matter from "gray-matter";
 import yaml from "js-yaml";
 import "../../../styles/admin.css";
 import type { PostSourceData, Quote } from "../../../types/admin";
-import { getUniqueTagNames, getUniqueSeriesNames } from "../../../utils/contentUtils"; // Updated path
+import {
+  getUniqueTagNames,
+  getUniqueSeriesNames,
+} from "../../../utils/contentUtils"; // Updated path
 import FeedbackDisplay from "../../../components/admin/FeedbackDisplay";
 
 if (import.meta.env.PROD) {
@@ -120,11 +123,7 @@ const pageTitle = `Edit: ${pageTitleDisplay} - ${SITE_TITLE}`;
 const pageDescription = `Edit the post: ${pageTitleDisplay}. This page is available in development mode only.`;
 ---
 
-<BaseLayout
-  title={pageTitle}
-  description={pageDescription}
-  isAdminPage={true}
->
+<BaseLayout title={pageTitle} description={pageDescription} isAdminPage={true}>
   <div class="page-detail-header">
     <h1>
       {
@@ -187,7 +186,10 @@ const pageDescription = `Edit the post: ${pageTitleDisplay}. This page is availa
 
   <div id="formFeedback" class="form-feedback-container">
     <p id="feedbackMessage"></p>
-    <a id="viewPostLink" href="#" class="button-edit" style="display:none;">View Post</a>
+    <a id="viewPostLink" href="#" class="button-edit" style="display:none;"
+      >View Post</a
+    >
   </div>
-  <FeedbackDisplay client:only="react" formId="editPostForm" /> {/* Changed to client:only="react" */}
+  <FeedbackDisplay client:only="react" formId="editPostForm" />
+  {/* Changed to client:only="react" */}
 </BaseLayout>

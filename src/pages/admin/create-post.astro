@@ -2,7 +2,10 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PostForm from "../../components/admin/PostForm"; // Removed .tsx extension
 import { SITE_TITLE } from "../../siteConfig";
-import { getUniqueTagNames, getUniqueSeriesNames } from "../../utils/contentUtils"; // Updated path
+import {
+  getUniqueTagNames,
+  getUniqueSeriesNames,
+} from "../../utils/contentUtils"; // Updated path
 import FeedbackDisplay from "../../components/admin/FeedbackDisplay";
 import "../../styles/admin.css"; // Import admin styles
 
@@ -44,7 +47,11 @@ const postToEdit = null; // or the post data you want to edit
         allPostTags={allPostTags}
         allBookTags={allBookTags}
         allQuoteTags={allQuoteTags}
-        allSeriesNames={allSeriesNames} // PASS THE PROP HERE
+        allSeriesNames={allSeriesNames}
+        PASS
+        THE
+        PROP
+        HERE
       />
       <div class="admin-actions">
         <button type="submit" class="button-primary">

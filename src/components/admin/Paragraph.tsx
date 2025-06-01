@@ -1,13 +1,17 @@
 // src/components/admin/Paragraph.tsx
-import React from 'react';
-import Sentence from './Sentence';
-import type { ParagraphData, SentenceData } from '../../types/admin';
-import { PlusCircle } from 'lucide-react';
+import React from "react";
+import Sentence from "./Sentence";
+import type { ParagraphData, SentenceData } from "../../types/admin";
+import { PlusCircle } from "lucide-react";
 
 interface ParagraphProps {
   paragraph: ParagraphData;
   index: number;
-  onUpdateSentence: (paragraphId: string, sentenceId: string, updatedSentence: SentenceData) => void;
+  onUpdateSentence: (
+    paragraphId: string,
+    sentenceId: string,
+    updatedSentence: SentenceData
+  ) => void;
   onRemoveSentence: (paragraphId: string, sentenceId: string) => void;
   onAddSentenceHere: (paragraphId: string) => void;
 }
@@ -37,12 +41,15 @@ const Paragraph: React.FC<ParagraphProps> = ({
           </React.Fragment>
         ))}
         {paragraph.sentences.length === 0 && (
-          <div style={{ padding: '10px', color: '#777', textAlign: 'center' }}>
+          <div style={{ padding: "10px", color: "#777", textAlign: "center" }}>
             This paragraph is empty. Click "Add Sentence" below to begin.
           </div>
         )}
       </div>
-      <div className="add-sentence-to-paragraph-container" style={{ textAlign: 'center', paddingTop: '10px' }}>
+      <div
+        className="add-sentence-to-paragraph-container"
+        style={{ textAlign: "center", paddingTop: "10px" }}
+      >
         <button
           type="button"
           className="control-button control-button-small"

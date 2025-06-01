@@ -17,7 +17,9 @@ export interface TagWithCount {
  */
 export async function getUniqueTagsWithCounts<C extends "blog" | "bookQuotes">(
   collectionName: C,
-  extractTagsFn: (data: CollectionEntry<C>["data"]) => string[] | string | undefined,
+  extractTagsFn: (
+    data: CollectionEntry<C>["data"]
+  ) => string[] | string | undefined,
   filterPredicate?: (entry: CollectionEntry<C>) => boolean
 ): Promise<TagWithCount[]> {
   const allEntries = await getCollection(collectionName, filterPredicate);
@@ -77,7 +79,10 @@ export async function getUniqueTagNames(
   filterPredicate?: (entry: CollectionEntry<any>) => boolean
 ): Promise<string[]> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const allEntries = await getCollection(collectionName as any, filterPredicate as any);
+  const allEntries = await getCollection(
+    collectionName as any,
+    filterPredicate as any
+  );
   const tagSet = new Set<string>();
 
   allEntries.forEach((entry) => {
@@ -96,12 +101,16 @@ export async function getUniqueTagNames(
 export async function getUniqueSeriesNames(): Promise<string[]> {
   const allPosts = await getCollection("blog", ({ data }) => {
     // Include all posts, draft or not, for series suggestions
-    return true; 
+    return true;
   });
   const seriesSet = new Set<string>();
 
   allPosts.forEach((post) => {
-    if (post.data.series && typeof post.data.series === "string" && post.data.series.trim() !== "") {
+    if (
+      post.data.series &&
+      typeof post.data.series === "string" &&
+      post.data.series.trim() !== ""
+    ) {
       seriesSet.add(post.data.series.trim());
     }
   });
