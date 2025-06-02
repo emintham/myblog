@@ -1,9 +1,10 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite'
+import { getViteConfig } from 'astro/config';
 
-export default defineConfig({
+export default getViteConfig({
   test: {
     globals: true,
     environment: 'jsdom'
+    // Vitest configuration options
   },
-})
+});

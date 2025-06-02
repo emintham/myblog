@@ -20,7 +20,7 @@ export interface PostFormProps {
 
 const POST_TYPES = ["standard", "fleeting", "bookNote"];
 const TODAY_ISO = new Date().toISOString().split("T")[0];
-const AUTO_SAVE_INTERVAL_MS = 10000; // For auto-save interval
+const AUTO_SAVE_INTERVAL_MS = 1000 * 60 * 2; // For auto-save interval
 
 const defaultValues: PostFormData = {
   title: "",
