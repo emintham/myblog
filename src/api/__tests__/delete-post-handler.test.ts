@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { POST as deletePostHandler } from './delete-post-handler';
+import { POST as deletePostHandler } from '../../pages/api/delete-post-handler';
 import type { APIContext } from 'astro';
 import fs from 'node:fs/promises'; // Import fs for mocking its methods
 import { getEntryBySlug } from 'astro:content'; // Import for mocking
@@ -40,15 +40,15 @@ const createMockAPIContext = (requestBody: any): Partial<APIContext> => ({
   // For this handler, only request.json() and import.meta.env are critical
   url: new URL("http://localhost/api/delete-post-handler"),
   props: {},
-  slots: {},
+
   cookies: {} as any,
   redirect: vi.fn() as any,
   locals: {},
   site: new URL("http://localhost"),
-  generator: "",
-  preferredLocale: "en",
-  canonicalURL: new URL("http://localhost"),
-  currentLocale: "en",
+
+
+
+
 });
 
 

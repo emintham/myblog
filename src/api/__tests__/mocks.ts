@@ -32,15 +32,18 @@ vi.mock('js-yaml', () => ({
 export const mockGenerateSlug = vi.fn((title: string) =>
   title.toLowerCase().replace(/\s+/g, '-').replace(/[?'"]/g, '') // More generic slugify
 );
-vi.mock('../../utils/slugify', () => ({
+vi.mock('../../../utils/slugify', () => ({
   generateSlug: mockGenerateSlug,
 }));
 
 // Mock adminApiHelpers
 export const mockTransformApiPayloadToFrontmatter = vi.fn(async (payload) => ({ ...payload })); // Simplified, actual was Promise.resolve
-export const mockGeneratePostFileContent = vi.fn((frontmatter, body) => `---\n${JSON.stringify(frontmatter)}\n---\n${body}`);
+export const mockGeneratePostFileContent = vi.fn((frontmatter, body) => `---
+${JSON.stringify(frontmatter)}
+---
+${body}`);
 
-vi.mock('../../utils/adminApiHelpers', () => ({
+vi.mock('../../../utils/adminApiHelpers', () => ({
   transformApiPayloadToFrontmatter: mockTransformApiPayloadToFrontmatter,
   generatePostFileContent: mockGeneratePostFileContent,
 }));
