@@ -1,5 +1,5 @@
-import './__tests__/mocks'; // This executes vi.mock calls
-import { mockFs, mockJsYaml } from './__tests__/mocks';
+import './mocks'; // This executes vi.mock calls
+import { mockFs, mockJsYaml } from './mocks';
 import { vi } from 'vitest';
 import type { Quote } from '../../types/admin';
 
@@ -10,7 +10,7 @@ let IS_PROD_ENV_FOR_HANDLER_TEST = false;
 // We need to get a reference to the original POST before it's replaced by the mock.
 // This is tricky. A common way is to import it as OriginalPOST first.
 // However, dynamic import within vi.mock factory is also an option.
-vi.mock('./create-post-handler', async (importOriginal) => {
+vi.mock('../../pages/api/create-post-handler', async (importOriginal) => {
   const originalModule = await importOriginal(); // Import actual module
   return {
     ...(originalModule as any), // Spread all original exports
@@ -44,7 +44,7 @@ describe('POST /api/create-post-handler', () => {
 
     // Re-import the module here to get the (potentially fresh) mocked version for each test
     // and clear its call history.
-    const importedModule = await import('./create-post-handler');
+    const importedModule = await import('../../pages/api/create-post-handler');
     POST_underTest = importedModule.POST;
     // It's a vi.fn(), so clear its calls.
     if (POST_underTest.mockClear) {
@@ -113,7 +113,7 @@ describe('POST /api/create-post-handler', () => {
   });
 
   test('should create a bookNote post with inline quotes and YAML file successfully (201)', async () => {
-    const inlineQuotes: Quote[] = [{ text: 'Q1', quoteAuthor: 'A1', tags:[], quoteSource:'S1'}];
+    const inlineQuotes: Quote[] = [{ id: 'test-quote-id-1', text: 'Q1', quoteAuthor: 'A1', tags:[], quoteSource:'S1'}];
     const mockRequest = new Request('http://localhost/api/create-post-handler', {
       method: 'POST', body: JSON.stringify({
         title: 'Book Note Test', pubDate: '2024-01-02', postType: 'bookNote',

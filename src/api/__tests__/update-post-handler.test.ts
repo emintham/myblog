@@ -1,13 +1,13 @@
-import './__tests__/mocks'; // This executes vi.mock calls
+import './mocks'; // This executes vi.mock calls
 import {
   mockFs,
   mockJsYaml,
-} from './__tests__/mocks';
+} from './mocks';
 
 // NOTE: The original static import of POST is removed.
 // Tests will use POST_underTest which is dynamically imported in beforeEach.
 // Or, for the production test, it's imported after vi.doMock.
-// import { POST } from './update-post-handler';
+// import { POST } from '../../pages/api/update-post-handler';
 import path from 'node:path';
 import { vi } from 'vitest';
 import type { Quote } from '../../types/admin';
@@ -16,7 +16,7 @@ import type { Quote } from '../../types/admin';
 let IS_PROD_ENV_FOR_UPDATE_HANDLER_TEST = false;
 
 // --- Mock the module being tested ---
-vi.mock('./update-post-handler', async (importOriginal) => {
+vi.mock('../../pages/api/update-post-handler', async (importOriginal) => {
   const originalModule = await importOriginal();
   return {
     ...(originalModule as any),
@@ -48,7 +48,7 @@ describe('POST /api/update-post-handler', () => {
     IS_PROD_ENV_FOR_UPDATE_HANDLER_TEST = false;
     vi.resetAllMocks();
 
-    const importedModule = await import('./update-post-handler');
+    const importedModule = await import('../../pages/api/update-post-handler');
     POST_underTest = importedModule.POST;
     if (POST_underTest.mockClear) {
         POST_underTest.mockClear();
@@ -148,7 +148,7 @@ describe('POST /api/update-post-handler', () => {
     const payload = {
       ...basePayload, title: 'My Book Note', postType: 'bookNote' as 'bookNote',
       quotesRef: 'my-book-note-quotes',
-      inlineQuotes: [{ text: 'Updated quote', quoteAuthor: 'Author', quoteSource: 'Source', tags: [] }] as Quote[],
+      inlineQuotes: [{ id: 'q1', text: 'Updated quote', quoteAuthor: 'Author', quoteSource: 'Source', tags: [] }] as Quote[],
     };
     mockFs.access.mockRejectedValue(new Error('File not found for access check'));
     const mockRequest = new Request('http://localhost', {
