@@ -25,4 +25,4 @@ observations. They reflect the environment and circumstances of my life and the 
 different from my past and I hope you play your cards to the best of your ability.
 There is no need for you to follow my path, or indeed, anyone's else's path but your own.
 
-You are headstrong and independent-- these are qualities I admire in you, even if they frustrate me and your mother at times. Life sometimes has a way to humble us and sand down those rough edges, I hope you find a way to keep your spirit and not let the world beat you down.
+You are headstrong and independent-- qualities I admire in you, even if they frustrate me and your mother at times. Life sometimes has a way to humble us and sand down those rough edges, I hope you find a way to keep your spirit and not let the world beat you down.
