@@ -28,12 +28,16 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const frontmatter = entry.data; // Convenience variable for frontmatter
 
+import Toc from "../../components/blog/Toc.astro";
+
 // Conditionally render content for standard/fleeting posts
 // For book notes, entry.render() is called within BookNoteDetail.astro
 let ContentComponent = null;
+let headings: any[] = [];
 if (frontmatter.postType !== "bookNote") {
-  const { Content } = await entry.render();
-  ContentComponent = Content;
+	const { Content, headings: renderedHeadings } = await entry.render();
+	ContentComponent = Content;
+	headings = renderedHeadings;
 }
 
 // --- Variables for standard post header/footer (series, tags) ---
@@ -107,8 +111,7 @@ const postUrlForComments = new URL(
 
         {ContentComponent && (
           <div class="post-content prose">
-            {" "}
-            {/* Added .prose for potential global content styling */}
+            {headings.length > 0 && <Toc headings={headings} />}
             <ContentComponent />
           </div>
         )}

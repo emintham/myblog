@@ -1,0 +1,109 @@
+---
+// src/components/blog/Toc.astro
+import type { MarkdownHeading } from "astro";
+
+export interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+
+// Filter headings to only include h2 and h3
+const filteredHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+
+// Function to build the nested list
+function buildToc(headings: MarkdownHeading[]) {
+  const toc: any[] = [];
+  const parentHeadings = new Map();
+
+  headings.forEach((h) => {
+    const node = { ...h, children: [] };
+    if (h.depth === 2) {
+      toc.push(node);
+      parentHeadings.set(h.depth, node);
+    } else {
+      const parent = parentHeadings.get(h.depth - 1);
+      if (parent) {
+        parent.children.push(node);
+      }
+    }
+  });
+
+  return toc;
+}
+
+const toc = buildToc(filteredHeadings);
+---
+
+<nav class="toc">
+  <h2 class="toc-title">On this page</h2>
+  <ul class="toc-list">
+    {
+      toc.map((heading) => (
+        <li class="toc-item">
+          <a class="toc-link" href={`#${heading.slug}`}>{heading.text}</a>
+          {heading.children.length > 0 && (
+            <ul class="toc-list-nested">
+              {heading.children.map((child) => (
+                <li class="toc-item">
+                  <a class="toc-link" href={`#${child.slug}`}>{child.text}</a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .toc {
+    margin: 2.5rem 0;
+    padding: 1.5rem;
+    border-top: 1px solid var(--color-border-subtle);
+    border-bottom: 1px solid var(--color-border-subtle);
+    background-color: transparent;
+  }
+
+  .toc-title {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-meta);
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .toc-list,
+  .toc-list-nested {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  .toc-list-nested {
+    padding-left: 1.5rem; /* Indent nested list */
+    margin-top: 0.75rem;
+  }
+
+  .toc-item {
+    padding: 0.25rem 0;
+  }
+
+  .toc-link {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--color-text);
+    text-decoration: none;
+    line-height: 1.5;
+  }
+
+  .toc-link:hover,
+  .toc-link:focus {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+</style>
