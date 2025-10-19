@@ -9,7 +9,7 @@ import cloudflare from "@astrojs/cloudflare";
 // https://astro.build/config
 export default defineConfig({
   site: 'https://emintham.com',
-exclude: ['**/__tests__/**', '**/*.test.ts', '**/*.spec.ts'],
+  exclude: ['**/__tests__/**', '**/*.test.ts', '**/*.spec.ts'],
 
   integrations: [
     sitemap(),

@@ -40,15 +40,10 @@ const createMockAPIContext = (requestBody: any): Partial<APIContext> => ({
   // For this handler, only request.json() and import.meta.env are critical
   url: new URL("http://localhost/api/delete-post-handler"),
   props: {},
-  
   cookies: {} as any,
   redirect: vi.fn() as any,
   locals: {},
   site: new URL("http://localhost"),
-  
-  
-  
-  
 });
 
 
