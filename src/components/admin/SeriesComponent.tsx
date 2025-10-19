@@ -1,5 +1,5 @@
 import React from "react";
-import Select from "react-select";
+import CreatableSelect from "react-select/creatable"; // Use CreatableSelect
 import type { OnChangeValue } from "react-select";
 import {
   customReactSelectStyles,
@@ -9,7 +9,7 @@ import {
 interface SeriesComponentProps {
   id: string;
   label: string;
-  value: string | null | undefined; // Series is a single string or null/undefined
+  value: string | null | undefined;
   onChange: (newSeries: string | null) => void;
   suggestions?: string[];
   placeholder?: string;
@@ -26,20 +26,26 @@ const SeriesComponent: React.FC<SeriesComponentProps> = ({
   onBlur,
 }) => {
   const suggestionOptions: readonly SelectOption[] = suggestions.map((s) => ({
-    value: s, // Keep original casing for series display if desired, or .toLowerCase()
+    value: s,
     label: s,
   }));
 
-  // Find the SelectOption that matches the current string value
   const currentSeriesOption: SelectOption | null = value
     ? suggestionOptions.find((option) => option.value === value) || {
         value,
         label: value,
-      } // Fallback if not in suggestions
+      }
     : null;
 
   const handleChange = (newValue: OnChangeValue<SelectOption, false>) => {
     onChange(newValue ? newValue.value : null);
+  };
+
+  // Handle creation of a new series
+  const handleCreate = (inputValue: string) => {
+    const newSeriesValue = inputValue.trim();
+    if (!newSeriesValue) return;
+    onChange(newSeriesValue);
   };
 
   return (
@@ -47,16 +53,18 @@ const SeriesComponent: React.FC<SeriesComponentProps> = ({
       <label htmlFor={id} className="series-component-label">
         {label}
       </label>
-      <Select
+      <CreatableSelect // Use CreatableSelect component
         inputId={id}
         instanceId={id}
         options={suggestionOptions}
         value={currentSeriesOption}
         onChange={handleChange}
-        placeholder={placeholder || "Select or type a series..."}
+        onCreateOption={handleCreate} // Add onCreateOption handler
+        placeholder={placeholder || "Select or create a series..."}
         styles={customReactSelectStyles}
         onBlur={onBlur}
-        isClearable // Allow clearing the series
+        isClearable
+        formatCreateLabel={(inputValue) => `Create "${inputValue}"`} // Customize create label
       />
     </div>
   );
