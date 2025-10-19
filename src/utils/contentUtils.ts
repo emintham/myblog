@@ -2,6 +2,54 @@
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 
+/**
+ * A generic utility to extract unique values and their counts from a content collection.
+ * @param collectionName The name of the collection (e.g., 'blog', 'bookQuotes').
+ * @param valueAccessor A function that extracts a value or values from an entry's data.
+ *                      It can return a string, an array of strings, or undefined.
+ * @param filterPredicate An optional function to filter entries before processing.
+ * @returns A promise that resolves to a Map where keys are unique normalized values
+ *          and values are their counts.
+ */
+async function getUniqueValuesFromCollection<C extends "blog" | "bookQuotes">(
+  collectionName: C,
+  valueAccessor: (
+    data: CollectionEntry<C>["data"]
+  ) => string[] | string | undefined,
+  filterPredicate?: (entry: CollectionEntry<C>) => boolean
+): Promise<Map<string, number>> {
+  const allEntries = await getCollection(collectionName, filterPredicate);
+  const valueCounts = new Map<string, number>();
+
+  allEntries.forEach((entry) => {
+    const valuesSource = valueAccessor(entry.data);
+    let currentEntryValues: string[] = [];
+
+    if (typeof valuesSource === "string") {
+      currentEntryValues = valuesSource
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean);
+    } else if (Array.isArray(valuesSource)) {
+      currentEntryValues = valuesSource
+        .map((v) => String(v).trim())
+        .filter(Boolean);
+    }
+
+    currentEntryValues.forEach((value) => {
+      const normalizedValue = value.toLowerCase();
+      if (normalizedValue) {
+        valueCounts.set(
+          normalizedValue,
+          (valueCounts.get(normalizedValue) || 0) + 1
+        );
+      }
+    });
+  });
+
+  return valueCounts;
+}
+
 export interface TagWithCount {
   tag: string;
   count: number;
@@ -22,31 +70,11 @@ export async function getUniqueTagsWithCounts<C extends "blog" | "bookQuotes">(
   ) => string[] | string | undefined,
   filterPredicate?: (entry: CollectionEntry<C>) => boolean
 ): Promise<TagWithCount[]> {
-  const allEntries = await getCollection(collectionName, filterPredicate);
-  const tagCounts = new Map<string, number>();
-
-  allEntries.forEach((entry) => {
-    const tagsSource = extractTagsFn(entry.data);
-    let currentEntryTags: string[] = [];
-
-    if (typeof tagsSource === "string") {
-      currentEntryTags = tagsSource
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean);
-    } else if (Array.isArray(tagsSource)) {
-      currentEntryTags = tagsSource
-        .map((t) => String(t).trim())
-        .filter(Boolean);
-    }
-
-    currentEntryTags.forEach((tag) => {
-      const normalizedTag = tag.toLowerCase();
-      if (normalizedTag) {
-        tagCounts.set(normalizedTag, (tagCounts.get(normalizedTag) || 0) + 1);
-      }
-    });
-  });
+  const tagCounts = await getUniqueValuesFromCollection(
+    collectionName,
+    extractTagsFn,
+    filterPredicate
+  );
 
   const sortedTagsWithCounts = Array.from(tagCounts.entries()).map(
     ([tag, count]) => ({ tag, count })
@@ -73,46 +101,26 @@ export async function getUniqueTagsWithCounts<C extends "blog" | "bookQuotes">(
  */
 export async function getUniqueTagNames(
   collectionName: "blog" | "bookQuotes",
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  tagExtractor: (data: any) => string[] | undefined,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  filterPredicate?: (entry: CollectionEntry<any>) => boolean
+  tagExtractor: (
+    data: CollectionEntry<"blog" | "bookQuotes">["data"]
+  ) => string[] | string | undefined,
+  filterPredicate?: (
+    entry: CollectionEntry<"blog" | "bookQuotes">
+  ) => boolean
 ): Promise<string[]> {
-   
-  const allEntries = await getCollection(
-    collectionName as any,
-    filterPredicate as any
+  const tagCounts = await getUniqueValuesFromCollection(
+    collectionName,
+    tagExtractor,
+    filterPredicate
   );
-  const tagSet = new Set<string>();
-
-  allEntries.forEach((entry) => {
-    const tags = tagExtractor(entry.data);
-    if (tags && Array.isArray(tags)) {
-      tags.forEach((tag) => {
-        if (typeof tag === "string" && tag.trim() !== "") {
-          tagSet.add(tag.trim());
-        }
-      });
-    }
-  });
-  return Array.from(tagSet).sort((a, b) => a.localeCompare(b));
+  return Array.from(tagCounts.keys()).sort((a, b) => a.localeCompare(b));
 }
 
 export async function getUniqueSeriesNames(): Promise<string[]> {
-  const allPosts = await getCollection("blog", ({ data }) => {
-    // Include all posts, draft or not, for series suggestions
-    return true;
-  });
-  const seriesSet = new Set<string>();
-
-  allPosts.forEach((post) => {
-    if (
-      post.data.series &&
-      typeof post.data.series === "string" &&
-      post.data.series.trim() !== ""
-    ) {
-      seriesSet.add(post.data.series.trim());
-    }
-  });
-  return Array.from(seriesSet).sort((a, b) => a.localeCompare(b));
+  const seriesCounts = await getUniqueValuesFromCollection(
+    "blog",
+    (data) => data.series,
+    () => true // Include all posts, draft or not
+  );
+  return Array.from(seriesCounts.keys()).sort((a, b) => a.localeCompare(b));
 }
