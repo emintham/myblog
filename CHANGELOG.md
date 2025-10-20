@@ -1,5 +1,9 @@
 # Changelog
 
+## Oct 19, 2025
+
+- Added TOC component.
+
 ## May 16, 2025
 
 - Added support for marking articles as part of a series for better discovery.
