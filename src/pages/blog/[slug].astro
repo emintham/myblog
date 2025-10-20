@@ -11,6 +11,7 @@ import Remark42Comments from "../../components/Remark42Comments.astro";
 
 // Utilities
 import { generateSlug } from "../../utils/slugify.ts"; // Your existing slugify utility
+import Toc from "../../components/blog/Toc.astro";
 
 // Generates static paths for all non-draft blog entries
 export async function getStaticPaths() {
@@ -27,8 +28,6 @@ export async function getStaticPaths() {
 // Get the current post entry from props
 const { entry } = Astro.props;
 const frontmatter = entry.data; // Convenience variable for frontmatter
-
-import Toc from "../../components/blog/Toc.astro";
 
 // Conditionally render content for standard/fleeting posts
 // For book notes, entry.render() is called within BookNoteDetail.astro
