@@ -9,9 +9,11 @@ This file tracks prioritized maintainability improvements for the codebase.
 **Effort:** Low
 
 ### Description
+
 Tests exist but there's no `test` script defined in package.json, making testing less discoverable.
 
 ### Tasks
+
 - [ ] Add `"test": "vitest"` to package.json scripts
 - [ ] Add `"test:ui": "vitest --ui"` for UI mode
 - [ ] Add `"test:run": "vitest run"` for CI mode (single run, no watch)
@@ -26,9 +28,11 @@ Tests exist but there's no `test` script defined in package.json, making testing
 **Effort:** Medium
 
 ### Description
+
 Found `any` types in 14 files, which weakens type safety and hides potential bugs.
 
 ### Priority Files
+
 - `src/hooks/usePostSubmission.ts`
 - `src/components/admin/PostForm.tsx`
 - `src/api/__tests__/mocks.ts`
@@ -45,6 +49,7 @@ Found `any` types in 14 files, which weakens type safety and hides potential bug
 - `src/utils/adminApiHelpers.ts`
 
 ### Tasks
+
 - [ ] Create proper type definitions for API responses
 - [ ] Type form event handlers properly
 - [ ] Type test mocks with accurate interfaces
@@ -60,9 +65,11 @@ Found `any` types in 14 files, which weakens type safety and hides potential bug
 **Effort:** Medium
 
 ### Description
+
 Error handling exists but is inconsistent across API handlers and utilities.
 
 ### Tasks
+
 - [ ] Create `src/utils/apiErrors.ts` with error response helpers
   - `createErrorResponse(message: string, status: number, details?: any)`
   - `createSuccessResponse<T>(data: T, message?: string)`
@@ -76,50 +83,6 @@ Error handling exists but is inconsistent across API handlers and utilities.
 
 ---
 
-## 10. Remove package-lock.json
-
-**Status:** Pending
-**Priority:** Medium
-**Effort:** Low
-
-### Description
-Both `package-lock.json` and `pnpm-lock.yaml` exist, which can cause dependency conflicts.
-
-### Tasks
-- [ ] Delete `package-lock.json` from repository
-- [ ] Add `package-lock.json` to `.gitignore`
-- [ ] Verify pnpm lockfile is up to date: `pnpm install`
-- [ ] Document in README/INSTALL.md that this project uses pnpm only
-
----
-
-## 12. Configure Pre-commit Hooks
-
-**Status:** Pending
-**Priority:** Medium
-**Effort:** Medium
-
-### Description
-No git hooks to prevent bad commits. Pre-commit checks improve code quality.
-
-### Tasks
-- [ ] Install Husky: `pnpm add -D husky`
-- [ ] Install lint-staged: `pnpm add -D lint-staged`
-- [ ] Initialize Husky: `pnpm exec husky init`
-- [ ] Configure `.husky/pre-commit` to run lint-staged
-- [ ] Add lint-staged config to package.json:
-  ```json
-  "lint-staged": {
-    "*.{js,cjs,mjs,ts,tsx,astro}": ["eslint --fix", "prettier --write"],
-    "*.{css,scss}": ["stylelint --fix", "prettier --write"],
-    "*.{md,json,yaml,yml}": ["prettier --write"]
-  }
-  ```
-- [ ] Test pre-commit hook with intentional linting error
-- [ ] Document setup in README/INSTALL.md
-
----
-
 ## 13. Add Error Handling to Image Processing Script
 
 **Status:** Pending
@@ -127,9 +90,11 @@ No git hooks to prevent bad commits. Pre-commit checks improve code quality.
 **Effort:** Low
 
 ### Description
+
 `scripts/process-images.mjs` lacks try-catch blocks and graceful error handling.
 
 ### Tasks
+
 - [ ] Wrap main processing logic in try-catch
 - [ ] Check if `images/originals/` directory exists before processing
 - [ ] Handle corrupted/invalid image files gracefully
@@ -147,11 +112,13 @@ No git hooks to prevent bad commits. Pre-commit checks improve code quality.
 **Effort:** Low
 
 ### Description
+
 Inconsistent error response formats make client-side error handling difficult.
 
 ### Related to Task #7
 
 ### Tasks
+
 - [ ] Ensure all error responses follow format: `{ error: string, details?: any, status?: number }`
 - [ ] All success responses follow format: `{ message: string, data?: any, ...otherFields }`
 - [ ] Update `usePostSubmission.ts` to handle standardized error format
@@ -171,9 +138,11 @@ Inconsistent error response formats make client-side error handling difficult.
 **Effort:** Low
 
 ### Description
+
 Remark42 configuration and other hardcoded values should be centralized and configurable.
 
 ### Tasks
+
 - [ ] Create `.env.example` with all available configuration options
 - [ ] Extract Remark42 configuration from `Remark42Comments.astro`:
   - `REMARK42_HOST`
@@ -197,9 +166,11 @@ Remark42 configuration and other hardcoded values should be centralized and conf
 **Effort:** Medium
 
 ### Description
+
 Currently using manual validation in API handlers. Zod is already a dependency and should be used for runtime validation.
 
 ### Tasks
+
 - [ ] Create `src/schemas/api.ts` with Zod schemas for:
   - `CreatePostPayloadSchema`
   - `UpdatePostPayloadSchema`
@@ -222,9 +193,11 @@ Currently using manual validation in API handlers. Zod is already a dependency a
 **Effort:** Low
 
 ### Description
+
 Image path logic is duplicated across components and utilities.
 
 ### Tasks
+
 - [ ] Create `src/utils/imagePaths.ts` with functions:
   - `getOriginalImagePath(imageName: string): string`
   - `getProcessedImagePath(imageName: string, width: number, format: 'webp' | 'jpg'): string`
@@ -241,13 +214,11 @@ Image path logic is duplicated across components and utilities.
 
 ## Progress Tracking
 
-- **Total Tasks:** 10
-- **Completed:** 0
-- **In Progress:** 0
-- **Pending:** 10
+- **Total Tasks:** 8 (2 completed and removed)
+- **Remaining:** 8
 
 **High Priority:** 1, 2, 7, 14, 16
-**Medium Priority:** 10, 12, 13, 15
+**Medium Priority:** 13, 15
 **Low Priority:** 17
 
 ## Notes
