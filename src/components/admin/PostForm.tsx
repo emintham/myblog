@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useForm, type UseFormReturn, Controller } from "react-hook-form";
-import type { PostSourceData, PostFormData, Quote } from "../../types/admin";
+import type { PostSourceData, PostFormData } from "../../types/admin";
 import { usePostSubmission } from "../../hooks/usePostSubmission";
 import { useInlineQuotes } from "../../hooks/useInlineQuotes";
 import { useAutoSave } from "../../hooks/useAutoSave";
@@ -8,6 +8,7 @@ import { usePostFormInitialization } from "../../hooks/usePostFormInitialization
 import InlineQuotesManager from "./InlineQuotesManager";
 import TagsComponent from "./TagsComponent";
 import SeriesComponent from "./SeriesComponent"; // IMPORT SeriesComponent
+import MarkdownEditor from "./MarkdownEditor";
 
 export interface PostFormProps {
   postData?: PostSourceData;
@@ -68,13 +69,13 @@ const PostForm: React.FC<PostFormProps> = ({
 
   const bodyContentRef = useRef<HTMLTextAreaElement | null>(null);
   const currentPostDetailsRef = useRef<PostSourceData | undefined>(postData);
-  const [currentPostDetails, setCurrentPostDetails] = useState<
-    PostSourceData | undefined
-  >(postData);
+  const [, setCurrentPostDetails] = useState<PostSourceData | undefined>(
+    postData
+  );
   const [lastSavedBodyContent, setLastSavedBodyContent] = useState<
     string | undefined
   >(undefined);
-  const [isQuotesRefReadOnly, setIsQuotesRefReadOnly] = useState(false);
+  const [, setIsQuotesRefReadOnly] = useState(false);
 
   const {
     inlineQuotes,
@@ -221,8 +222,6 @@ const PostForm: React.FC<PostFormProps> = ({
     }
   }, [formId, handleSubmit, submitPost, inlineQuotes]);
 
-  const { ref: bodyContentRHFRef, ...bodyContentRestProps } =
-    register("bodyContent");
 
   return (
     <>
@@ -293,7 +292,7 @@ const PostForm: React.FC<PostFormProps> = ({
           />
           {errors.tags && (
             <span className="field-error-message">
-              {(errors.tags as any).message || "Invalid tags"}
+              {(errors.tags.message as string) || "Invalid tags"}
             </span>
           )}
         </div>
@@ -364,7 +363,7 @@ const PostForm: React.FC<PostFormProps> = ({
             />
             {errors.bookTags && (
               <span className="field-error-message">
-                {(errors.bookTags as any).message || "Invalid book tags"}
+                {(errors.bookTags.message as string) || "Invalid book tags"}
               </span>
             )}
           </div>
@@ -382,12 +381,20 @@ const PostForm: React.FC<PostFormProps> = ({
         <legend>Content</legend>
         <div className="form-field">
           <label htmlFor="bodyContent">Post Body (Markdown)</label>
-          <textarea
-            id="bodyContent"
-            {...register("bodyContent")}
-            rows={15}
-            placeholder="Start writing your Markdown content here..."
-          ></textarea>
+          <Controller
+            name="bodyContent"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <MarkdownEditor
+                value={field.value || ""}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                placeholder="Start writing your Markdown content here..."
+                minHeight="400px"
+              />
+            )}
+          />
         </div>
       </fieldset>
     </>

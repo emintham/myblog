@@ -6,6 +6,7 @@
 - Reduced auto-save interval to 10 seconds.
 - Added toast notifications for save feedback.
 - Added Zod validation schemas for API handlers.
+- Replaced textarea with CodeMirror 6 editor for markdown editing with syntax highlighting and collapsible headings.
 
 ## Oct 19, 2025
 
