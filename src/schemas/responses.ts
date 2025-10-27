@@ -5,8 +5,8 @@ import { z } from "zod";
  * Schema for error responses
  */
 export const ErrorResponseSchema = z.object({
-  error: z.string(),
-  details: z.unknown().optional(),
+  message: z.string(),
+  errorDetail: z.unknown().optional(),
   status: z.number().optional(),
 });
 
@@ -42,14 +42,14 @@ export type DeleteSuccessResponse = z.infer<typeof DeleteSuccessResponseSchema>;
  * Helper function to create standardized error responses
  */
 export function createErrorResponse(
-  error: string,
+  message: string,
   status: number = 400,
-  details?: unknown
+  errorDetail?: unknown
 ): Response {
   const body: ErrorResponse = {
-    error,
+    message,
     status,
-    ...(details && { details }),
+    ...(errorDetail && { errorDetail }),
   };
 
   return new Response(JSON.stringify(body), {
@@ -75,7 +75,7 @@ export function createSuccessResponse<T extends Record<string, unknown>>(
  * Helper function to format Zod validation errors
  */
 export function formatZodError(error: z.ZodError): string {
-  return error.errors
+  return error.issues
     .map((err) => `${err.path.join(".")}: ${err.message}`)
     .join(", ");
 }

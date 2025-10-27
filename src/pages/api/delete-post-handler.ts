@@ -23,11 +23,12 @@ export const POST: APIRoute = async ({ request }) => {
     const validationResult = DeletePostPayloadSchema.safeParse(rawPayload);
 
     if (!validationResult.success) {
-      return createErrorResponse(
-        "Validation failed",
-        400,
-        formatZodError(validationResult.error)
+      // Check if slug is missing specifically
+      const slugError = validationResult.error.issues.find(
+        (err) => err.path[0] === "slug"
       );
+      const message = slugError ? "Missing slug parameter" : "Validation failed";
+      return createErrorResponse(message, 400);
     }
 
     const { slug } = validationResult.data;
