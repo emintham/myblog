@@ -20,7 +20,7 @@ export interface PostFormProps {
 
 const POST_TYPES = ["standard", "fleeting", "bookNote"];
 const TODAY_ISO = new Date().toISOString().split("T")[0];
-const AUTO_SAVE_INTERVAL_MS = 1000 * 60 * 2; // For auto-save interval
+const AUTO_SAVE_INTERVAL_MS = 1000 * 10; // Auto-save every 10 seconds
 
 const defaultValues: PostFormData = {
   title: "",
@@ -67,6 +67,7 @@ const PostForm: React.FC<PostFormProps> = ({
   });
 
   const bodyContentRef = useRef<HTMLTextAreaElement | null>(null);
+  const currentPostDetailsRef = useRef<PostSourceData | undefined>(postData);
   const [currentPostDetails, setCurrentPostDetails] = useState<
     PostSourceData | undefined
   >(postData);
@@ -97,10 +98,11 @@ const PostForm: React.FC<PostFormProps> = ({
 
   useEffect(() => {
     setCurrentPostDetails(postData);
+    currentPostDetailsRef.current = postData;
   }, [postData]);
 
   const { submitPost, isSubmitting: isSubmittingHook } = usePostSubmission({
-    existingPostData: currentPostDetails,
+    existingPostData: currentPostDetailsRef.current,
     resetForm: reset,
     defaultFormValues: defaultValues,
   });
@@ -121,6 +123,7 @@ const PostForm: React.FC<PostFormProps> = ({
       const customEvent = event as CustomEvent<{
         result: PostSourceData;
         actionType: "create" | "update";
+        isAutoSave?: boolean;
       }>;
 
       if (
@@ -130,29 +133,37 @@ const PostForm: React.FC<PostFormProps> = ({
         const currentBodyContent = getValues("bodyContent");
         setLastSavedBodyContent(currentBodyContent);
 
+        // Always update currentPostDetails after create to convert subsequent auto-saves to updates
         if (
           customEvent.detail.actionType === "create" &&
           customEvent.detail.result
         ) {
           setCurrentPostDetails(customEvent.detail.result);
-          if (customEvent.detail.result.inlineQuotes) {
+        }
+
+        // Skip other state updates during auto-save to prevent re-renders
+        if (!customEvent.detail.isAutoSave) {
+          if (
+            customEvent.detail.actionType === "create" &&
+            customEvent.detail.result?.inlineQuotes
+          ) {
+            setInlineQuotes(customEvent.detail.result.inlineQuotes);
+          } else if (
+            customEvent.detail.actionType === "update" &&
+            customEvent.detail.result?.inlineQuotes
+          ) {
             setInlineQuotes(customEvent.detail.result.inlineQuotes);
           }
-        } else if (
-          customEvent.detail.actionType === "update" &&
-          customEvent.detail.result?.inlineQuotes
-        ) {
-          setInlineQuotes(customEvent.detail.result.inlineQuotes);
+
+          if (bodyContentRef.current) {
+            setTimeout(() => bodyContentRef.current?.focus(), 0);
+          }
         }
 
         if (import.meta.env.DEV) {
           console.log(
-            `[PostForm] Post ${customEvent.detail.actionType}: lastSavedBodyContent updated.`
+            `[PostForm] Post ${customEvent.detail.actionType}${customEvent.detail.isAutoSave ? " (auto-save)" : ""}: lastSavedBodyContent updated.`
           );
-        }
-
-        if (bodyContentRef.current) {
-          setTimeout(() => bodyContentRef.current?.focus(), 0);
         }
       }
     };
@@ -165,7 +176,7 @@ const PostForm: React.FC<PostFormProps> = ({
 
   const autoSaveSubmitFn = useCallback(
     async (formDataFromAutoSave: PostFormData) => {
-      await submitPost({ ...formDataFromAutoSave, inlineQuotes });
+      await submitPost({ ...formDataFromAutoSave, inlineQuotes }, true);
     },
     [submitPost, inlineQuotes]
   );
@@ -197,8 +208,9 @@ const PostForm: React.FC<PostFormProps> = ({
     if (parentForm && parentForm instanceof HTMLFormElement) {
       const formSubmitWrapper = async (event: SubmitEvent) => {
         event.preventDefault();
+        event.stopPropagation();
         handleSubmit(async (data) => {
-          await submitPost({ ...data, inlineQuotes });
+          await submitPost({ ...data, inlineQuotes }, false);
         })();
       };
 

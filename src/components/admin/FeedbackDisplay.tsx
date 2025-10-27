@@ -59,12 +59,16 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
   ); // Setters from useState are stable
 
   const handlePostFormSubmitting = useCallback((event: Event) => {
-    const customEvent = event as CustomEvent<{ isSubmitting: boolean }>;
-    const { isSubmitting } = customEvent.detail;
+    const customEvent = event as CustomEvent<{
+      isSubmitting: boolean;
+      isAutoSave?: boolean;
+    }>;
+    const { isSubmitting, isAutoSave } = customEvent.detail;
     const button = submitButtonRef.current;
     const formType = formTypeRef.current;
 
-    if (button) {
+    // Don't update button state during auto-save
+    if (button && !isAutoSave) {
       button.disabled = isSubmitting;
       if (formType === "create") {
         button.textContent = isSubmitting ? "Saving..." : "Save New Post";
@@ -79,17 +83,23 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
       const customEvent = event as CustomEvent<{
         error: any;
         actionType: "create" | "update";
+        isAutoSave?: boolean;
       }>;
-      const { error, actionType } = customEvent.detail;
-      const message = error?.message || "An unknown error occurred.";
-      showFeedback(
-        `Error ${actionType === "create" ? "creating" : "updating"} post: ${message}`,
-        "error"
-      );
+      const { error, actionType, isAutoSave } = customEvent.detail;
+
+      // Skip feedback display during auto-save (but still log to console in dev)
       if (import.meta.env.DEV) {
         console.error(
-          `[FeedbackDisplay] Error during ${actionType} post:`,
+          `[FeedbackDisplay] Error during ${actionType} post${isAutoSave ? " (auto-save)" : ""}:`,
           error
+        );
+      }
+
+      if (!isAutoSave) {
+        const message = error?.message || "An unknown error occurred.";
+        showFeedback(
+          `Error ${actionType === "create" ? "creating" : "updating"} post: ${message}`,
+          "error"
         );
       }
     },
@@ -101,8 +111,15 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
       const customEvent = event as CustomEvent<{
         result: PostSuccessEventResult;
         actionType: "create" | "update";
+        isAutoSave?: boolean;
       }>;
-      const { result, actionType } = customEvent.detail;
+      const { result, actionType, isAutoSave } = customEvent.detail;
+
+      // Skip feedback display during auto-save
+      if (isAutoSave) {
+        return;
+      }
+
       const formElement = formRef.current;
 
       const apiMessage = result?.message;

@@ -32,11 +32,11 @@ export function usePostSubmission({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitPost = useCallback(
-    async (formData: PostFormData) => {
+    async (formData: PostFormData, isAutoSave = false) => {
       setIsSubmitting(true);
       window.dispatchEvent(
         new CustomEvent("postFormSubmitting", {
-          detail: { isSubmitting: true },
+          detail: { isSubmitting: true, isAutoSave },
         })
       );
 
@@ -110,9 +110,12 @@ export function usePostSubmission({
                 : formData.quotesRef,
           };
 
-          resetForm(
-            actionType === "create" ? defaultFormValues : finalFormState
-          );
+          // Skip form reset during auto-save to preserve cursor position
+          if (!isAutoSave) {
+            resetForm(
+              actionType === "create" ? defaultFormValues : finalFormState
+            );
+          }
 
           const eventDataForResult: PostSuccessEventResult = {
             ...finalFormState,
@@ -131,7 +134,7 @@ export function usePostSubmission({
 
           window.dispatchEvent(
             new CustomEvent("postFormSuccess", {
-              detail: { result: eventDataForResult, actionType },
+              detail: { result: eventDataForResult, actionType, isAutoSave },
             })
           );
         } else {
@@ -144,7 +147,7 @@ export function usePostSubmission({
           }
           window.dispatchEvent(
             new CustomEvent("postFormError", {
-              detail: { error: apiResult, actionType },
+              detail: { error: apiResult, actionType, isAutoSave },
             })
           );
         }
@@ -161,13 +164,15 @@ export function usePostSubmission({
           }
         }
         window.dispatchEvent(
-          new CustomEvent("postFormError", { detail: { error, actionType } })
+          new CustomEvent("postFormError", {
+            detail: { error, actionType, isAutoSave },
+          })
         );
       } finally {
         setIsSubmitting(false);
         window.dispatchEvent(
           new CustomEvent("postFormSubmitting", {
-            detail: { isSubmitting: false },
+            detail: { isSubmitting: false, isAutoSave },
           })
         );
       }

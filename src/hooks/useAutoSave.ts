@@ -36,11 +36,6 @@ export function useAutoSave({
         currentTitle &&
         currentTitle.trim() !== ""
       ) {
-        if (import.meta.env.DEV) {
-          console.log(
-            "[useAutoSave] Auto-saving: Detected bodyContent change with title. Attempting save..."
-          );
-        }
         // The `submitFn` (which will be `submitPost` from PostForm)
         // is expected to handle the inclusion of `inlineQuotes` itself
         // if it needs them, typically by being passed `inlineQuotes`

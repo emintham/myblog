@@ -75,11 +75,13 @@ export const CreatePostPayloadSchema = BasePostSchema.merge(
 /**
  * Schema for updating an existing post
  */
-export const UpdatePostPayloadSchema = CreatePostPayloadSchema.extend({
-  originalSlug: z.string().optional(),
-  originalFilePath: z.string().min(1, "Original file path is required"),
-  originalExtension: z.string().optional(),
-});
+export const UpdatePostPayloadSchema = CreatePostPayloadSchema.merge(
+  z.object({
+    originalSlug: z.string().optional(),
+    originalFilePath: z.string().min(1, "Original file path is required"),
+    originalExtension: z.string().optional(),
+  })
+);
 
 /**
  * Schema for deleting a post
