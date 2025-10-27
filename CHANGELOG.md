@@ -1,5 +1,17 @@
 # Changelog
 
+## Oct 26, 2025
+
+- Fixed auto-save page refresh and cursor reset by ignoring content directory from Vite HMR.
+- Reduced auto-save interval to 10 seconds.
+- Added toast notifications for save feedback.
+- Added Zod validation schemas for API handlers.
+- Replaced textarea with CodeMirror 6 editor for markdown editing with syntax highlighting and collapsible headings.
+
+## Oct 19, 2025
+
+- Added TOC component.
+
 ## May 16, 2025
 
 - Added support for marking articles as part of a series for better discovery.

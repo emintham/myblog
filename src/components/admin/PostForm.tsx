@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useForm, type UseFormReturn, Controller } from "react-hook-form";
-import type { PostSourceData, PostFormData, Quote } from "../../types/admin";
+import type { PostSourceData, PostFormData } from "../../types/admin";
 import { usePostSubmission } from "../../hooks/usePostSubmission";
 import { useInlineQuotes } from "../../hooks/useInlineQuotes";
 import { useAutoSave } from "../../hooks/useAutoSave";
@@ -8,6 +8,7 @@ import { usePostFormInitialization } from "../../hooks/usePostFormInitialization
 import InlineQuotesManager from "./InlineQuotesManager";
 import TagsComponent from "./TagsComponent";
 import SeriesComponent from "./SeriesComponent"; // IMPORT SeriesComponent
+import MarkdownEditor from "./MarkdownEditor";
 
 export interface PostFormProps {
   postData?: PostSourceData;
@@ -20,7 +21,7 @@ export interface PostFormProps {
 
 const POST_TYPES = ["standard", "fleeting", "bookNote"];
 const TODAY_ISO = new Date().toISOString().split("T")[0];
-const AUTO_SAVE_INTERVAL_MS = 1000 * 60 * 2; // For auto-save interval
+const AUTO_SAVE_INTERVAL_MS = 1000 * 10; // Auto-save every 10 seconds
 
 const defaultValues: PostFormData = {
   title: "",
@@ -67,13 +68,14 @@ const PostForm: React.FC<PostFormProps> = ({
   });
 
   const bodyContentRef = useRef<HTMLTextAreaElement | null>(null);
-  const [currentPostDetails, setCurrentPostDetails] = useState<
-    PostSourceData | undefined
-  >(postData);
+  const currentPostDetailsRef = useRef<PostSourceData | undefined>(postData);
+  const [, setCurrentPostDetails] = useState<PostSourceData | undefined>(
+    postData
+  );
   const [lastSavedBodyContent, setLastSavedBodyContent] = useState<
     string | undefined
   >(undefined);
-  const [isQuotesRefReadOnly, setIsQuotesRefReadOnly] = useState(false);
+  const [, setIsQuotesRefReadOnly] = useState(false);
 
   const {
     inlineQuotes,
@@ -97,10 +99,11 @@ const PostForm: React.FC<PostFormProps> = ({
 
   useEffect(() => {
     setCurrentPostDetails(postData);
+    currentPostDetailsRef.current = postData;
   }, [postData]);
 
   const { submitPost, isSubmitting: isSubmittingHook } = usePostSubmission({
-    existingPostData: currentPostDetails,
+    existingPostData: currentPostDetailsRef.current,
     resetForm: reset,
     defaultFormValues: defaultValues,
   });
@@ -121,6 +124,7 @@ const PostForm: React.FC<PostFormProps> = ({
       const customEvent = event as CustomEvent<{
         result: PostSourceData;
         actionType: "create" | "update";
+        isAutoSave?: boolean;
       }>;
 
       if (
@@ -130,29 +134,37 @@ const PostForm: React.FC<PostFormProps> = ({
         const currentBodyContent = getValues("bodyContent");
         setLastSavedBodyContent(currentBodyContent);
 
+        // Always update currentPostDetails after create to convert subsequent auto-saves to updates
         if (
           customEvent.detail.actionType === "create" &&
           customEvent.detail.result
         ) {
           setCurrentPostDetails(customEvent.detail.result);
-          if (customEvent.detail.result.inlineQuotes) {
+        }
+
+        // Skip other state updates during auto-save to prevent re-renders
+        if (!customEvent.detail.isAutoSave) {
+          if (
+            customEvent.detail.actionType === "create" &&
+            customEvent.detail.result?.inlineQuotes
+          ) {
+            setInlineQuotes(customEvent.detail.result.inlineQuotes);
+          } else if (
+            customEvent.detail.actionType === "update" &&
+            customEvent.detail.result?.inlineQuotes
+          ) {
             setInlineQuotes(customEvent.detail.result.inlineQuotes);
           }
-        } else if (
-          customEvent.detail.actionType === "update" &&
-          customEvent.detail.result?.inlineQuotes
-        ) {
-          setInlineQuotes(customEvent.detail.result.inlineQuotes);
+
+          if (bodyContentRef.current) {
+            setTimeout(() => bodyContentRef.current?.focus(), 0);
+          }
         }
 
         if (import.meta.env.DEV) {
           console.log(
-            `[PostForm] Post ${customEvent.detail.actionType}: lastSavedBodyContent updated.`
+            `[PostForm] Post ${customEvent.detail.actionType}${customEvent.detail.isAutoSave ? " (auto-save)" : ""}: lastSavedBodyContent updated.`
           );
-        }
-
-        if (bodyContentRef.current) {
-          setTimeout(() => bodyContentRef.current?.focus(), 0);
         }
       }
     };
@@ -165,7 +177,7 @@ const PostForm: React.FC<PostFormProps> = ({
 
   const autoSaveSubmitFn = useCallback(
     async (formDataFromAutoSave: PostFormData) => {
-      await submitPost({ ...formDataFromAutoSave, inlineQuotes });
+      await submitPost({ ...formDataFromAutoSave, inlineQuotes }, true);
     },
     [submitPost, inlineQuotes]
   );
@@ -197,8 +209,9 @@ const PostForm: React.FC<PostFormProps> = ({
     if (parentForm && parentForm instanceof HTMLFormElement) {
       const formSubmitWrapper = async (event: SubmitEvent) => {
         event.preventDefault();
+        event.stopPropagation();
         handleSubmit(async (data) => {
-          await submitPost({ ...data, inlineQuotes });
+          await submitPost({ ...data, inlineQuotes }, false);
         })();
       };
 
@@ -209,8 +222,6 @@ const PostForm: React.FC<PostFormProps> = ({
     }
   }, [formId, handleSubmit, submitPost, inlineQuotes]);
 
-  const { ref: bodyContentRHFRef, ...bodyContentRestProps } =
-    register("bodyContent");
 
   return (
     <>
@@ -281,7 +292,7 @@ const PostForm: React.FC<PostFormProps> = ({
           />
           {errors.tags && (
             <span className="field-error-message">
-              {(errors.tags as any).message || "Invalid tags"}
+              {(errors.tags.message as string) || "Invalid tags"}
             </span>
           )}
         </div>
@@ -352,7 +363,7 @@ const PostForm: React.FC<PostFormProps> = ({
             />
             {errors.bookTags && (
               <span className="field-error-message">
-                {(errors.bookTags as any).message || "Invalid book tags"}
+                {(errors.bookTags.message as string) || "Invalid book tags"}
               </span>
             )}
           </div>
@@ -370,12 +381,20 @@ const PostForm: React.FC<PostFormProps> = ({
         <legend>Content</legend>
         <div className="form-field">
           <label htmlFor="bodyContent">Post Body (Markdown)</label>
-          <textarea
-            id="bodyContent"
-            {...register("bodyContent")}
-            rows={15}
-            placeholder="Start writing your Markdown content here..."
-          ></textarea>
+          <Controller
+            name="bodyContent"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <MarkdownEditor
+                value={field.value || ""}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                placeholder="Start writing your Markdown content here..."
+                minHeight="400px"
+              />
+            )}
+          />
         </div>
       </fieldset>
     </>

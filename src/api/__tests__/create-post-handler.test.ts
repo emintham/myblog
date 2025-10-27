@@ -118,6 +118,7 @@ describe('POST /api/create-post-handler', () => {
       method: 'POST', body: JSON.stringify({
         title: 'Book Note Test', pubDate: '2024-01-02', postType: 'bookNote',
         bodyContent: 'This is a book note.', inlineQuotes: inlineQuotes,
+        bookTitle: 'Test Book', bookAuthor: 'Test Author',
       }),
       headers: { 'Content-Type': 'application/json' },
     });
@@ -179,7 +180,8 @@ describe('POST /api/create-post-handler', () => {
     const mockRequest = new Request('http://localhost/api/create-post-handler', {
       method: 'POST', body: JSON.stringify({
         title: 'Mkdir Fail BookNote', pubDate: '2024-01-04', postType: 'bookNote', bodyContent: 'Content',
-        inlineQuotes: [{ text: 'Q', quoteAuthor: 'A', quoteSource: 'S' }],
+        inlineQuotes: [{ id: 'test-id-1', text: 'Q', quoteAuthor: 'A', quoteSource: 'S' }],
+        bookTitle: 'Test Book', bookAuthor: 'Test Author',
       }),
       headers: { 'Content-Type': 'application/json' },
     });
@@ -196,7 +198,8 @@ describe('POST /api/create-post-handler', () => {
     const mockRequest = new Request('http://localhost/api/create-post-handler', {
       method: 'POST', body: JSON.stringify({
         title: 'YAML Write Fail BookNote', pubDate: '2024-01-05', postType: 'bookNote', bodyContent: 'Content',
-        inlineQuotes: [{ text: 'Q', quoteAuthor: 'A', quoteSource: 'S' }],
+        inlineQuotes: [{ id: 'test-id-2', text: 'Q', quoteAuthor: 'A', quoteSource: 'S' }],
+        bookTitle: 'Test Book', bookAuthor: 'Test Author',
       }),
       headers: { 'Content-Type': 'application/json' },
     });

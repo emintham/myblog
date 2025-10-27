@@ -1,0 +1,219 @@
+/* Markdown Editor - Kinfolk Minimalist Theme */
+
+.markdown-editor {
+  width: 100%;
+  border: 1px solid var(--color-border-admin-subtle, #ededed);
+  border-radius: var(--border-radius-admin, 3px);
+  background-color: var(--color-background-admin, #faf8f5);
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.markdown-editor .cm-editor {
+  height: 100%;
+  background-color: transparent;
+}
+
+.markdown-editor .cm-scroller {
+  overflow: auto;
+}
+
+/* Focused state */
+.markdown-editor .cm-editor.cm-focused {
+  outline: none;
+}
+
+.markdown-editor:focus-within {
+  border-color: var(--color-focus-admin, #93a191);
+  box-shadow: 0 0 0 2px rgba(163, 177, 161, 0.2);
+}
+
+/* Gutters (line numbers, fold indicators) */
+.markdown-editor .cm-gutters {
+  background-color: transparent;
+  border-right: 1px solid var(--color-border-admin-subtle, #ededed);
+  color: var(--color-text-admin-secondary, #8c8c8c);
+  padding-right: 4px;
+}
+
+.markdown-editor .cm-activeLineGutter {
+  background-color: rgba(163, 177, 161, 0.08);
+}
+
+/* Line numbers */
+.markdown-editor .cm-lineNumbers .cm-gutterElement {
+  font-size: 12px;
+  min-width: 30px;
+  text-align: right;
+  padding-right: 8px;
+}
+
+/* Active line highlighting */
+.markdown-editor .cm-activeLine {
+  background-color: rgba(163, 177, 161, 0.05);
+}
+
+/* Cursor */
+.markdown-editor .cm-cursor {
+  border-left-color: var(--color-text-admin-primary, #4a4a4a);
+}
+
+/* Selection */
+.markdown-editor .cm-selectionBackground {
+  background-color: rgba(163, 177, 161, 0.25) !important;
+}
+
+.markdown-editor .cm-focused .cm-selectionBackground {
+  background-color: rgba(163, 177, 161, 0.35) !important;
+}
+
+/* Fold gutter */
+.markdown-editor .cm-foldGutter {
+  width: 20px;
+}
+
+.markdown-editor .cm-foldGutter .cm-gutterElement {
+  text-align: center;
+  cursor: pointer;
+  color: var(--color-text-admin-secondary, #8c8c8c);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.markdown-editor .cm-foldGutter .cm-gutterElement:hover {
+  color: var(--color-accent-admin, #a3b1a1);
+}
+
+/* Markdown syntax highlighting */
+.markdown-editor .cm-content {
+  color: var(--color-text-admin-primary, #4a4a4a);
+  caret-color: var(--color-text-admin-primary, #4a4a4a);
+}
+
+/* Headings */
+.markdown-editor .cm-line .cm-header {
+  font-weight: 600;
+  color: var(--color-text-admin-primary, #4a4a4a);
+}
+
+.markdown-editor .cm-line .cm-header-1 {
+  font-size: 1.5em;
+  color: #3a3a3a;
+}
+
+.markdown-editor .cm-line .cm-header-2 {
+  font-size: 1.3em;
+  color: #3e3e3e;
+}
+
+.markdown-editor .cm-line .cm-header-3 {
+  font-size: 1.15em;
+  color: #424242;
+}
+
+/* Bold and italic */
+.markdown-editor .cm-line .cm-strong {
+  font-weight: 600;
+  color: #3a3a3a;
+}
+
+.markdown-editor .cm-line .cm-em {
+  font-style: italic;
+  color: var(--color-text-admin-primary, #4a4a4a);
+}
+
+/* Links */
+.markdown-editor .cm-line .cm-link {
+  color: var(--color-accent-admin, #a3b1a1);
+  text-decoration: underline;
+}
+
+.markdown-editor .cm-line .cm-url {
+  color: var(--color-text-admin-secondary, #8c8c8c);
+}
+
+/* Code */
+.markdown-editor .cm-line .cm-code,
+.markdown-editor .cm-line .cm-monospace {
+  font-family: var(--font-mono, monospace);
+  background-color: rgba(140, 140, 140, 0.08);
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-size: 0.95em;
+}
+
+/* Lists */
+.markdown-editor .cm-line .cm-list {
+  color: var(--color-accent-admin, #a3b1a1);
+}
+
+/* Quotes */
+.markdown-editor .cm-line .cm-quote {
+  color: var(--color-text-admin-secondary, #8c8c8c);
+  font-style: italic;
+}
+
+/* Horizontal rules */
+.markdown-editor .cm-line .cm-hr {
+  color: var(--color-border-admin-subtle, #ededed);
+}
+
+/* Comments/meta */
+.markdown-editor .cm-line .cm-comment,
+.markdown-editor .cm-line .cm-meta {
+  color: var(--color-text-admin-secondary, #8c8c8c);
+}
+
+/* Search/replace panel */
+.markdown-editor .cm-panel {
+  background-color: var(--color-background-admin, #faf8f5);
+  border: 1px solid var(--color-border-admin-subtle, #ededed);
+}
+
+.markdown-editor .cm-panel input {
+  background-color: white;
+  border: 1px solid var(--color-border-admin-subtle, #ededed);
+  border-radius: var(--border-radius-admin, 3px);
+  padding: 4px 8px;
+  font-family: var(--font-sans, sans-serif);
+  font-size: 14px;
+}
+
+.markdown-editor .cm-panel button {
+  background-color: transparent;
+  border: 1px solid var(--color-accent-admin, #a3b1a1);
+  color: var(--color-accent-admin, #a3b1a1);
+  border-radius: var(--border-radius-admin, 3px);
+  padding: 4px 12px;
+  cursor: pointer;
+  font-family: var(--font-sans, sans-serif);
+  font-size: 14px;
+}
+
+.markdown-editor .cm-panel button:hover {
+  background-color: rgba(163, 177, 161, 0.1);
+}
+
+/* Placeholder */
+.markdown-editor .cm-placeholder {
+  color: var(--color-text-admin-secondary, #8c8c8c);
+  font-style: italic;
+}
+
+/* Scrollbar styling (webkit browsers) */
+.markdown-editor .cm-scroller::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.markdown-editor .cm-scroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.markdown-editor .cm-scroller::-webkit-scrollbar-thumb {
+  background: var(--color-border-admin-subtle, #ededed);
+  border-radius: 5px;
+}
+
+.markdown-editor .cm-scroller::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-admin-secondary, #8c8c8c);
+}

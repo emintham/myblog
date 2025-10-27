@@ -10,12 +10,18 @@ import cloudflare from "@astrojs/cloudflare";
 export default defineConfig({
   site: 'https://emintham.com',
   exclude: ['**/__tests__/**', '**/*.test.ts', '**/*.spec.ts'],
-
   integrations: [
     sitemap(),
     mdx(),
     react()
   ],
-
   adapter: cloudflare(),
+  vite: {
+    server: {
+      watch: {
+        // Ignore content directory to prevent HMR refresh during auto-save
+        ignored: ["**/src/content/**"],
+      },
+    },
+  },
 });

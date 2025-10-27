@@ -5,6 +5,7 @@ dist/
 
 # dependencies
 node_modules/
+package-lock.json
 
 # logs
 npm-debug.log*
@@ -22,5 +23,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Claude Code settings
+.claude/
 
 .exported-content/

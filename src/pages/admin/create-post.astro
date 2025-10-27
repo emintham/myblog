@@ -7,6 +7,7 @@ import {
   getUniqueSeriesNames,
 } from "../../utils/contentUtils"; // Updated path
 import FeedbackDisplay from "../../components/admin/FeedbackDisplay";
+import ToastContainer from "../../components/admin/ToastContainer";
 import "../../styles/admin.css"; // Import admin styles
 
 if (import.meta.env.PROD) {
@@ -60,5 +61,6 @@ const postToEdit = null; // or the post data you want to edit
       </div>
     </form>
     <FeedbackDisplay client:load formId="postAdminForm" />
+    <ToastContainer client:only="react" formId="postAdminForm" />
   </div>
 </BaseLayout>

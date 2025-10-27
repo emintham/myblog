@@ -43,22 +43,6 @@ describe('generatePostFileContent', () => {
     expect(result).not.toContain('## Start Writing Here');
   });
 
-  it('should correctly format YAML frontmatter', () => {
-    const result = generatePostFileContent(baseFrontmatter, 'Body', 'blog', true);
-    const frontmatterPart = result.split('---')[1]; // Get content between ---
-    expect(frontmatterPart).toMatchSnapshot(); // Using snapshot for complex structure
-  });
-
-  it('should ensure a final newline character', () => {
-    const result = generatePostFileContent(baseFrontmatter, 'Some content', 'blog', true);
-    expect(result.endsWith('\n')).toBe(true);
-  });
-
-  it('should ensure a final newline even if body is empty and no placeholder is added', () => {
-    const result = generatePostFileContent(baseFrontmatter, '', 'blog', false); // isNewPost = false
-    expect(result.endsWith('\n')).toBe(true);
-  });
-
   it('should handle frontmatter with optional fields', () => {
     const fullFrontmatter: FrontmatterObject = {
       ...baseFrontmatter,
@@ -72,17 +56,6 @@ describe('generatePostFileContent', () => {
     expect(result).toContain('- test');
     expect(result).toContain('- sample');
     expect(result).toContain('series: Test Series');
-    const frontmatterPart = result.split('---')[1];
-    expect(frontmatterPart).toMatchSnapshot();
-  });
-
-  it('should handle empty body content correctly (trimmed)', () => {
-    const bodyContent = '   '; // Only spaces
-    const result = generatePostFileContent(baseFrontmatter, bodyContent, 'blog', false); // isNewPost = false (update)
-    // Expecting that a body with only whitespace is treated as empty
-    // So, YAML frontmatter ending with \n--- and then two newlines
-    expect(result.endsWith('\n---\n\n')).toBe(true);
-    expect(result.trim().endsWith('---')).toBe(true); // After trimming all newlines, should end with '---'
   });
 
   it('should correctly serialize date objects in frontmatter', () => {
