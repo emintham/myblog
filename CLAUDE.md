@@ -48,6 +48,30 @@ pnpm vitest --ui  # Open Vitest UI
 
 Test files are located in `src/utils/*.test.ts`, `src/components/admin/*.test.tsx`, and `src/api/__tests__/*.test.ts`.
 
+## Development Practices
+
+### Git Commit Messages
+
+**Keep commit messages concise.** Follow this format:
+
+```
+type: brief description (50 chars or less)
+
+- Bullet point 1 (concise)
+- Bullet point 2 (concise)
+- Bullet point 3 (concise)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+**Examples:**
+- Good: "feat: add toast notifications for save feedback"
+- Too verbose: "feat: add toast notifications to provide user feedback when saving posts in the admin interface"
+
+**Changelog entries** should also be concise, following the style of existing entries.
+
 ## Architecture Overview
 
 ### Content Type System
