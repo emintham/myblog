@@ -48,6 +48,23 @@ pnpm vitest --ui  # Open Vitest UI
 
 Test files are located in `src/utils/*.test.ts`, `src/components/admin/*.test.tsx`, and `src/api/__tests__/*.test.ts`.
 
+### Testing Guidelines
+
+**Focus on high-value tests. Avoid:**
+- Testing obvious behavior (e.g., "should handle strings that are already slugs")
+- Duplicate test cases with slight variations
+- Implementation details (e.g., "should ensure a final newline character")
+- Edge cases with no production impact (e.g., "should handle very long strings" when no limit exists)
+- Trivial empty/undefined variations already covered by other tests
+
+**Prioritize:**
+- Core business logic and transformations
+- API handlers and critical paths
+- Edge cases that could cause production bugs
+- Validation and error handling
+
+**Keep tests concise and meaningful.**
+
 ## Development Practices
 
 ### Git Commit Messages
