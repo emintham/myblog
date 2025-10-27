@@ -1,41 +1,42 @@
 import type { APIRoute } from "astro";
 import fs from "node:fs/promises";
 import path from "node:path";
-import yaml from "js-yaml"; // Import js-yaml
+import yaml from "js-yaml";
 import { generateSlug } from "../../utils/slugify";
-import type { PostApiPayload, Quote } from "../../types/admin"; // Import Quote
+import type { PostApiPayload } from "../../types/admin";
 import {
   transformApiPayloadToFrontmatter,
   generatePostFileContent,
 } from "../../utils/adminApiHelpers";
+import { CreatePostPayloadSchema } from "../../schemas/api";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  formatZodError,
+} from "../../schemas/responses";
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
   if (import.meta.env.PROD) {
-    return new Response(
-      JSON.stringify({ message: "Not available in production" }),
-      {
-        status: 403,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return createErrorResponse("Not available in production", 403);
   }
 
   try {
-    const payload: PostApiPayload = await request.json();
+    const rawPayload = await request.json();
 
-    if (!payload.title || !payload.pubDate || !payload.postType) {
-      return new Response(
-        JSON.stringify({
-          message: "Missing required fields (title, pubDate, postType)",
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+    // Validate payload with Zod
+    const validationResult = CreatePostPayloadSchema.safeParse(rawPayload);
+
+    if (!validationResult.success) {
+      return createErrorResponse(
+        "Validation failed",
+        400,
+        formatZodError(validationResult.error)
       );
     }
+
+    const payload: PostApiPayload = validationResult.data;
 
     const slug = generateSlug(payload.title || "untitled");
     const filename = `${slug}.mdx`; // Default to mdx for new posts
@@ -44,16 +45,11 @@ export const POST: APIRoute = async ({ request }) => {
 
     try {
       await fs.access(filePath);
-      return new Response(
-        JSON.stringify({
-          message: `File already exists: ${filename}. Please use a different title.`,
-        }),
-        {
-          status: 409, // Conflict
-          headers: { "Content-Type": "application/json" },
-        }
+      return createErrorResponse(
+        `File already exists: ${filename}. Please use a different title.`,
+        409
       );
-    } catch (error) {
+    } catch {
       // File does not exist, proceed with creation
     }
 
@@ -70,7 +66,7 @@ export const POST: APIRoute = async ({ request }) => {
 
       try {
         await fs.mkdir(quotesDir, { recursive: true });
-      } catch (mkdirError: any) {
+      } catch (mkdirError) {
         console.error(
           `[API Create] Error creating bookQuotes directory ${quotesDir}:`,
           mkdirError
@@ -98,7 +94,7 @@ export const POST: APIRoute = async ({ request }) => {
             `[API Create] Successfully created quotes file: ${quotesFilePath}`
           );
         }
-      } catch (quoteError: any) {
+      } catch (quoteError) {
         console.error(
           `[API Create] Error writing quotes file ${quotesFilePath}:`,
           quoteError
@@ -118,49 +114,32 @@ export const POST: APIRoute = async ({ request }) => {
 
     await fs.writeFile(filePath, fileContent);
 
-    const responsePayload: any = {
+    const responsePayload = {
       message: "Post created successfully!",
       filename: filename,
       path: `/blog/${slug}`,
       newSlug: slug,
-      title: frontmatterObject.title, // Return the processed title
+      title: frontmatterObject.title,
+      ...(generatedQuotesRef && { quotesRef: generatedQuotesRef }),
     };
 
-    if (generatedQuotesRef) {
-      responsePayload.quotesRef = generatedQuotesRef;
-    }
-
-    return new Response(JSON.stringify(responsePayload), {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error: any) {
+    return createSuccessResponse(responsePayload, 201);
+  } catch (error: unknown) {
     if (
       error instanceof SyntaxError &&
       error.message.toLowerCase().includes("json")
     ) {
       console.error("[API Create] Error parsing JSON body:", error);
-      return new Response(
-        JSON.stringify({
-          message: "Invalid JSON data received.",
-          errorDetail: error.message,
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+      return createErrorResponse(
+        "Invalid JSON data received.",
+        400,
+        error.message
       );
     }
+
     console.error("[API Create] Error creating post:", error);
-    return new Response(
-      JSON.stringify({
-        message: "Error creating post.",
-        errorDetail: error.message,
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return createErrorResponse("Error creating post.", 500, errorMessage);
   }
 };

@@ -2,61 +2,61 @@ import type { APIRoute } from "astro";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { getEntryBySlug } from "astro:content";
+import { DeletePostPayloadSchema } from "../../schemas/api";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  formatZodError,
+} from "../../schemas/responses";
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
   if (import.meta.env.PROD) {
-    return new Response(
-      JSON.stringify({ message: "Not available in production" }),
-      {
-        status: 403,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return createErrorResponse("Not available in production", 403);
   }
 
   try {
-    const { slug } = await request.json();
+    const rawPayload = await request.json();
 
-    if (!slug) {
-      return new Response(
-        JSON.stringify({ message: "Missing slug parameter" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+    // Validate payload with Zod
+    const validationResult = DeletePostPayloadSchema.safeParse(rawPayload);
+
+    if (!validationResult.success) {
+      return createErrorResponse(
+        "Validation failed",
+        400,
+        formatZodError(validationResult.error)
       );
     }
+
+    const { slug } = validationResult.data;
 
     const projectRoot = process.cwd();
     const postEntry = await getEntryBySlug("blog", slug);
 
     if (!postEntry) {
-      return new Response(
-        JSON.stringify({ message: `Post with slug '${slug}' not found` }),
-        {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      return createErrorResponse(`Post with slug '${slug}' not found`, 404);
     }
 
     // Astro's `postEntry.id` for markdown/mdx files is the filename (e.g., `my-post.mdx`)
     // For content collections, the `id` is the relative path from `src/content/collectionName/`
-    const filePath = path.join(projectRoot, "src", "content", "blog", postEntry.id);
+    const filePath = path.join(
+      projectRoot,
+      "src",
+      "content",
+      "blog",
+      postEntry.id
+    );
 
     try {
       await fs.access(filePath); // Check if file exists before attempting to delete
-    } catch (e) {
+    } catch {
       // This case should ideally be caught by getEntryBySlug not finding the post,
       // but as a safeguard:
-      return new Response(
-        JSON.stringify({ message: `File not found for slug '${slug}' at path ${filePath}` }),
-        {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        }
+      return createErrorResponse(
+        `File not found for slug '${slug}' at path ${filePath}`,
+        404
       );
     }
 
@@ -77,42 +77,38 @@ export const POST: APIRoute = async ({ request }) => {
         await fs.access(quotesFilePath);
         await fs.unlink(quotesFilePath);
         quotesMessage = ` Also deleted associated quotes file: ${quotesFileName}`;
-      } catch (quoteError: any) {
+      } catch (quoteError) {
         // Log if the quotes file doesn't exist or couldn't be deleted, but don't fail the whole operation
+        const errMessage =
+          quoteError instanceof Error ? quoteError.message : "Unknown error";
         console.warn(
-          `[API Delete] Could not delete quotes file ${quotesFilePath}: ${quoteError.message}`
+          `[API Delete] Could not delete quotes file ${quotesFilePath}: ${errMessage}`
         );
         quotesMessage = ` Could not delete associated quotes file: ${quotesFileName} (may not exist or permissions issue).`;
       }
     }
 
-    return new Response(
-      JSON.stringify({
-        message: `Post '${slug}' deleted successfully.${quotesMessage}`,
-      }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-  } catch (error: any) {
+    return createSuccessResponse({
+      message: `Post '${slug}' deleted successfully.${quotesMessage}`,
+      slug,
+      ...(postEntry.data.quotesRef && { quotesRef: postEntry.data.quotesRef }),
+    });
+  } catch (error: unknown) {
     console.error("[API Delete] Error deleting post:", error);
-    // Check if the error is due to JSON parsing
-     if (error instanceof SyntaxError && error.message.toLowerCase().includes("json")) {
-      return new Response(JSON.stringify({ message: "Invalid JSON data in request body." }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+
+    if (
+      error instanceof SyntaxError &&
+      error.message.toLowerCase().includes("json")
+    ) {
+      return createErrorResponse(
+        "Invalid JSON data in request body.",
+        400,
+        error.message
+      );
     }
-    return new Response(
-      JSON.stringify({
-        message: "Error deleting post.",
-        errorDetail: error.message,
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return createErrorResponse("Error deleting post.", 500, errorMessage);
   }
 };

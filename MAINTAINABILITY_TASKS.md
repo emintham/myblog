@@ -159,33 +159,6 @@ Remark42 configuration and other hardcoded values should be centralized and conf
 
 ---
 
-## 16. Add Validation Schemas for API Payloads
-
-**Status:** Pending
-**Priority:** High
-**Effort:** Medium
-
-### Description
-
-Currently using manual validation in API handlers. Zod is already a dependency and should be used for runtime validation.
-
-### Tasks
-
-- [ ] Create `src/schemas/api.ts` with Zod schemas for:
-  - `CreatePostPayloadSchema`
-  - `UpdatePostPayloadSchema`
-  - `DeletePostPayloadSchema`
-- [ ] Create `src/schemas/responses.ts` for response validation
-- [ ] Update API handlers to validate incoming payloads:
-  ```typescript
-  const validatedPayload = CreatePostPayloadSchema.parse(payload);
-  ```
-- [ ] Return proper validation errors (400 status) with field-level details
-- [ ] Consider sharing schemas between frontend and backend for type inference
-- [ ] Add tests for schema validation (valid and invalid payloads)
-
----
-
 ## 17. Create Utility for Image Path Resolution
 
 **Status:** Pending
@@ -214,10 +187,10 @@ Image path logic is duplicated across components and utilities.
 
 ## Progress Tracking
 
-- **Total Tasks:** 8 (2 completed and removed)
-- **Remaining:** 8
+- **Total Tasks:** 7 (3 completed and removed)
+- **Remaining:** 7
 
-**High Priority:** 1, 2, 7, 14, 16
+**High Priority:** 1, 2, 7, 14
 **Medium Priority:** 13, 15
 **Low Priority:** 17
 
