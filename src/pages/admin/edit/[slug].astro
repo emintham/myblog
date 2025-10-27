@@ -14,6 +14,7 @@ import {
   getUniqueSeriesNames,
 } from "../../../utils/contentUtils"; // Updated path
 import FeedbackDisplay from "../../../components/admin/FeedbackDisplay";
+import ToastContainer from "../../../components/admin/ToastContainer";
 
 if (import.meta.env.PROD) {
   return new Response(null, {
@@ -191,5 +192,6 @@ const pageDescription = `Edit the post: ${pageTitleDisplay}. This page is availa
     >
   </div>
   <FeedbackDisplay client:only="react" formId="editPostForm" />
+  <ToastContainer client:only="react" formId="editPostForm" />
   {/* Changed to client:only="react" */}
 </BaseLayout>
