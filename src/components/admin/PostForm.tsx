@@ -8,7 +8,8 @@ import { usePostFormInitialization } from "../../hooks/usePostFormInitialization
 import InlineQuotesManager from "./InlineQuotesManager";
 import TagsComponent from "./TagsComponent";
 import SeriesComponent from "./SeriesComponent"; // IMPORT SeriesComponent
-import MarkdownEditor from "./MarkdownEditor";
+import MarkdownEditor, { type MarkdownEditorRef } from "./MarkdownEditor";
+import { ImageUploadZone } from "./ImageUploadZone";
 
 export interface PostFormProps {
   postData?: PostSourceData;
@@ -68,6 +69,7 @@ const PostForm: React.FC<PostFormProps> = ({
   });
 
   const bodyContentRef = useRef<HTMLTextAreaElement | null>(null);
+  const markdownEditorRef = useRef<MarkdownEditorRef>(null);
   const currentPostDetailsRef = useRef<PostSourceData | undefined>(postData);
   const [, setCurrentPostDetails] = useState<PostSourceData | undefined>(
     postData
@@ -221,7 +223,6 @@ const PostForm: React.FC<PostFormProps> = ({
       };
     }
   }, [formId, handleSubmit, submitPost, inlineQuotes]);
-
 
   return (
     <>
@@ -379,6 +380,24 @@ const PostForm: React.FC<PostFormProps> = ({
 
       <fieldset>
         <legend>Content</legend>
+
+        <ImageUploadZone
+          onImageUploaded={(componentMarkup) => {
+            const currentContent = getValues("bodyContent") || "";
+            const importStatement =
+              "import ResponsiveImage from '../../components/ResponsiveImage.astro';\n\n";
+
+            // Check if import already exists
+            if (!currentContent.includes("import ResponsiveImage")) {
+              // Prepend import to content if not present
+              setValue("bodyContent", importStatement + currentContent);
+            }
+
+            // Insert component at cursor
+            markdownEditorRef.current?.insertText(componentMarkup);
+          }}
+        />
+
         <div className="form-field">
           <label htmlFor="bodyContent">Post Body (Markdown)</label>
           <Controller
@@ -387,10 +406,10 @@ const PostForm: React.FC<PostFormProps> = ({
             defaultValue=""
             render={({ field }) => (
               <MarkdownEditor
+                ref={markdownEditorRef}
                 value={field.value || ""}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
-                placeholder="Start writing your Markdown content here..."
                 minHeight="400px"
               />
             )}

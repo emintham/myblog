@@ -1,5 +1,9 @@
 # Changelog
 
+## Oct 28, 2025
+
+- Added drag-and-drop image upload with custom filename, automatic processing, and ResponsiveImage component insertion.
+
 ## Oct 26, 2025
 
 - Fixed auto-save page refresh and cursor reset by ignoring content directory from Vite HMR.

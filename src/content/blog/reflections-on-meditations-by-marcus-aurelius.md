@@ -15,7 +15,7 @@ bookTitle: Meditations
 bookAuthor: Marcus Aurelius
 bookCover:
   imageName: meditations
-  alt: ""
+  alt: Cover for Meditations
   originalWidth: 976
 quotesRef: meditations-quotes
 bookTags:
@@ -26,7 +26,18 @@ bookTags:
   - ethics
 ---
 
+import ResponsiveImage from '../../components/ResponsiveImage.astro';
+
 Marcus Aurelius' _Meditations_ offers a profound and surprisingly accessible window into the mind of a Roman emperor grappling with the challenges of leadership, mortality, and the pursuit of a virtuous life. Written as a series of personal notes and reflections, it wasn't intended for publication, which perhaps lends it an even greater sense of authenticity and raw insight.
+
+<ResponsiveImage
+imageName="bar-screen"
+alt="bar screen"
+originalImageWidth={1727}
+widths={[480, 800, 1200]}
+sizesAttr="(max-width: 768px) 100vw, 800px"
+imgClass="content-image"
+/>
 
 ## Core Themes Explored
 
