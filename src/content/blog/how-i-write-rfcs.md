@@ -17,54 +17,22 @@ tags:
 series: Software Engineering
 ---
 
-[Request For Comments](https://en.m.wikipedia.org/wiki/Request_for_Comments) (RFC)
-are a great way to document and discuss ideas in software development [^rfc-sidenote].
-We will not discuss the RFC process itself or the benefits it confers here and
-just assume that you are familiar with it.
+I am sharing my approach to writing RFCs to invite discussion and feedback as I continue refining the method.
 
-I've developed a method for [thinking](/blog/notes-on-writing-to-learn) about
-software designs and writing technical documents with the help of AI assistants
-which I've been refining for a while now [^non-tech-writing]. It works well for me and helps
-me evaluate ideas in a more robust way by challenging my assumptions and
-helping with surfacing issues I missed. I am sharing this approach to invite
-discussion and feedback as I am always looking for ways to improve myself.
-
-## Important Notes Before We Begin
-
-### AI Assistant
-
-When I say "AI assistant" in this post, I am referring in particular
-to thinking models that are similar to or more powerful than [Gemini 2.5 Pro](https://gemini.google.com).
-You may or may not get the same results with a less capable assistant. I have
-not done experiments to see if the AI's achievement in coding benchmarks
-translates to better design thinking. If anyone has done such experiments,
-please let me know in the comments below.
-
-### Overkill
-
-If you are working on a small project or a simple problem, this process may
-be too lengthy and complex. You will probably want to use this only for more
+Note that if you are working on a small project or a simple problem, this process is overkill. Reserve this for
 mission-critical projects or problems that require a more thorough examination.
 
+## Process
 
-## The Process
+### Investigations/Explorations
 
-### Ponder the Problem Independently
-
-Start by reflecting on the problem without any input from AI. Humans are
-~~currently still~~ driving the design and you should not bias your own thinking
-with early input from AI.
-
-### Brainstorming with AI
-
-Only once I have a good understanding of the problem, its context, and have come up
-with one or more candidate designs/solutions, will I start bouncing ideas with AI.
-I work with a prompt that looks roughly like the following:
+Start by writing down the available context, the surrounding systems, assumptions, and business requirements of the problem. Consider the problem independently until you've come up with some candidate solutions. At this point, you can loop in an AI to help. I work with a prompt that looks roughly like the following:
 
 ```
-Let's brainstorm some ideas for a [problem].
+Let's brainstorm some ideas for [problem].
 
-The context for this is:
+# Context
+
 - context about your problem, what you're trying to solve, etc.
 - context about your organization, what metrics you care about, any special considerations.
 
@@ -92,7 +60,7 @@ the above services.
 My rough idea is as follows:
 [describe your idea in detail, including the API, the data model, etc.]
 
-I have also considered the following alternative
+I have also considered the following alternatives
 [document an alternative with similar details]
 
 I have chosen not to pursue the alternative because [some reason].
@@ -100,52 +68,26 @@ I have chosen not to pursue the alternative because [some reason].
 Please come up with potential issues for my design considering the given context.
 Consider the potential failure modes and how it affects the design.
 
-Please also suggest improvements on the the design and come up with your own
-ideas for alternative designs.
+Please also suggest improvements on the the design and come up with your own ideas for alternative designs.
 ```
 
+### Iteration
 
-As you can probably tell, there is _a lot_ of work required to fill in all these.
-In particular, the context about the problem, the goals, the non-goals, and the
-constraints will force you to examine your problem deeply and explain your company's
-overall software architecture (in particular the ones that are close to your
-project) in a first principles fashion [^prj-ctx]. Furthermore, this explanation is also
-available during your actual RFC drafting process and can be valuable by itself
-as documentation.
-
-The more comprehensively you describe the existing services and their characteristics,
-the richer the information your AI partner will have to work with. Bear in mind
-that you can reuse this context document across different prompts and share it
-amongst your team so while it could be a lot of work to write initially, it
-can yield compounding benefits [^maintain]. While I have not
-tried generating this context with AI, it could be an interesting avenue to
-explore. Though, I suspect it may over-specify the context with too much detail [^long-ctx] [^rag].
-
-### Iterate on the Design(s)
-
-At this point, the assistant will likely begin offering potential issues
+The assistant will likely begin offering potential issues
 as well as suggestions for improvements. Consider these critically and when
 there are non-viable suggestions, push back, providing the missing
 context on why that may not be a good idea. A useful tip here is to ask the
-AI to consider a narrower or more general problem [^shannon-creative].
+AI to consider either a narrower or more general problem [^shannon-creative].
 Other meta-cognitive strategies, such as Munger's [inversion technique](https://fs.blog/inversion/)
 for problem solving will likely work well here as well [^cfa] depending on the
 actual problem you are solving. Throughout this process, your aim is to clarify enough of the
-surrounding context and refine the design(s) proposed. Discuss and debate as
-you would a colleague.
+surrounding context and refine the design(s) proposed.
 
-Eventually, you will have one or more viable designs that you believe are good
-solutions to your problem. You could ask the assistant to summarize the
-context and designs at this point as material for writing your RFC but the
-context should be fairly well defined and clear at this point that it may be
-unnecessary.
+### First Draft
 
-### Writing a First Draft
-
-Start writing a draft without the assistant. It helps you think through the
-entire problem and solution from start to finish. Sometimes, you may uncover
-gaps in your understanding or flaws with your design that require you to go back
-to the previous step.
+Once you have decided on an approach, write a draft without the assistant. Restarting fresh from scratch helps you think through the
+entire problem from start to finish. Sometimes, you may uncover
+gaps in your understanding or flaws with your design that require you to go back to the previous step.
 
 Everyone has a different [process](/blog/notes-on-writing-to-learn) of writing
 but there are a few tips I can share.
@@ -162,15 +104,15 @@ to their design documents/RFCs for the uninitiated. Be empathetic to your reader
 certain design patterns or technologies, common knowledge to you, may be
 new to others. Not everyone has the same background and
 a quick link to external resources so that they can find out more will go
-a long way to making your RFC easier for them to understand and comment on. Finally,
+a long way to making your RFC easier for them to understand and comment on as well as help upskill other engineers. Finally,
 don't use acronyms without defining them. Nothing is more frustrating than
 joining a company and trying to gather context on a project only to find that
 all the documents are littered with inscrutable acronyms without a glossary.
 
-#### Detail Alternatives
+#### Alternatives
 
 This is where all your discussions with your assistant will prove valuable. You
-should document the *key* alternatives you considered and why you chose not to
+should document the _key_ alternatives you considered and why you chose not to
 pursue them. This is especially important if there are certain established
 options (either in your company or in the industry) that you are not pursuing.
 This is also important if you're applying for a patent or government grants--
@@ -182,12 +124,12 @@ one in a section with their own sub-sections containing the variations. This
 aids in understanding and provides handy references (e.g. Option A.1, A.2, B.1, etc.)
 throughout the RFC. If it helps, summarize the options in a table with the pros and cons of each.
 
-#### Use Visuals
+#### Visuals
 
 Visuals are a great way to communicate ideas. Use architecture diagrams, flowcharts, sequence
 diagrams, API mockups, UI mockups, etc. to help the reader understand your ideas.
 
-#### Strategic Simplification
+#### Simplification
 
 If the solution/algorithm is complex with many edge cases, it may sometimes
 be beneficial to simplify it, eliding some of the nuances, and only present a core
@@ -196,86 +138,41 @@ that you have glossed over in a section below. By doing so, you build the comple
 from the simple and show how each piece of complexity is justified. Sometimes,
 it requires breaking the solution into multiple pieces and presenting them
 separately the same way you would modularize your code. Take note, however, of
-*over-simplification*, you want to skip nit picky details but not crucial details
+_over-simplification_, you want to skip nit picky details but not crucial details
 that masks fundamental flaws.
 
 ### Polishing
 
-After I am done with a draft, I will usually just put it aside for some time
-and take a walk to clear my head. I will then come back to it and read it from
-start to end a couple times, making sure it flows well and is easy to read.
+After I am done with a draft, I will usually just put it aside for some time and come back to it fresh, looking for any errors and omissions I may have made as well as making sure it flows well. It would also be a good idea at this time to start cutting sentences/ideas, delegating less important information to the appendix to focus the narrative.
 
 Once I am reasonably happy with the draft, I will export it as markdown and pass
-it to an assistant again for more polishing. It is key that you start a new
+it to an assistant again for more polishing. Start a new
 conversation so that the assistant is not tainted by the previous context--
 some assistants have a tendency to become fixated and double down on their
-opinions. I will use something akin to the following:
+opinions. An example prompt:
 
 ```
 Please review this RFC and provide feedback on clarity and flow. Identify logical
 gaps, alternative designs, and any potential simplifications to the design.
-Please also note down any unmentioned risks and failure modes not considered
-in the document as well as mitigation strategies. Finally, please provide
-a list of assumptions, both explicit and implicit within the RFC and assess
+Please identify any unmentioned risks and failure modes not considered
+in the document and suggest mitigation strategies. Finally, please highlight the assumptions, both explicit and implicit, within the RFC and assess
 their validity. Identify key assumptions that will make or break the
 proposed design or the project as a whole.
 ```
 
-Not all the output at this stage is valid. The assistant will sometimes
-make invalid assumptions about the context you are working under or simply
-hallucinate certain situations that are improbable. Use your best judgement.
-If everything goes well, this will not identify any major issues and will
-help you figure out if there are key risks that you have not considered or
-crucial assumptions that your project rests upon. This is especially important
-for the ongoing health of the project-- if key assumptions are violated during
-the implementation, it may lead to a design that does not meet its stated goals.
-
-If you have not yet done so, write down the list of assumptions and risks into
-your document and how you plan to monitor or mitigate their risks. This should
-be an ongoing process and the team should reconvene to discuss whether the
-design still makes sense if the assumptions are violated. Minor divergences
-and "patches" to the design as assumptions keep changing can lead to catastrophic
+Take note of the assumptions and risks and write it down somewhere,
+I have found out the hard way that even minor divergences
+and "patches" to the design as assumptions change can lead to catastrophic
 failure modes or unmaintainable designs if the team is not careful.
 
-### Final Review
+### Retrospective
 
-Sleep on the document for a few days, give it a final read and then start
-circulating it for review. Start small with a few colleagues who understand
-the problem well and slowly expand the audience to include more people.
+In parallel with the RFC being reviewed, I will also record the blind spots or issues that I missed during the entire process to improve myself and the process.
 
-#### Retrospective
+[^shannon-creative]:
+    This is a great way in general to solve problems and I
+    learnt it from Claude Shannon's speech on [Creative Thinking](https://jamesclear.com/great-speeches/creative-thinking-by-claude-shannon).
+    I highly recommend reading it if you are interested in the topic and additionally
+    also recommend this [biography](https://www.goodreads.com/book/show/32919530-a-mind-at-play) of Shannon.
 
-In parallel with the RFC being reviewed, I will also take note and try to
-internalize the blind spots or issues that I missed during the entire process.
-I am seeking to
-
-1. Improve myself technically and round out any technical gaps I have that the
-    assistant was able to identify.
-2. Improve the writing process and how I use the assistant to help me.
-
-The assistant should be a tool to propel you forward and improve yourself, not
-a crutch to lean on forever. It has the context and knowledge of the world
-but is not creative enough to come up with completely novel ideas *yet*.
-
-[^rfc-sidenote]: If your company does not yet have such a document or process,
- consider introducing it. It can be a great way to get feedback on ideas
- and surface potential problems before someone comes out from their coding
- cave with an unmaintainable PR that no one can understand.
-[^non-tech-writing]: I have a slightly modified process for other non-technical
- writing that I will cover in a future post.
-[^rag]: Another avenue for experimentation would be to dump all these context
- into a vector database and use RAG on it. Perhaps someone can experiment and
- let me know how it goes.
-[^shannon-creative]: This is a great way in general to solve problems and I
- learnt it from Claude Shannon's speech on [Creative Thinking](https://jamesclear.com/great-speeches/creative-thinking-by-claude-shannon).
- I highly recommend reading it if you are interested in the topic and additionally
- also recommend this [biography](https://www.goodreads.com/book/show/32919530-a-mind-at-play) of Shannon.
 [^cfa]: Let me know in the comments below if you have suggestions for these!
-[^maintain]: So long as you take care to update it as things change.
-[^long-ctx]: If your assistant works with long contexts, this may not be that
-  much of a problem.
-[^prj-ctx]: In particular, if your company has a habit of over-engineering
-  or creating in-house versions of software, explaining the context and problems
-  that those solutions were trying to address in the first place can be a useful
-  exercise in reflecting on whether those assumptions are still valid and should
-  be revisited.
