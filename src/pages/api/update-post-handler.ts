@@ -15,7 +15,6 @@ import {
   formatZodError,
 } from "../../schemas/responses";
 
-export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
   if (import.meta.env.PROD) {

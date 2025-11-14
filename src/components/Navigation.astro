@@ -1,6 +1,7 @@
 ---
 // src/components/Navigation.astro
 import { SITE_TITLE, ADMIN_PATH_PREFIX } from "../siteConfig.ts";
+import SearchButton from "./SearchButton.tsx";
 
 const baseNavLinks = [
   { href: "/", label: "Home" },
@@ -33,28 +34,33 @@ const initialContext = isAdminPage ? "author" : "reader";
     <div class="blog-title">
       <a href="/">{SITE_TITLE}</a>
     </div>
-    <ul class="nav-links">
-      {
-        navLinks.map((link) => {
-          const isAdminLink = link.href.startsWith(ADMIN_PATH_PREFIX);
-          const shouldHide =
-            initialContext === "author" ? !isAdminLink : isAdminLink;
+    <div class="nav-actions">
+      <ul class="nav-links">
+        {
+          navLinks.map((link) => {
+            const isAdminLink = link.href.startsWith(ADMIN_PATH_PREFIX);
+            const shouldHide =
+              initialContext === "author" ? !isAdminLink : isAdminLink;
 
-          return (
-            <li style={shouldHide ? "display: none;" : ""}>
-              <a
-                href={link.href}
-                class:list={{
-                  "is-active": isActiveLink(link.href, Astro.url.pathname),
-                }}
-              >
-                {link.label}
-              </a>
-            </li>
-          );
-        })
-      }
-    </ul>
+            return (
+              <li style={shouldHide ? "display: none;" : ""}>
+                <a
+                  href={link.href}
+                  class:list={{
+                    "is-active": isActiveLink(link.href, Astro.url.pathname),
+                  }}
+                >
+                  {link.label}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+      <div class="search-container">
+        <SearchButton client:load />
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -93,6 +99,14 @@ const initialContext = isAdminPage ? "author" : "reader";
     color: var(--color-accent);
   }
 
+  .nav-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 1rem;
+  }
+
   .nav-links {
     list-style: none;
     padding: 0;
@@ -101,6 +115,11 @@ const initialContext = isAdminPage ? "author" : "reader";
     justify-content: space-between;
     width: 100%;
     flex-wrap: wrap;
+  }
+
+  .search-container {
+    display: flex;
+    justify-content: center;
   }
 
   .nav-links li {

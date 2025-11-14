@@ -1,0 +1,49 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PostPreview from "../components/PostPreview.astro";
+import Pagination from "../components/Pagination.astro";
+import { getCollection } from "astro:content";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../siteConfig.ts";
+
+export async function getStaticPaths() {
+  const POSTS_PER_PAGE = 10;
+
+  const allPosts = await getCollection("blog", ({ data }) => {
+    return import.meta.env.PROD ? data.draft !== true : true;
+  });
+
+  // Sort posts by date, newest first
+  const sortedPosts = allPosts.sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  );
+
+  const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE);
+
+  // Generate paths for pages 2 and onwards (page 1 is at /)
+  return Array.from({ length: totalPages - 1 }, (_, i) => {
+    const pageNum = i + 2;
+    const start = (pageNum - 1) * POSTS_PER_PAGE;
+    const end = start + POSTS_PER_PAGE;
+
+    return {
+      params: { page: String(pageNum) },
+      props: {
+        posts: sortedPosts.slice(start, end),
+        currentPage: pageNum,
+        totalPages,
+      },
+    };
+  });
+}
+
+const { posts, currentPage, totalPages } = Astro.props;
+const pageTitle = `${SITE_TITLE} - Page ${currentPage}`;
+---
+
+<BaseLayout title={pageTitle} description={SITE_DESCRIPTION}>
+  <section class="post-list">
+    <h1 class="section-title">Latest Writings</h1>
+    {posts.map((post) => <PostPreview post={post} />)}
+    <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl="/" />
+  </section>
+</BaseLayout>

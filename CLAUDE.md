@@ -231,6 +231,91 @@ Type definitions in `src/types/admin.d.ts` document each transformation step.
 - Provides WebP with JPG fallback
 - Uses `originalWidth` to optimize srcset generation
 
+### Full-Text Search
+
+**Implementation:** Client-side search using Fuse.js
+
+**Components:**
+- `SearchButton.tsx` - Search trigger button with keyboard shortcut indicator
+- `SearchModal.tsx` - Modal interface with keyboard navigation
+- `searchUtils.ts` - Utility to prepare posts for search indexing
+- `/search-data.json` - Pre-generated search index (static file)
+
+**Features:**
+- Keyboard shortcut: `⌘K` (Mac) or `Ctrl+K` (Windows/Linux)
+- Fuzzy search across titles, descriptions, tags, and content
+- Keyboard navigation: `↑↓` to navigate, `Enter` to select, `Esc` to close
+- Results show post type, description, and tags
+- Weighted search: title (2x), description (1.5x), tags (1.2x), content (0.8x)
+
+**Search Index:**
+- Generated at build time via `/search-data.json.ts`
+- Includes all non-draft posts in production
+- Loaded on-demand when user opens search modal
+
+**Usage:**
+- Click search button in navigation or press `⌘K`/`Ctrl+K`
+- Type to search, use arrow keys to navigate results
+- Click or press Enter to navigate to post
+
+### Pagination
+
+**Implementation:** Static pagination using Astro's dynamic routing
+
+**Pages:**
+- `/` - Homepage (page 1, displays first 10 posts)
+- `/[page].astro` - Paginated pages (e.g., `/2/`, `/3/`)
+
+**Configuration:**
+- `POSTS_PER_PAGE = 10` - Default posts per page
+- Set in both `index.astro` and `[page].astro`
+
+**Components:**
+- `Pagination.astro` - Reusable pagination component with smart page number generation
+
+**Features:**
+- Smart ellipsis: Shows `1 ... 4 5 6 ... 10` for large page counts
+- Previous/Next navigation links
+- Current page indicator (highlighted)
+- Responsive design (stacks on mobile)
+- SEO-friendly URLs (`/`, `/2/`, `/3/`)
+
+**Usage:**
+- Automatically displays on home page when >10 posts exist
+- Can be added to any listing page with `<Pagination currentPage={1} totalPages={5} baseUrl="/" />`
+
+### Series Navigation & Progress
+
+**Implementation:** Contextual navigation for multi-part series
+
+**Components:**
+- `SeriesNavigation.astro` - Previous/next navigation with progress indicator
+- `seriesUtils.ts` - Utility functions to calculate series position
+
+**Features:**
+- Previous/next post links within a series
+- Progress indicator: "Part 3 of 7"
+- Series title display
+- Post title previews (truncated to 2 lines)
+- Responsive design (stacks on mobile)
+- Only shows for posts in a series (not fleeting thoughts)
+
+**Series Detail Page Enhancements:**
+- Post count: "5 posts in this series"
+- Part numbers: "Part 1", "Part 2", etc. on each preview
+- Chronological ordering (oldest first)
+
+**Data Flow:**
+1. `getSeriesNavigation()` finds all posts in same series
+2. Sorts chronologically by `pubDate`
+3. Determines current post position
+4. Returns previous/next posts + metadata
+
+**Usage:**
+- Automatically appears on post detail pages for posts with `series` field
+- Positioned after content, before tags/comments
+- Also visible on series detail pages (`/series/[seriesSlug]`)
+
 ## Development Patterns
 
 ### Adding a New Post Type
@@ -331,10 +416,15 @@ exclude: ["**/__tests__/**", "**/*.test.ts", "**/*.spec.ts"]
 | Type definitions | `src/types/admin.d.ts` |
 | Slug generation | `src/utils/slugify.ts` |
 | Tag utilities | `src/utils/contentUtils.ts` |
+| Series utilities | `src/utils/seriesUtils.ts` |
+| Search utilities | `src/utils/searchUtils.ts` |
 | Content preview extraction | `src/utils/content.ts` |
 | API transformation logic | `src/utils/adminApiHelpers.ts` |
 | Form state management | `src/components/admin/PostForm.tsx`, `src/hooks/*.ts` |
 | Post routing | `src/components/PostPreview.astro` |
+| Pagination | `src/components/Pagination.astro`, `src/pages/[page].astro` |
+| Search | `src/components/SearchButton.tsx`, `src/components/SearchModal.tsx`, `src/pages/search-data.json.ts` |
+| Series navigation | `src/components/SeriesNavigation.astro` |
 | Image processing | `scripts/process-images.mjs`, `src/components/ResponsiveImage.astro` |
 | API handlers | `src/pages/api/*-handler.ts` |
 

@@ -8,9 +8,11 @@ import { getCollection } from "astro:content";
 // Component imports
 import BookNoteDetail from "../../components/BookNoteDetail.astro";
 import Remark42Comments from "../../components/Remark42Comments.astro";
+import SeriesNavigation from "../../components/SeriesNavigation.astro";
 
 // Utilities
 import { generateSlug } from "../../utils/slugify.ts"; // Your existing slugify utility
+import { getSeriesNavigation } from "../../utils/seriesUtils.ts";
 import Toc from "../../components/blog/Toc.astro";
 
 // Generates static paths for all non-draft blog entries
@@ -21,22 +23,27 @@ export async function getStaticPaths() {
   });
   return blogEntries.map((entry) => ({
     params: { slug: entry.slug },
-    props: { entry },
+    props: { entry, allPosts: blogEntries },
   }));
 }
 
 // Get the current post entry from props
-const { entry } = Astro.props;
+const { entry, allPosts } = Astro.props;
 const frontmatter = entry.data; // Convenience variable for frontmatter
+
+// Get series navigation data if this post is part of a series
+const seriesNav = frontmatter.series
+  ? getSeriesNavigation(entry, allPosts)
+  : null;
 
 // Conditionally render content for standard/fleeting posts
 // For book notes, entry.render() is called within BookNoteDetail.astro
 let ContentComponent = null;
-let headings: any[] = [];
+let headings = [];
 if (frontmatter.postType !== "bookNote") {
-	const { Content, headings: renderedHeadings } = await entry.render();
-	ContentComponent = Content;
-	headings = renderedHeadings;
+  const { Content, headings: renderedHeadings } = await entry.render();
+  ContentComponent = Content;
+  headings = renderedHeadings;
 }
 
 // --- Variables for standard post header/footer (series, tags) ---
@@ -115,24 +122,21 @@ const postUrlForComments = new URL(
           </div>
         )}
 
+        {/* Series Navigation - Show for posts in a series (except fleeting) */}
+        {seriesNav && frontmatter.postType !== "fleeting" && (
+          <SeriesNavigation
+            previousPost={seriesNav.previousPost}
+            nextPost={seriesNav.nextPost}
+            currentIndex={seriesNav.currentIndex}
+            totalPosts={seriesNav.totalPosts}
+            seriesName={frontmatter.series!}
+          />
+        )}
+
         {/* Footer with Series and Tags - Not shown for Fleeting Thoughts */}
         {frontmatter.postType !== "fleeting" &&
           (postTags.length > 0 || (seriesLinkPath && frontmatter.series)) && (
             <footer class="post-meta-footer">
-              {seriesLinkPath && frontmatter.series && (
-                <div class="meta-item series-meta-item">
-                  <p class="series-statement">
-                    This post is part of{" "}
-                    <a
-                      href={seriesLinkPath}
-                      aria-label={`View all posts in the "${frontmatter.series}" series`}
-                    >
-                      {frontmatter.series}
-                    </a>
-                    .
-                  </p>
-                </div>
-              )}
               {postTags.length > 0 && (
                 <div class="meta-item tags-meta-item">
                   <span class="meta-label">TAGS</span>

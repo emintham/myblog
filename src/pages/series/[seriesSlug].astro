@@ -34,6 +34,7 @@ const postsInSeries = allPosts
 
 const pageTitle = `Series: ${seriesName}`;
 const pageDescription = `Posts in the series "${seriesName}", in chronological order.`;
+const totalPosts = postsInSeries.length;
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription}>
@@ -43,13 +44,19 @@ const pageDescription = `Posts in the series "${seriesName}", in chronological o
         <a href="/series/">All Series</a> &rarr;
       </p>
       <h1>{seriesName}</h1>
+      {totalPosts > 0 && (
+        <p class="series-count">{totalPosts} {totalPosts === 1 ? 'post' : 'posts'} in this series</p>
+      )}
     </header>
 
     {
       postsInSeries.length > 0 ? (
         <div class="posts-list">
-          {postsInSeries.map((post) => (
-            <PostPreview post={post} />
+          {postsInSeries.map((post, index) => (
+            <div class="series-post-item">
+              <span class="series-post-number">Part {index + 1}</span>
+              <PostPreview post={post} />
+            </div>
           ))}
         </div>
       ) : (
@@ -60,11 +67,38 @@ const pageDescription = `Posts in the series "${seriesName}", in chronological o
 </BaseLayout>
 
 <style>
+  .series-count {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-top: 0.5rem;
+    text-align: center;
+  }
+
   .posts-list {
     /* Styles for the list of posts, BlogPostPreview will handle individual item styling */
   }
+
+  .series-post-item {
+    position: relative;
+    margin-bottom: 2.5rem;
+  }
+
+  .series-post-number {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    background-color: var(--color-accent-bg, rgba(0, 0, 0, 0.05));
+    border-radius: 4px;
+  }
+
   .posts-list > :global(article) {
     /* Target the article tag from BlogPostPreview if needed */
-    margin-bottom: 2.5rem; /* Add space between post previews */
   }
 </style>
