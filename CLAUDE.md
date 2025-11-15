@@ -67,6 +67,14 @@ Test files are located in `src/utils/*.test.ts`, `src/components/admin/*.test.ts
 
 ## Development Practices
 
+### Project Documentation
+
+**ROADMAP.md** - Single source of truth for all planned work:
+- Current maintainability tasks (organized by priority)
+- Feature ideas with effort estimates
+- Implementation priorities
+- Refer to this file when planning new work or checking what's on the backlog
+
 ### Git Commit Messages
 
 **Keep commit messages concise.** Follow this format:
@@ -87,7 +95,24 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - Good: "feat: add toast notifications for save feedback"
 - Too verbose: "feat: add toast notifications to provide user feedback when saving posts in the admin interface"
 
-**Changelog entries** should also be concise, following the style of existing entries.
+### Changelog Updates
+
+**Update CHANGELOG.md when adding user-facing features or significant changes:**
+
+- Add entry at the top under current date (format: `## MMM DD, YYYY`)
+- Use concise bullet points following existing style
+- Include features, bug fixes, and notable improvements
+- Don't include: internal refactors, test updates, minor code cleanup (unless they fix bugs)
+
+**Examples of what to include:**
+- "Added full-text search with keyboard shortcuts (⌘K/Ctrl+K)"
+- "Fixed auto-save page refresh and cursor reset"
+- "Added pagination to home page (10 posts per page)"
+
+**Examples of what NOT to include:**
+- "Refactored usePostSubmission hook"
+- "Added tests for API handlers"
+- "Updated TypeScript types"
 
 ## Architecture Overview
 
