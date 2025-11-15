@@ -16,11 +16,9 @@
   background-color: var(--color-background-admin, #faf8f5);
   border: 1px solid var(--color-border-admin-subtle, #ededed);
   border-radius: var(--border-radius-admin, 3px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-
+  box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
   padding: 12px 16px;
   max-width: 300px;
-
   animation: toast-slide-in 0.3s ease-out;
   transition: all 0.3s ease-out;
 }
@@ -47,7 +45,7 @@
 /* Auto-save toast is more subtle */
 .toast--auto-save {
   opacity: 0.9;
-  background-color: rgba(250, 248, 245, 0.98);
+  background-color: rgb(250 248 245 / 98%);
 }
 
 .toast__content {
@@ -89,6 +87,7 @@
     opacity: 0;
     transform: translateX(-100%);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -100,6 +99,7 @@
     opacity: 1;
     transform: translateX(0);
   }
+
   to {
     opacity: 0;
     transform: translateX(-100%);
@@ -107,7 +107,7 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .toast-container {
     top: 10px;
     left: 10px;

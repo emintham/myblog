@@ -30,75 +30,134 @@ const pageDescription =
         No posts found. Ready to create your first one?
       </p>
     ) : (
-      <ul class="item-list-container admin-post-list">
-        {posts.map((post) => (
-          <li class="list-item-entry">
-            <div class="post-info-column">
-              <div class="title-line">
-                {post.data.draft && (
-                  <span class="status-draft-badge">Draft</span>
-                )}
-                <a
-                  href={`/blog/${post.slug}/`}
-                  class:list={[
-                    "list-item-name",
-                    { "title-with-draft-badge": post.data.draft },
-                  ]}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={`View '${post.data.title}' live`}
-                >
-                  {post.data.title}
-                </a>
+      <>
+        <div class="filter-controls">
+          <label for="status-filter">Filter by status:</label>
+          <select id="status-filter" class="status-filter-select">
+            <option value="all">All Posts</option>
+            <option value="published">Published Only</option>
+            <option value="drafts">Drafts Only</option>
+          </select>
+          <span id="post-count" class="post-count"></span>
+        </div>
+
+        <ul class="item-list-container admin-post-list" id="posts-list">
+          {posts.map((post) => (
+            <li class="list-item-entry" data-draft={post.data.draft ? "true" : "false"}>
+              <div class="post-info-column">
+                <div class="title-line">
+                  {post.data.draft && (
+                    <span class="status-draft-badge">Draft</span>
+                  )}
+                  <a
+                    href={`/blog/${post.slug}/`}
+                    class:list={[
+                      "list-item-name",
+                      { "title-with-draft-badge": post.data.draft },
+                    ]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={`View '${post.data.title}' live`}
+                  >
+                    {post.data.title}
+                  </a>
+                </div>
+                <small class="post-meta-details">
+                  {post.data.pubDate.toLocaleDateString("en-CA", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}{" "}
+                  |
+                  <span class="post-type-label">
+                    {post.data.postType || "standard"}
+                  </span>
+                </small>
               </div>
-              <small class="post-meta-details">
-                {post.data.pubDate.toLocaleDateString("en-CA", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}{" "}
-                |
-                <span class="post-type-label">
-                  {post.data.postType || "standard"}
-                </span>
-              </small>
-            </div>
-            <a
-              href={`/admin/edit/${post.slug}/`}
-              class="button-edit"
-              role="button"
-            >
-              Edit
-            </a>
-            <a
-              href="#"
-              role="button"
-              class="button-delete"
-              data-slug={post.slug}
-              data-post-title={post.data.title}
-              data-quotes-ref={post.data.postType === 'bookNote' && post.data.quotesRef ? post.data.quotesRef : ''}
-            >
-              Delete
-            </a>
-          </li>
-        ))}
-      </ul>
+              <a
+                href={`/admin/edit/${post.slug}/`}
+                class="button-edit"
+                role="button"
+              >
+                Edit
+              </a>
+              <a
+                href="#"
+                role="button"
+                class="button-delete"
+                data-slug={post.slug}
+                data-post-title={post.data.title}
+                data-quotes-ref={post.data.postType === 'bookNote' && post.data.quotesRef ? post.data.quotesRef : ''}
+              >
+                Delete
+              </a>
+            </li>
+          ))}
+        </ul>
+      </>
     )
   }
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
+    const statusFilter = document.getElementById('status-filter');
+    const postsList = document.getElementById('posts-list');
+    const postCount = document.getElementById('post-count');
     const deleteButtons = document.querySelectorAll('.button-delete');
 
+    // Filter functionality
+    function updatePostsDisplay() {
+      if (!statusFilter || !postsList) return;
+
+      const filterValue = statusFilter.value;
+      const allPosts = postsList.querySelectorAll('.list-item-entry');
+      let visibleCount = 0;
+
+      allPosts.forEach(post => {
+        const isDraft = post.dataset.draft === 'true';
+        let shouldShow = false;
+
+        switch (filterValue) {
+          case 'all':
+            shouldShow = true;
+            break;
+          case 'published':
+            shouldShow = !isDraft;
+            break;
+          case 'drafts':
+            shouldShow = isDraft;
+            break;
+        }
+
+        if (shouldShow) {
+          post.style.display = '';
+          visibleCount++;
+        } else {
+          post.style.display = 'none';
+        }
+      });
+
+      // Update count display
+      if (postCount) {
+        const totalCount = allPosts.length;
+        postCount.textContent = `Showing ${visibleCount} of ${totalCount} posts`;
+      }
+    }
+
+    // Listen for filter changes
+    if (statusFilter) {
+      statusFilter.addEventListener('change', updatePostsDisplay);
+      // Initial display update
+      updatePostsDisplay();
+    }
+
+    // Delete functionality
     deleteButtons.forEach(button => {
       button.addEventListener('click', async (event) => {
         event.preventDefault();
 
         const slug = button.dataset.slug;
-        const postTitle = button.dataset.postTitle || 'this post'; // Fallback title
-        // quotesRef is not directly needed for the delete call itself to the new handler,
-        // as the handler derives it from the slug's post data.
-        // However, it was added to the button, so it's available if requirements change.
+        const postTitle = button.dataset.postTitle || 'this post';
 
         if (!slug) {
           alert('Error: Could not find post slug for deletion.');
@@ -123,12 +182,12 @@ const pageDescription =
 
             if (response.ok) {
               alert(result.message || 'Post deleted successfully!');
-              // Remove the list item from the DOM
               const listItem = button.closest('li.list-item-entry');
               if (listItem) {
                 listItem.remove();
+                // Update count after deletion
+                updatePostsDisplay();
               } else {
-                // Fallback if structure is different, or to force reload
                 window.location.reload();
               }
             } else {
