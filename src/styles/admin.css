@@ -164,6 +164,28 @@ body.admin-scope legend {
   margin: 0; /* Reset existing margins */
 }
 
+/* Collapsible fieldset legend styles */
+body.admin-scope .collapsible-fieldset legend {
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+
+body.admin-scope .collapsible-fieldset legend:hover {
+  opacity: 0.7;
+}
+
+body.admin-scope .collapsible-fieldset legend .legend-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Smooth transition for content collapse/expand */
+body.admin-scope .collapsible-fieldset .fieldset-content {
+  transition: opacity 0.2s ease;
+}
+
 /* You can add specific font sizes for other heading levels if needed */
 body.admin-scope h3 {
   font-size: 1.25rem;

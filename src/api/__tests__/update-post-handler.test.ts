@@ -146,7 +146,7 @@ describe('POST /api/update-post-handler', () => {
 
   test('should update bookNote with inline quotes successfully (200 OK)', async () => {
     const payload = {
-      ...basePayload, title: 'My Book Note', postType: 'bookNote' as 'bookNote',
+      ...basePayload, title: 'My Book Note', postType: 'bookNote' as const,
       quotesRef: 'my-book-note-quotes',
       inlineQuotes: [{ id: 'q1', text: 'Updated quote', quoteAuthor: 'Author', quoteSource: 'Source', tags: [] }] as Quote[],
     };
@@ -204,7 +204,7 @@ describe('POST /api/update-post-handler', () => {
   test('should handle error during mkdir for bookQuotes (bookNote update, logs but proceeds)', async () => {
     mockFs.mkdir.mockReset();
     mockFs.mkdir.mockRejectedValueOnce(new Error('mkdir failed'));
-    const payload = { ...basePayload, postType: 'bookNote' as 'bookNote', quotesRef: 'qref', inlineQuotes: [] as Quote[] };
+    const payload = { ...basePayload, postType: 'bookNote' as const, quotesRef: 'qref', inlineQuotes: [] as Quote[] };
     const mockRequest = new Request('http://localhost', {
       method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' },
     });
@@ -215,7 +215,7 @@ describe('POST /api/update-post-handler', () => {
   test('should handle error during writeFile for quotes YAML (bookNote update, logs but proceeds)', async () => {
     mockFs.writeFile.mockReset();
     mockFs.writeFile.mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error('YAML write failed'));
-    const payload = { ...basePayload, postType: 'bookNote' as 'bookNote', quotesRef: 'qref', inlineQuotes: [] as Quote[] };
+    const payload = { ...basePayload, postType: 'bookNote' as const, quotesRef: 'qref', inlineQuotes: [] as Quote[] };
     const mockRequest = new Request('http://localhost', {
       method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' },
     });
