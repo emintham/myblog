@@ -15,15 +15,76 @@ import {
   formatZodError,
 } from "../../schemas/responses";
 
+// Mark as server-rendered endpoint (required for POST requests in dev mode)
+export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
   if (import.meta.env.PROD) {
     return createErrorResponse("Not available in production", 403);
   }
 
+  let rawPayload: unknown;
+  let rawBody: string | undefined;
   try {
-    const rawPayload = await request.json();
+    // Try to get the raw body text first for better error reporting
+    const bodyText = await request.text();
+    rawBody = bodyText;
 
+    if (import.meta.env.DEV) {
+      const bodySizeKB = new Blob([bodyText]).size / 1024;
+      console.log(
+        `[API Create] Received request body size: ${bodySizeKB.toFixed(2)} KB`
+      );
+      if (bodySizeKB > 1024) {
+        console.warn("[API Create] Large request body detected (> 1MB)");
+      }
+    }
+
+    rawPayload = JSON.parse(bodyText);
+  } catch (parseError) {
+    if (
+      parseError instanceof SyntaxError ||
+      (parseError instanceof Error &&
+        parseError.message.toLowerCase().includes("json"))
+    ) {
+      const errorMsg =
+        parseError instanceof Error
+          ? parseError.message
+          : "Unknown parsing error";
+      console.error("[API Create] JSON parsing failed:", errorMsg);
+      console.error(
+        "[API Create] Request headers:",
+        Object.fromEntries(request.headers.entries())
+      );
+
+      // Log a snippet of the body for debugging (truncate to avoid logging huge bodies)
+      if (import.meta.env.DEV && rawBody) {
+        const snippet =
+          rawBody.length > 200
+            ? rawBody.substring(0, 100) +
+              "..." +
+              rawBody.substring(rawBody.length - 100)
+            : rawBody;
+        console.error(
+          "[API Create] Body snippet (first/last 100 chars):",
+          snippet
+        );
+        console.error("[API Create] Body length:", rawBody.length);
+
+        // Check for common issues
+        if (rawBody.endsWith("}") === false) {
+          console.error(
+            "[API Create] WARNING: Body doesn't end with '}' - likely truncated!"
+          );
+        }
+      }
+
+      return createErrorResponse("Invalid JSON data received.", 400, errorMsg);
+    }
+    throw parseError;
+  }
+
+  try {
     // Validate payload with Zod
     const validationResult = CreatePostPayloadSchema.safeParse(rawPayload);
 
@@ -124,18 +185,6 @@ export const POST: APIRoute = async ({ request }) => {
 
     return createSuccessResponse(responsePayload, 201);
   } catch (error: unknown) {
-    if (
-      error instanceof SyntaxError &&
-      error.message.toLowerCase().includes("json")
-    ) {
-      console.error("[API Create] Error parsing JSON body:", error);
-      return createErrorResponse(
-        "Invalid JSON data received.",
-        400,
-        error.message
-      );
-    }
-
     console.error("[API Create] Error creating post:", error);
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
