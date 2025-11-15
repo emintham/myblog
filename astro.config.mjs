@@ -3,8 +3,8 @@ import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
 import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
-
 import cloudflare from "@astrojs/cloudflare";
+import { contentHmr } from "./vite-plugin-content-hmr.mjs";
 
 // https://astro.build/config
 export default defineConfig({
@@ -14,11 +14,9 @@ export default defineConfig({
   integrations: [sitemap(), mdx(), react()],
   adapter: cloudflare(),
   vite: {
-    server: {
-      watch: {
-        // Ignore content directory to prevent HMR refresh during auto-save
-        ignored: ["**/src/content/**"],
-      },
-    },
+    plugins: [
+      // Debounce content updates to prevent auto-save spam while allowing manual updates
+      contentHmr({ debounceMs: 3000 })
+    ],
   },
 });

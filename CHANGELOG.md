@@ -5,6 +5,7 @@
 - Added collapsible sections to admin form (Core Information, Metadata, Book Note Details, Content).
 - Added draft status filter to manage-posts page with post count display.
 - Updated search to link directly to edit pages when in admin mode.
+- Improved content HMR with debounced updates - posts now refresh automatically without needing to restart dev server.
 
 ## Nov 14, 2025
 

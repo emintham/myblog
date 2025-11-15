@@ -54,6 +54,17 @@ Test files are located in `src/utils/*.test.ts`, `src/components/admin/*.test.ts
 
 **Prioritize:** Core logic, API handlers, production bugs, validation/errors
 
+### Hot Module Replacement (HMR) for Content
+
+The project uses a custom Vite plugin (`vite-plugin-content-hmr.mjs`) to handle content file changes without forcing immediate page reloads:
+
+- **Debounced Updates**: Content changes trigger a reload after 3 seconds of inactivity
+- **Auto-Save Friendly**: Prevents rapid reloads when auto-save triggers every 2 minutes
+- **Manual Save Support**: Still allows you to see updates without restarting the dev server
+- **Configuration**: Adjust `debounceMs` in `astro.config.mjs` if needed
+
+When you edit content files (`.md`, `.mdx`, `.yaml` in `src/content/`), the dev server will refresh automatically after the debounce period, showing your changes without a manual restart.
+
 ## Development Practices
 
 ### Project Documentation
