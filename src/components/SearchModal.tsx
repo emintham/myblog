@@ -18,6 +18,24 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const [isAdminMode, setIsAdminMode] = useState(false);
+
+  // Detect if we're in admin mode
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsAdminMode(window.location.pathname.startsWith("/admin"));
+    }
+  }, []);
+
+  // Get URL for a post based on context (admin mode or regular mode)
+  const getPostUrl = useCallback((post: SearchablePost) => {
+    if (isAdminMode) {
+      // In admin mode, link to edit page
+      return `/admin/edit/${post.slug}/`;
+    }
+    // In regular mode, link to post page
+    return post.url;
+  }, [isAdminMode]);
 
   // Load search data and initialize Fuse
   useEffect(() => {
@@ -91,12 +109,12 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         case "Enter":
           e.preventDefault();
           if (results[selectedIndex]) {
-            window.location.href = results[selectedIndex].url;
+            window.location.href = getPostUrl(results[selectedIndex]);
           }
           break;
       }
     },
-    [isOpen, onClose, results, selectedIndex]
+    [isOpen, onClose, results, selectedIndex, getPostUrl]
   );
 
   useEffect(() => {
@@ -174,7 +192,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             results.map((post, index) => (
               <a
                 key={post.slug}
-                href={post.url}
+                href={getPostUrl(post)}
                 className={`search-result-item ${
                   index === selectedIndex ? "selected" : ""
                 }`}
