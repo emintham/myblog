@@ -4,19 +4,6 @@
 
 ### High Priority
 
-#### Replace `any` Types (Medium effort)
-
-**Files:** `usePostSubmission.ts`, `FeedbackDisplay.tsx/.test.tsx`, `CloseReadingAnalyzer.tsx`, `adminApiHelpers.ts`, API test files
-
-- [ ] Create proper type definitions for API responses
-- [ ] Type form event handlers and test mocks
-- [ ] Replace `any` in catch blocks with `unknown` or Error types
-- [ ] Document justified `any` usages
-
----
-
-### Medium Priority
-
 #### Improve Image Processing Error Handling (Low effort)
 
 - [ ] Check for missing `images/originals/` directory

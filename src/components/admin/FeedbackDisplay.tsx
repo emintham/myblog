@@ -1,20 +1,13 @@
 import React, { useEffect, useCallback, useRef, useState } from "react";
+import type { ApiSuccessResponse, ApiErrorResponse } from "../../types/api";
 
 interface FeedbackDisplayProps {
   formId: string;
 }
 
 // Define an augmented type for the event result, matching usePostSubmission
-interface PostSuccessEventResult {
-  originalSlug?: string;
-  newSlug?: string; // Can be used as a direct alias from API
-  title?: string;
-  message?: string;
-  path?: string;
-  originalFilePath?: string;
-  originalExtension?: string;
-  // Include other properties from PostSourceData if needed by FeedbackDisplay directly
-  [key: string]: any; // Allow other properties
+interface PostSuccessEventResult extends ApiSuccessResponse {
+  // This can be extended if the event detail needs more properties than the API response
 }
 
 const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
@@ -81,7 +74,7 @@ const FeedbackDisplay: React.FC<FeedbackDisplayProps> = ({ formId }) => {
   const handlePostFormError = useCallback(
     (event: Event) => {
       const customEvent = event as CustomEvent<{
-        error: any;
+        error: ApiErrorResponse;
         actionType: "create" | "update";
         isAutoSave?: boolean;
       }>;
