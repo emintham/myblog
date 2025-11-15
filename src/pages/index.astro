@@ -1,21 +1,31 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PostPreview from "../components/PostPreview.astro";
+import Pagination from "../components/Pagination.astro";
 import { getCollection } from "astro:content";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../siteConfig.ts";
+
+const POSTS_PER_PAGE = 10;
 
 const allPosts = await getCollection("blog", ({ data }) => {
   return import.meta.env.PROD ? data.draft !== true : true;
 });
+
 // Sort posts by date, newest first
 const sortedPosts = allPosts.sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
+
+// Paginate posts
+const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE);
+const currentPage = 1;
+const postsToDisplay = sortedPosts.slice(0, POSTS_PER_PAGE);
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
   <section class="post-list">
     <h1 class="section-title">Latest Writings</h1>
-    {sortedPosts.map((post) => <PostPreview post={post} />)}
+    {postsToDisplay.map((post) => <PostPreview post={post} />)}
+    <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl="/" />
   </section>
 </BaseLayout>

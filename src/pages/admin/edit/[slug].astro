@@ -1,5 +1,4 @@
 ---
-export const prerender = false;
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import PostForm from "../../../components/admin/PostForm";
 import { SITE_TITLE } from "../../../siteConfig";
@@ -15,6 +14,15 @@ import {
 } from "../../../utils/contentUtils"; // Updated path
 import FeedbackDisplay from "../../../components/admin/FeedbackDisplay";
 import ToastContainer from "../../../components/admin/ToastContainer";
+
+// Return empty paths in production (admin only available in dev)
+export async function getStaticPaths() {
+  if (import.meta.env.PROD) {
+    return [];
+  }
+  // In dev, we don't pre-generate paths, they're loaded on demand
+  return [];
+}
 
 if (import.meta.env.PROD) {
   return new Response(null, {

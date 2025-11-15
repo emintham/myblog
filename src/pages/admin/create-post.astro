@@ -13,7 +13,6 @@ import "../../styles/admin.css"; // Import admin styles
 if (import.meta.env.PROD) {
   return new Response(null, { status: 404, statusText: "Not Found" });
 }
-export const prerender = false;
 
 // Fetch all unique tag names for suggestions
 const allPostTags = await getUniqueTagNames("blog", (data) => data.tags);
