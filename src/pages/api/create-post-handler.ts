@@ -21,8 +21,23 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   let rawPayload: unknown;
+  let rawBody: string | undefined;
   try {
-    rawPayload = await request.json();
+    // Try to get the raw body text first for better error reporting
+    const bodyText = await request.text();
+    rawBody = bodyText;
+
+    if (import.meta.env.DEV) {
+      const bodySizeKB = new Blob([bodyText]).size / 1024;
+      console.log(
+        `[API Create] Received request body size: ${bodySizeKB.toFixed(2)} KB`
+      );
+      if (bodySizeKB > 1024) {
+        console.warn("[API Create] Large request body detected (> 1MB)");
+      }
+    }
+
+    rawPayload = JSON.parse(bodyText);
   } catch (parseError) {
     if (
       parseError instanceof SyntaxError ||
@@ -38,6 +53,29 @@ export const POST: APIRoute = async ({ request }) => {
         "[API Create] Request headers:",
         Object.fromEntries(request.headers.entries())
       );
+
+      // Log a snippet of the body for debugging (truncate to avoid logging huge bodies)
+      if (import.meta.env.DEV && rawBody) {
+        const snippet =
+          rawBody.length > 200
+            ? rawBody.substring(0, 100) +
+              "..." +
+              rawBody.substring(rawBody.length - 100)
+            : rawBody;
+        console.error(
+          "[API Create] Body snippet (first/last 100 chars):",
+          snippet
+        );
+        console.error("[API Create] Body length:", rawBody.length);
+
+        // Check for common issues
+        if (rawBody.endsWith("}") === false) {
+          console.error(
+            "[API Create] WARNING: Body doesn't end with '}' - likely truncated!"
+          );
+        }
+      }
+
       return createErrorResponse("Invalid JSON data received.", 400, errorMsg);
     }
     throw parseError;
