@@ -69,6 +69,35 @@ Display 3-5 related posts via similarity scoring (series > tags > type).
 
 ### Medium Priority
 
+#### Writing Quality Analyzer (Low effort)
+
+Local, client-side writing feedback on individual posts.
+
+- [ ] Readability scores (Flesch-Kincaid, etc.)
+- [ ] Word count, reading time estimates
+- [ ] Paragraph/sentence length distribution
+- [ ] Passive voice detection
+- [ ] Repeated words/phrases
+- [ ] Heading structure analysis (H2, H3 hierarchy)
+
+**Technical:** Pure JavaScript/regex, no external APIs
+
+---
+
+#### Concept Evolution Tracker (Medium effort)
+
+Trace how thinking on a topic has changed over time.
+
+- [ ] Select tag → chronological progression view
+- [ ] Highlight contradictions or refinements
+- [ ] Visual timeline showing idea development
+- [ ] Compare posts across time periods
+- [ ] "What did I believe about X in 2023 vs now?"
+
+**Replaces:** Close reading feature (better aligned with second-brain workflow)
+
+---
+
 #### Link Helper (Low-Medium effort)
 
 Quick link insertion with internal post search and validation.
