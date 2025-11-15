@@ -10,6 +10,7 @@ import TagsComponent from "./TagsComponent";
 import SeriesComponent from "./SeriesComponent"; // IMPORT SeriesComponent
 import MarkdownEditor, { type MarkdownEditorRef } from "./MarkdownEditor";
 import { ImageUploadZone } from "./ImageUploadZone";
+import CollapsibleFieldset from "./CollapsibleFieldset";
 
 export interface PostFormProps {
   postData?: PostSourceData;
@@ -227,8 +228,7 @@ const PostForm: React.FC<PostFormProps> = ({
   return (
     <>
       {/* Fieldset for Core Information */}
-      <fieldset>
-        <legend>Core Information</legend>
+      <CollapsibleFieldset legend="Core Information" defaultOpen={true}>
         <div className="form-field">
           <label htmlFor="title">Title*</label>
           <input
@@ -270,10 +270,9 @@ const PostForm: React.FC<PostFormProps> = ({
             ))}
           </select>
         </div>
-      </fieldset>
+      </CollapsibleFieldset>
 
-      <fieldset>
-        <legend>Metadata</legend>
+      <CollapsibleFieldset legend="Metadata" defaultOpen={false}>
         <div className="form-field">
           <Controller
             name="tags"
@@ -323,11 +322,15 @@ const PostForm: React.FC<PostFormProps> = ({
             Mark as Draft
           </label>
         </div>
-      </fieldset>
+      </CollapsibleFieldset>
 
       {showBookNoteFieldsUI && (
-        <fieldset id="formBookNoteFieldsReact" className="book-note-fields">
-          <legend>Book Note Details</legend>
+        <CollapsibleFieldset
+          legend="Book Note Details"
+          defaultOpen={true}
+          className="book-note-fields"
+          id="formBookNoteFieldsReact"
+        >
           <div className="form-field">
             <label htmlFor="bookTitle">Book Title</label>
             <input type="text" id="bookTitle" {...register("bookTitle")} />
@@ -375,12 +378,10 @@ const PostForm: React.FC<PostFormProps> = ({
             onUpdateQuoteField={handleUpdateQuoteField}
             allQuoteTags={allQuoteTags}
           />
-        </fieldset>
+        </CollapsibleFieldset>
       )}
 
-      <fieldset>
-        <legend>Content</legend>
-
+      <CollapsibleFieldset legend="Content" defaultOpen={true}>
         <ImageUploadZone
           onImageUploaded={(componentMarkup) => {
             const currentContent = getValues("bodyContent") || "";
@@ -415,7 +416,7 @@ const PostForm: React.FC<PostFormProps> = ({
             )}
           />
         </div>
-      </fieldset>
+      </CollapsibleFieldset>
     </>
   );
 };

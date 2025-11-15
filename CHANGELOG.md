@@ -2,6 +2,7 @@
 
 ## Nov 15, 2025
 
+- Added collapsible sections to admin form (Core Information, Metadata, Book Note Details, Content).
 - Added draft status filter to manage-posts page with post count display.
 - Updated search to link directly to edit pages when in admin mode.
 
