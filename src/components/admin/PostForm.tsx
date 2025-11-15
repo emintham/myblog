@@ -8,7 +8,9 @@ import { usePostFormInitialization } from "../../hooks/usePostFormInitialization
 import InlineQuotesManager from "./InlineQuotesManager";
 import TagsComponent from "./TagsComponent";
 import SeriesComponent from "./SeriesComponent"; // IMPORT SeriesComponent
-import MarkdownEditor from "./MarkdownEditor";
+import MarkdownEditor, { type MarkdownEditorRef } from "./MarkdownEditor";
+import { ImageUploadZone } from "./ImageUploadZone";
+import CollapsibleFieldset from "./CollapsibleFieldset";
 
 export interface PostFormProps {
   postData?: PostSourceData;
@@ -68,6 +70,7 @@ const PostForm: React.FC<PostFormProps> = ({
   });
 
   const bodyContentRef = useRef<HTMLTextAreaElement | null>(null);
+  const markdownEditorRef = useRef<MarkdownEditorRef>(null);
   const currentPostDetailsRef = useRef<PostSourceData | undefined>(postData);
   const [, setCurrentPostDetails] = useState<PostSourceData | undefined>(
     postData
@@ -222,12 +225,10 @@ const PostForm: React.FC<PostFormProps> = ({
     }
   }, [formId, handleSubmit, submitPost, inlineQuotes]);
 
-
   return (
     <>
       {/* Fieldset for Core Information */}
-      <fieldset>
-        <legend>Core Information</legend>
+      <CollapsibleFieldset legend="Core Information" defaultOpen={true}>
         <div className="form-field">
           <label htmlFor="title">Title*</label>
           <input
@@ -269,10 +270,9 @@ const PostForm: React.FC<PostFormProps> = ({
             ))}
           </select>
         </div>
-      </fieldset>
+      </CollapsibleFieldset>
 
-      <fieldset>
-        <legend>Metadata</legend>
+      <CollapsibleFieldset legend="Metadata" defaultOpen={false}>
         <div className="form-field">
           <Controller
             name="tags"
@@ -322,11 +322,15 @@ const PostForm: React.FC<PostFormProps> = ({
             Mark as Draft
           </label>
         </div>
-      </fieldset>
+      </CollapsibleFieldset>
 
       {showBookNoteFieldsUI && (
-        <fieldset id="formBookNoteFieldsReact" className="book-note-fields">
-          <legend>Book Note Details</legend>
+        <CollapsibleFieldset
+          legend="Book Note Details"
+          defaultOpen={true}
+          className="book-note-fields"
+          id="formBookNoteFieldsReact"
+        >
           <div className="form-field">
             <label htmlFor="bookTitle">Book Title</label>
             <input type="text" id="bookTitle" {...register("bookTitle")} />
@@ -374,11 +378,27 @@ const PostForm: React.FC<PostFormProps> = ({
             onUpdateQuoteField={handleUpdateQuoteField}
             allQuoteTags={allQuoteTags}
           />
-        </fieldset>
+        </CollapsibleFieldset>
       )}
 
-      <fieldset>
-        <legend>Content</legend>
+      <CollapsibleFieldset legend="Content" defaultOpen={true}>
+        <ImageUploadZone
+          onImageUploaded={(componentMarkup) => {
+            const currentContent = getValues("bodyContent") || "";
+            const importStatement =
+              "import ResponsiveImage from '../../components/ResponsiveImage.astro';\n\n";
+
+            // Check if import already exists
+            if (!currentContent.includes("import ResponsiveImage")) {
+              // Prepend import to content if not present
+              setValue("bodyContent", importStatement + currentContent);
+            }
+
+            // Insert component at cursor
+            markdownEditorRef.current?.insertText(componentMarkup);
+          }}
+        />
+
         <div className="form-field">
           <label htmlFor="bodyContent">Post Body (Markdown)</label>
           <Controller
@@ -387,16 +407,16 @@ const PostForm: React.FC<PostFormProps> = ({
             defaultValue=""
             render={({ field }) => (
               <MarkdownEditor
+                ref={markdownEditorRef}
                 value={field.value || ""}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
-                placeholder="Start writing your Markdown content here..."
                 minHeight="400px"
               />
             )}
           />
         </div>
-      </fieldset>
+      </CollapsibleFieldset>
     </>
   );
 };

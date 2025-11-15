@@ -1,5 +1,22 @@
 # Changelog
 
+## Nov 15, 2025
+
+- Added collapsible sections to admin form (Core Information, Metadata, Book Note Details, Content).
+- Added draft status filter to manage-posts page with post count display.
+- Updated search to link directly to edit pages when in admin mode.
+
+## Nov 14, 2025
+
+- Added full-text search with keyboard shortcuts (⌘K/Ctrl+K).
+- Added pagination to home page (10 posts per page).
+- Added series navigation with prev/next links and progress indicators.
+
+## Oct 28, 2025
+
+- Added drag-and-drop image upload with custom filename, automatic processing, and ResponsiveImage component insertion.
+- Auto-convert posts to .mdx when components are detected.
+
 ## Oct 26, 2025
 
 - Fixed auto-save page refresh and cursor reset by ignoring content directory from Vite HMR.

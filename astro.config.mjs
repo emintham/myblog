@@ -9,12 +9,9 @@ import cloudflare from "@astrojs/cloudflare";
 // https://astro.build/config
 export default defineConfig({
   site: 'https://emintham.com',
-  exclude: ['**/__tests__/**', '**/*.test.ts', '**/*.spec.ts'],
-  integrations: [
-    sitemap(),
-    mdx(),
-    react()
-  ],
+  output: "static", // Static site generation
+  exclude: ["**/__tests__/**", "**/*.test.ts", "**/*.spec.ts"],
+  integrations: [sitemap(), mdx(), react()],
   adapter: cloudflare(),
   vite: {
     server: {

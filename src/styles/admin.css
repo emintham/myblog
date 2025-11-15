@@ -164,6 +164,28 @@ body.admin-scope legend {
   margin: 0; /* Reset existing margins */
 }
 
+/* Collapsible fieldset legend styles */
+body.admin-scope .collapsible-fieldset legend {
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+
+body.admin-scope .collapsible-fieldset legend:hover {
+  opacity: 0.7;
+}
+
+body.admin-scope .collapsible-fieldset legend .legend-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Smooth transition for content collapse/expand */
+body.admin-scope .collapsible-fieldset .fieldset-content {
+  transition: opacity 0.2s ease;
+}
+
 /* You can add specific font sizes for other heading levels if needed */
 body.admin-scope h3 {
   font-size: 1.25rem;
@@ -224,6 +246,32 @@ body.admin-scope .admin-actions {
 }
 
 /* Admin Post List Styles */
+
+body.admin-scope .filter-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md-admin);
+  margin-bottom: var(--spacing-lg-admin);
+  padding: var(--spacing-md-admin);
+  background-color: rgb(237 237 237 / 30%);
+  border-radius: var(--border-radius-admin);
+}
+
+body.admin-scope .filter-controls label {
+  margin-bottom: 0;
+  font-weight: 500;
+}
+
+body.admin-scope .status-filter-select {
+  min-width: 180px;
+  width: auto;
+}
+
+body.admin-scope .post-count {
+  color: var(--color-text-admin-secondary);
+  font-size: 0.875rem;
+  margin-left: auto;
+}
 
 body.admin-scope .item-list-container.admin-post-list {
   list-style-type: none; /* Remove default bullet points */
@@ -401,6 +449,7 @@ body.admin-scope .button-primary {
   /* Transparent by default, using accent color for outline */
   background-color: transparent;
   color: var(--color-accent-admin); /* Accent green text */
+
   /* .button-base provides 'border: 1px solid transparent;',
      so we only need to set the border-color. */
   border-color: var(--color-accent-admin); /* Accent green border */
@@ -450,9 +499,11 @@ body.admin-scope .button-remove-quote:focus {
 body.admin-scope .button-delete {
   /* Base properties - explicitly defined */
   font-family: var(--font-sans);
+
   /* ---- MODIFIED ---- */
   font-size: 0.875rem; /* Smaller font size, matches .button-remove-quote */
   padding: var(--spacing-sm-admin) var(--spacing-md-admin); /* Smaller padding, matches .button-remove-quote */
+
   /* ---- END MODIFIED ---- */
   border-radius: var(--border-radius-admin);
   cursor: pointer;
@@ -469,18 +520,21 @@ body.admin-scope .button-delete {
 
   /* Specific appearance for delete button */
   background-color: transparent; /* Ensures no solid background */
+
   /* ---- MODIFIED: New Muted Reddish Color ---- */
   color: #c78c86; /* Placeholder for a muted, dusty rose / kinfolk red */
   border: 1px solid #c78c86; /* Same muted red for the border */
+
   /* ---- END MODIFIED ---- */
 }
 
 body.admin-scope .button-delete:hover,
 body.admin-scope .button-delete:focus {
   /* ---- MODIFIED: Hover state for new muted red ---- */
-  background-color: rgba(199, 140, 134, 0.05); /* Very light transparent version of #c78c86 */
+  background-color: rgb(199 140 134 / 5%); /* Very light transparent version of #c78c86 */
   color: #af746e; /* Slightly darker/desaturated version of #c78c86 for hover text */
   border-color: #af746e; /* Slightly darker/desaturated version of #c78c86 for hover border */
+
   /* ---- END MODIFIED ---- */
   text-decoration: none;
 }
@@ -577,11 +631,13 @@ body.admin-scope .form-feedback-container.error-message {
 }
 
 /* -------------------------------------------------------------------------- */
+
 /* Responsive Adjustments for Admin Buttons                                   */
+
 /* -------------------------------------------------------------------------- */
 
 /* Media query for smaller screens (e.g., tablets and mobile devices) */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   /* Reduce padding and font size for admin buttons to fit smaller screens */
   body.admin-scope .button-edit,
   body.admin-scope .button-delete,

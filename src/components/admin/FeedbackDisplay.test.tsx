@@ -2,20 +2,14 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import FeedbackDisplay from './FeedbackDisplay'; // Adjust path as necessary
 import { vi, expect, describe, it, beforeAll, afterAll, beforeEach, afterEach } from 'vitest'; // Import test functions and lifecycle hooks
-import * as matchers from '@testing-library/jest-dom/matchers'; 
+import * as matchers from '@testing-library/jest-dom/matchers';
+import type { ApiSuccessResponse, ApiErrorResponse } from '../../types/api';
 
-expect.extend(matchers); 
+expect.extend(matchers);
 
 // Define an augmented type for the event result, matching usePostSubmission
-interface PostSuccessEventResult {
-  originalSlug?: string;
-  newSlug?: string;
-  title?: string;
-  message?: string;
-  path?: string;
-  originalFilePath?: string;
-  originalExtension?: string;
-  [key: string]: any;
+interface PostSuccessEventResult extends ApiSuccessResponse {
+  // This can be extended if the event detail needs more properties than the API response
 }
 
 beforeAll(() => {
@@ -55,8 +49,11 @@ const FORM_ID = 'testPostForm';
 
 describe('FeedbackDisplay', () => {
   // Helper to dispatch the postFormSuccess event
-  const dispatchPostSuccessEvent = (detail: { result: PostSuccessEventResult; actionType: 'create' | 'update' }) => {
-    const event = new CustomEvent('postFormSuccess', { detail });
+  const dispatchPostSuccessEvent = (detail: {
+    result: PostSuccessEventResult;
+    actionType: "create" | "update";
+  }) => {
+    const event = new CustomEvent("postFormSuccess", { detail });
     act(() => {
       window.dispatchEvent(event);
     });

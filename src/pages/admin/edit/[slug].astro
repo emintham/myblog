@@ -1,5 +1,4 @@
 ---
-export const prerender = false;
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import PostForm from "../../../components/admin/PostForm";
 import { SITE_TITLE } from "../../../siteConfig";
@@ -16,14 +15,41 @@ import {
 import FeedbackDisplay from "../../../components/admin/FeedbackDisplay";
 import ToastContainer from "../../../components/admin/ToastContainer";
 
+// Return empty paths in production (admin only available in dev)
+export async function getStaticPaths() {
+  if (import.meta.env.PROD) {
+    return [];
+  }
+
+  // In dev, generate paths for all markdown files in the blog content directory
+  const projectRoot = process.cwd();
+  const contentDir = path.join(projectRoot, "src", "content", "blog");
+  try {
+    const files = await fs.readdir(contentDir);
+    const paths = files
+      .filter((file) => file.endsWith(".md") || file.endsWith(".mdx"))
+      .map((file) => ({
+        params: { slug: path.basename(file, path.extname(file)) },
+      }));
+    return paths;
+  } catch (err) {
+    console.error("Error reading content directory for static paths:", err);
+    return [];
+  }
+}
+
+const { slug } = Astro.params;
+
+// This top-level check is for runtime, protecting the route in production
 if (import.meta.env.PROD) {
+  // Even though getStaticPaths is empty, a direct visit in dev would still render.
+  // This ensures it's completely inaccessible in prod.
   return new Response(null, {
     status: 404,
     statusText: "Not Found (Admin Only)",
   });
 }
 
-const { slug } = Astro.params;
 let postToEdit: PostSourceData | null = null;
 let errorMessage: string | null = null;
 

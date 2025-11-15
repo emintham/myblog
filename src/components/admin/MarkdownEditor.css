@@ -24,7 +24,7 @@
 
 .markdown-editor:focus-within {
   border-color: var(--color-focus-admin, #93a191);
-  box-shadow: 0 0 0 2px rgba(163, 177, 161, 0.2);
+  box-shadow: 0 0 0 2px rgb(163 177 161 / 20%);
 }
 
 /* Gutters (line numbers, fold indicators) */
@@ -36,7 +36,7 @@
 }
 
 .markdown-editor .cm-activeLineGutter {
-  background-color: rgba(163, 177, 161, 0.08);
+  background-color: rgb(163 177 161 / 8%);
 }
 
 /* Line numbers */
@@ -49,7 +49,7 @@
 
 /* Active line highlighting */
 .markdown-editor .cm-activeLine {
-  background-color: rgba(163, 177, 161, 0.05);
+  background-color: rgb(163 177 161 / 5%);
 }
 
 /* Cursor */
@@ -59,11 +59,11 @@
 
 /* Selection */
 .markdown-editor .cm-selectionBackground {
-  background-color: rgba(163, 177, 161, 0.25) !important;
+  background-color: rgb(163 177 161 / 25%) !important;
 }
 
 .markdown-editor .cm-focused .cm-selectionBackground {
-  background-color: rgba(163, 177, 161, 0.35) !important;
+  background-color: rgb(163 177 161 / 35%) !important;
 }
 
 /* Fold gutter */
@@ -135,7 +135,7 @@
 .markdown-editor .cm-line .cm-code,
 .markdown-editor .cm-line .cm-monospace {
   font-family: var(--font-mono, monospace);
-  background-color: rgba(140, 140, 140, 0.08);
+  background-color: rgb(140 140 140 / 8%);
   padding: 2px 4px;
   border-radius: 2px;
   font-size: 0.95em;
@@ -190,7 +190,7 @@
 }
 
 .markdown-editor .cm-panel button:hover {
-  background-color: rgba(163, 177, 161, 0.1);
+  background-color: rgb(163 177 161 / 10%);
 }
 
 /* Placeholder */

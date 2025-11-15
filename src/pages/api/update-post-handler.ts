@@ -15,7 +15,6 @@ import {
   formatZodError,
 } from "../../schemas/responses";
 
-export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
   if (import.meta.env.PROD) {
@@ -40,14 +39,22 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const payload: PostApiPayload = validationResult.data;
-    const { originalFilePath, originalExtension, title } = payload;
+    const { originalFilePath, originalExtension, title, bodyContent } = payload;
 
     const currentTitle = title || "untitled"; // Should always have a title from the form
     const newSlug = generateSlug(currentTitle);
-    // Determine the file extension: use original, or derive from originalFilePath, or default to .mdx
-    const fileExtension =
-      originalExtension ||
-      (originalFilePath ? path.extname(originalFilePath) : ".mdx");
+
+    // Check if content contains component imports (requires MDX)
+    const hasComponents =
+      bodyContent &&
+      (bodyContent.includes("import ") ||
+        bodyContent.includes("<ResponsiveImage"));
+
+    // Determine the file extension: force .mdx if components detected, otherwise use original or default to .mdx
+    const fileExtension = hasComponents
+      ? ".mdx"
+      : originalExtension ||
+        (originalFilePath ? path.extname(originalFilePath) : ".mdx");
     const newFilename = `${newSlug}${fileExtension}`;
 
     const projectRoot = process.cwd();

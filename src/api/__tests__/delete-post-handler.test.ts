@@ -31,17 +31,23 @@ vi.mock('node:fs/promises', () => ({
 }));
 
 // Helper to create a mock APIContext
-const createMockAPIContext = (requestBody: any): Partial<APIContext> => ({
+const createMockAPIContext = (requestBody: unknown): APIContext => ({
   request: {
     json: () => Promise.resolve(requestBody),
     headers: new Headers({ 'Content-Type': 'application/json' }),
-  } as any,
+  } as Request,
   // Other APIContext properties can be added here if needed by the handler
   // For this handler, only request.json() and import.meta.env are critical
   url: new URL("http://localhost/api/delete-post-handler"),
   props: {},
-  cookies: {} as any,
-  redirect: vi.fn() as any,
+  cookies: {
+    get: vi.fn(),
+    set: vi.fn(),
+    delete: vi.fn(),
+    has: vi.fn(),
+    serialize: vi.fn(),
+  },
+  redirect: vi.fn(),
   locals: {},
   site: new URL("http://localhost"),
 });
@@ -70,7 +76,7 @@ describe('API Route: delete-post-handler', () => {
   it('should return 403 if in production environment', async () => {
     import.meta.env.PROD = true; // Simulate production environment
     import.meta.env.DEV = false;
-    const mockContext = createMockAPIContext({ slug: 'any-slug' }) as APIContext;
+    const mockContext = createMockAPIContext({ slug: 'any-slug' });
     const response = await deletePostHandler(mockContext);
     expect(response.status).toBe(403);
     const json = await response.json();
@@ -78,7 +84,7 @@ describe('API Route: delete-post-handler', () => {
   });
 
   it('should return 400 if slug is missing', async () => {
-    const mockContext = createMockAPIContext({}) as APIContext;
+    const mockContext = createMockAPIContext({});
     const response = await deletePostHandler(mockContext);
     expect(response.status).toBe(400);
     const json = await response.json();
@@ -87,7 +93,7 @@ describe('API Route: delete-post-handler', () => {
 
   it('should return 404 if post entry is not found', async () => {
     (getEntryBySlug as vi.Mock).mockResolvedValue(null);
-    const mockContext = createMockAPIContext({ slug: 'non-existent-slug' }) as APIContext;
+    const mockContext = createMockAPIContext({ slug: 'non-existent-slug' });
     const response = await deletePostHandler(mockContext);
     expect(response.status).toBe(404);
     const json = await response.json();
@@ -103,7 +109,7 @@ describe('API Route: delete-post-handler', () => {
     // Access the mock function through the imported fs module
     (fs.access as vi.Mock).mockRejectedValue(new Error('File not found'));
 
-    const mockContext = createMockAPIContext({ slug: 'my-post' }) as APIContext;
+    const mockContext = createMockAPIContext({ slug: 'my-post' });
     const response = await deletePostHandler(mockContext);
     expect(response.status).toBe(404);
     const json = await response.json();
@@ -120,7 +126,7 @@ describe('API Route: delete-post-handler', () => {
     (fs.access as vi.Mock).mockResolvedValue(undefined); // File exists
     (fs.unlink as vi.Mock).mockResolvedValue(undefined); // Deletion successful
 
-    const mockContext = createMockAPIContext({ slug: 'standard-post' }) as APIContext;
+    const mockContext = createMockAPIContext({ slug: 'standard-post' });
     const response = await deletePostHandler(mockContext);
 
     expect(response.status).toBe(200);
@@ -143,7 +149,7 @@ describe('API Route: delete-post-handler', () => {
     (fs.access as vi.Mock).mockResolvedValue(undefined); // Both files exist
     (fs.unlink as vi.Mock).mockResolvedValue(undefined); // Deletions successful
 
-    const mockContext = createMockAPIContext({ slug: 'book-note-post' }) as APIContext;
+    const mockContext = createMockAPIContext({ slug: 'book-note-post' });
     const response = await deletePostHandler(mockContext);
 
     expect(response.status).toBe(200);
@@ -172,7 +178,7 @@ describe('API Route: delete-post-handler', () => {
       .mockRejectedValueOnce(new Error('Quotes file not found')); // Quotes file does not exist
     (fs.unlink as vi.Mock).mockResolvedValue(undefined); // Post deletion successful
 
-    const mockContext = createMockAPIContext({ slug: 'bn-no-qfile' }) as APIContext;
+    const mockContext = createMockAPIContext({ slug: 'bn-no-qfile' });
     const response = await deletePostHandler(mockContext);
 
     expect(response.status).toBe(200);
@@ -208,7 +214,7 @@ describe('API Route: delete-post-handler', () => {
     (fs.access as vi.Mock).mockResolvedValue(undefined); // File access is fine
     (fs.unlink as vi.Mock).mockRejectedValueOnce(new Error('Disk full')); // Simulate fs.unlink failing for the post file
 
-    const mockContext = createMockAPIContext({ slug: 'error-post' }) as APIContext;
+    const mockContext = createMockAPIContext({ slug: 'error-post' });
     const response = await deletePostHandler(mockContext);
     expect(response.status).toBe(500);
     const json = await response.json();
@@ -231,7 +237,7 @@ describe('API Route: delete-post-handler', () => {
       .mockResolvedValueOnce(undefined) // Main post file deletes fine
       .mockRejectedValueOnce(new Error('Permission issue on quotes')); // Quotes file deletion fails
 
-    const mockContext = createMockAPIContext({ slug: 'book-err-qdelete' }) as APIContext;
+    const mockContext = createMockAPIContext({ slug: 'book-err-qdelete' });
     const response = await deletePostHandler(mockContext);
     expect(response.status).toBe(200); // Still 200 because main post deleted
     const json = await response.json();
