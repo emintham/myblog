@@ -50,30 +50,15 @@ Test files are located in `src/utils/*.test.ts`, `src/components/admin/*.test.ts
 
 ### Testing Guidelines
 
-**Focus on high-value tests. Avoid:**
-- Testing obvious behavior (e.g., "should handle strings that are already slugs")
-- Duplicate test cases with slight variations
-- Implementation details (e.g., "should ensure a final newline character")
-- Edge cases with no production impact (e.g., "should handle very long strings" when no limit exists)
-- Trivial empty/undefined variations already covered by other tests
+**Avoid:** Obvious behavior, duplicate cases, implementation details, trivial edge cases
 
-**Prioritize:**
-- Core business logic and transformations
-- API handlers and critical paths
-- Edge cases that could cause production bugs
-- Validation and error handling
-
-**Keep tests concise and meaningful.**
+**Prioritize:** Core logic, API handlers, production bugs, validation/errors
 
 ## Development Practices
 
 ### Project Documentation
 
-**ROADMAP.md** - Single source of truth for all planned work:
-- Current maintainability tasks (organized by priority)
-- Feature ideas with effort estimates
-- Implementation priorities
-- Refer to this file when planning new work or checking what's on the backlog
+**ROADMAP.md** - All planned work: maintainability tasks, features, priorities
 
 ### Git Commit Messages
 
@@ -97,22 +82,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ### Changelog Updates
 
-**Update CHANGELOG.md when adding user-facing features or significant changes:**
+Update CHANGELOG.md for user-facing features/fixes only. Add under current date (`## MMM DD, YYYY`).
 
-- Add entry at the top under current date (format: `## MMM DD, YYYY`)
-- Use concise bullet points following existing style
-- Include features, bug fixes, and notable improvements
-- Don't include: internal refactors, test updates, minor code cleanup (unless they fix bugs)
-
-**Examples of what to include:**
-- "Added full-text search with keyboard shortcuts (⌘K/Ctrl+K)"
-- "Fixed auto-save page refresh and cursor reset"
-- "Added pagination to home page (10 posts per page)"
-
-**Examples of what NOT to include:**
-- "Refactored usePostSubmission hook"
-- "Added tests for API handlers"
-- "Updated TypeScript types"
+**Include:** Features, bug fixes, notable improvements
+**Exclude:** Refactors, tests, type updates (unless fixing bugs)
 
 ## Architecture Overview
 
@@ -137,16 +110,16 @@ The codebase implements three distinct post types with conditional rendering thr
 - Rich display with book cover image, collapsible quotes section
 - Distinct preview cards and detail pages
 
-**Critical Pattern:** Always check `postType` when adding features that render or process posts. Components like `PostPreview.astro` act as routers that dispatch to type-specific implementations.
+**Critical:** Always check `postType` when rendering/processing posts. `PostPreview.astro` routes to type-specific components.
 
 ### Four Parallel Tagging Systems
 
-1. **General Post Tags** (`tags` field) - Categorize all post types, displayed at `/tags/`
-2. **Book Tags** (`bookTags` field) - Only on bookNote posts, displayed at `/book-tags/`
-3. **Quote Tags** (on individual quotes in YAML) - Tag quotes within books, displayed at `/quote-tags/`
-4. **Series** (`series` field) - Group related posts chronologically, displayed at `/series/`
+1. **Post Tags** (`tags`) - All post types → `/tags/`
+2. **Book Tags** (`bookTags`) - Book notes only → `/book-tags/`
+3. **Quote Tags** (YAML) - Quotes within books → `/quote-tags/`
+4. **Series** (`series`) - Chronological grouping → `/series/`
 
-**Implementation:** All tag systems use shared utilities in `src/utils/contentUtils.ts` (`getUniqueValuesFromCollection()`), ensuring consistent behavior across tag types.
+All use `getUniqueValuesFromCollection()` in `contentUtils.ts`.
 
 ### Content-to-File Relationship
 
@@ -168,178 +141,73 @@ The codebase implements three distinct post types with conditional rendering thr
 
 ### Development-Only Admin Interface
 
-**Access:** `/admin/*` routes (automatically disabled in production builds)
+**Routes:** `/admin/*` (disabled in production)
 
-**Pages:**
-- `/admin/create-post` - Form to create new posts with auto-save
-- `/admin/edit/[slug]` - Edit existing posts
-- `/admin/manage-posts` - List all posts with edit/delete actions
-- `/admin/analyze` - Rhetorical analysis tool
+**Pages:** `create-post`, `edit/[slug]`, `manage-posts`, `analyze`
 
-**Auto-Save System:**
-- Runs every 2 minutes when form body content changes
-- Silent saves (no UI feedback unless error)
-- Uses same API handlers as manual submit
-- Implemented via `useAutoSave()` hook in `src/hooks/useAutoSave.ts`
+**Auto-Save:** Every 2 min when body changes (silent, via `useAutoSave()` hook)
 
-**Important:** Admin pages are server-rendered (`prerender = false`). They read/write files directly via Node.js fs module, which only works in dev mode.
+**Important:** Server-rendered (`prerender = false`), uses Node.js fs (dev only).
 
 ### API Handler Architecture
 
-Three POST endpoints handle file system operations:
+**`/api/create-post-handler`** - Validate, generate slug, write file (+ quotes YAML for bookNote)
 
-**`/api/create-post-handler`**
-- Validates input, generates slug, checks for conflicts
-- Transforms form data → frontmatter object → YAML string
-- Writes markdown file to `src/content/blog/`
-- If bookNote: also creates matching `bookQuotes/{quotesRef}.yaml`
+**`/api/update-post-handler`** - Update content, handle slug changes/renames (+ quotes YAML for bookNote)
 
-**`/api/update-post-handler`**
-- Handles slug changes (renames file if title changed)
-- Updates existing file with new content
-- Deletes old file if slug changed
-- If bookNote: updates/creates associated quotes file
+**`/api/delete-post-handler`** - Delete file (+ quotes YAML for bookNote)
 
-**`/api/delete-post-handler`**
-- Deletes markdown file from `src/content/blog/`
-- If bookNote: also deletes associated quotes YAML file
+**Data flow:** `PostFormData` → `PostApiPayload` → `FrontmatterObject` → YAML + markdown → fs write
 
-**Data Flow:**
-```
-PostFormData (React state)
-  → PostApiPayload (JSON)
-  → FrontmatterObject (with type coercion)
-  → YAML string + markdown body
-  → File system write
-```
-
-Type definitions in `src/types/admin.d.ts` document each transformation step.
+Type definitions in `src/types/admin.d.ts`.
 
 ### React Component Integration
 
-**Pattern:** Astro components for static content, React components for interactivity
+**Pattern:** Astro for static, React for interactivity (all `client:load`)
 
-**Key React Components:**
-- `PostForm.tsx` - Master form using react-hook-form
-- `TagsComponent.tsx` - Multi-select creatable dropdown (react-select)
-- `SeriesComponent.tsx` - Single-select creatable dropdown
-- `InlineQuotesManager.tsx` - Dynamic quote editor for book notes
-- `FeedbackDisplay.tsx` - Event-driven submission feedback
+**Key Components:** `PostForm.tsx`, `TagsComponent.tsx`, `SeriesComponent.tsx`, `InlineQuotesManager.tsx`, `FeedbackDisplay.tsx`
 
-**Hydration:** All admin components use `client:load` directive for immediate interactivity
+**State:** react-hook-form + custom hooks (`usePostFormInitialization`, `useInlineQuotes`, `usePostSubmission`, `useAutoSave`)
 
-**State Management:**
-- Forms use react-hook-form for validation and submission
-- Custom hooks (`usePostFormInitialization`, `useInlineQuotes`, `usePostSubmission`, `useAutoSave`) encapsulate complex logic
-- Event-driven pattern for form feedback (custom events: `postFormSubmitting`, `postFormSuccess`, `postFormError`)
+**Events:** `postFormSubmitting`, `postFormSuccess`, `postFormError`
 
 ### Image Processing Workflow
 
-**Manual Process:**
-1. Add original image to `images/originals/` (any size, JPG/PNG)
-2. Update post frontmatter: `bookCover: { imageName: "filename-base", alt: "...", originalWidth: 1200 }`
-3. Run `pnpm img` to generate responsive variants
+**Manual:** Add to `images/originals/` → Run `pnpm img` → Update frontmatter with `imageName`, `alt`, `originalWidth`
 
-**Script Behavior (`scripts/process-images.mjs`):**
-- Uses Sharp library to generate WebP + JPG variants
-- Target widths: [100, 150, 200, 480, 800, 1200, 1600, 1920]
-- Skips widths larger than original image
-- Outputs to `public/images/processed/filename-{width}w.{webp|jpg}`
+**Script:** Sharp generates WebP + JPG at widths [100, 150, 200, 480, 800, 1200, 1600, 1920] → `public/images/processed/`
 
-**API Auto-Processing (Book Covers):**
-- When creating/updating book notes via admin, API handler reads original image
-- Automatically extracts `originalWidth` using Sharp
-- Stores in frontmatter so ResponsiveImage knows which variants exist
+**API:** Auto-extracts `originalWidth` when creating/updating book notes
 
-**Display (`ResponsiveImage.astro`):**
-- Generates `<picture>` element with media queries
-- Provides WebP with JPG fallback
-- Uses `originalWidth` to optimize srcset generation
+**Display:** `ResponsiveImage.astro` generates `<picture>` with WebP + JPG fallback
 
 ### Full-Text Search
 
-**Implementation:** Client-side search using Fuse.js
+**Implementation:** Client-side Fuse.js, `⌘K`/`Ctrl+K` shortcut
 
-**Components:**
-- `SearchButton.tsx` - Search trigger button with keyboard shortcut indicator
-- `SearchModal.tsx` - Modal interface with keyboard navigation
-- `searchUtils.ts` - Utility to prepare posts for search indexing
-- `/search-data.json` - Pre-generated search index (static file)
+**Components:** `SearchButton.tsx`, `SearchModal.tsx`, `searchUtils.ts`, `/search-data.json`
 
-**Features:**
-- Keyboard shortcut: `⌘K` (Mac) or `Ctrl+K` (Windows/Linux)
-- Fuzzy search across titles, descriptions, tags, and content
-- Keyboard navigation: `↑↓` to navigate, `Enter` to select, `Esc` to close
-- Results show post type, description, and tags
-- Weighted search: title (2x), description (1.5x), tags (1.2x), content (0.8x)
+**Weighted search:** title (2x), description (1.5x), tags (1.2x), content (0.8x)
 
-**Search Index:**
-- Generated at build time via `/search-data.json.ts`
-- Includes all non-draft posts in production
-- Loaded on-demand when user opens search modal
-
-**Usage:**
-- Click search button in navigation or press `⌘K`/`Ctrl+K`
-- Type to search, use arrow keys to navigate results
-- Click or press Enter to navigate to post
+**Index:** Generated at build, non-draft posts only (prod), loaded on-demand
 
 ### Pagination
 
-**Implementation:** Static pagination using Astro's dynamic routing
+**Pages:** `/` (page 1), `/[page].astro` (e.g., `/2/`, `/3/`)
 
-**Pages:**
-- `/` - Homepage (page 1, displays first 10 posts)
-- `/[page].astro` - Paginated pages (e.g., `/2/`, `/3/`)
+**Config:** `POSTS_PER_PAGE = 10` in `index.astro` and `[page].astro`
 
-**Configuration:**
-- `POSTS_PER_PAGE = 10` - Default posts per page
-- Set in both `index.astro` and `[page].astro`
-
-**Components:**
-- `Pagination.astro` - Reusable pagination component with smart page number generation
-
-**Features:**
-- Smart ellipsis: Shows `1 ... 4 5 6 ... 10` for large page counts
-- Previous/Next navigation links
-- Current page indicator (highlighted)
-- Responsive design (stacks on mobile)
-- SEO-friendly URLs (`/`, `/2/`, `/3/`)
-
-**Usage:**
-- Automatically displays on home page when >10 posts exist
-- Can be added to any listing page with `<Pagination currentPage={1} totalPages={5} baseUrl="/" />`
+**Component:** `Pagination.astro` with smart ellipsis (e.g., `1 ... 4 5 6 ... 10`)
 
 ### Series Navigation & Progress
 
-**Implementation:** Contextual navigation for multi-part series
+**Components:** `SeriesNavigation.astro`, `seriesUtils.ts`
 
-**Components:**
-- `SeriesNavigation.astro` - Previous/next navigation with progress indicator
-- `seriesUtils.ts` - Utility functions to calculate series position
+**Features:** Prev/next links, progress ("Part 3 of 7"), chronological ordering
 
-**Features:**
-- Previous/next post links within a series
-- Progress indicator: "Part 3 of 7"
-- Series title display
-- Post title previews (truncated to 2 lines)
-- Responsive design (stacks on mobile)
-- Only shows for posts in a series (not fleeting thoughts)
+**Data flow:** `getSeriesNavigation()` finds posts in series → sorts by `pubDate` → returns prev/next + metadata
 
-**Series Detail Page Enhancements:**
-- Post count: "5 posts in this series"
-- Part numbers: "Part 1", "Part 2", etc. on each preview
-- Chronological ordering (oldest first)
-
-**Data Flow:**
-1. `getSeriesNavigation()` finds all posts in same series
-2. Sorts chronologically by `pubDate`
-3. Determines current post position
-4. Returns previous/next posts + metadata
-
-**Usage:**
-- Automatically appears on post detail pages for posts with `series` field
-- Positioned after content, before tags/comments
-- Also visible on series detail pages (`/series/[seriesSlug]`)
+**Display:** Auto-shows on post pages with `series` field, after content
 
 ## Development Patterns
 
@@ -386,52 +254,23 @@ const post = await getEntry("blog", slug);
 
 ### Slug Generation
 
-All slugs generated via `src/utils/slugify.ts`:
-- Converts to lowercase
-- Replaces spaces/special chars with hyphens
-- Removes non-alphanumeric (except hyphens)
-- Deduplicates consecutive hyphens
-- Fallback: "untitled-post" if empty
+Via `slugify.ts`: lowercase, replace spaces/special chars with hyphens, deduplicate, fallback "untitled-post"
 
-**Important:** When updating titles, API handlers regenerate slugs, which can change file names and URLs. The update handler manages this gracefully.
+**Note:** Title updates regenerate slugs (may rename files/URLs). Update handler manages this.
 
 ### Form Submission Flow
 
-**Manual Submit:**
-1. User clicks Save/Update button
-2. `usePostSubmission()` hook receives form data
-3. Transforms to `PostApiPayload`, sends POST to API
-4. API handler processes, writes files
-5. Custom events dispatched (`postFormSuccess`/`postFormError`)
-6. `FeedbackDisplay` shows feedback
-7. Form resets (create) or refills with saved data (edit)
+**Manual:** Click Save → `usePostSubmission()` → API POST → events (`postFormSuccess`/`Error`) → `FeedbackDisplay` → reset/refill
 
-**Auto-Save:**
-1. `useAutoSave()` hook checks every 2 minutes
-2. Compares current body with last saved body
-3. If changed (and title exists), triggers submit with `isAutoSave = true`
-4. Same API flow, but no form reset
-5. Updates `lastSavedBodyContent` to prevent navigation issues
+**Auto-Save:** Every 2 min → compare body → submit if changed → no reset → update `lastSavedBodyContent`
 
 ## Configuration
 
-### Site URL
-Update `site` in `astro.config.mjs` before deploying:
-```javascript
-site: "https://your-actual-domain.com"
-```
-Used for sitemap generation and canonical URLs.
+**Site URL:** Update `site` in `astro.config.mjs` (for sitemap/canonical URLs)
 
-### Build Exclusions
-Test files are excluded from builds via:
-```javascript
-exclude: ["**/__tests__/**", "**/*.test.ts", "**/*.spec.ts"]
-```
+**Build Exclusions:** Test files (`**/__tests__/**`, `**/*.test.ts`, `**/*.spec.ts`)
 
-### Integrations
-- `@astrojs/sitemap` - Auto-generates sitemap.xml
-- `@astrojs/mdx` - Enables MDX in content (components in markdown)
-- `@astrojs/react` - Enables React component integration
+**Integrations:** `@astrojs/sitemap`, `@astrojs/mdx`, `@astrojs/react`
 
 ## Important Files Reference
 
@@ -455,23 +294,10 @@ exclude: ["**/__tests__/**", "**/*.test.ts", "**/*.spec.ts"]
 
 ## Known Patterns to Maintain
 
-**1. Event-Driven Form Feedback**
-Forms dispatch custom events rather than managing UI state directly. This allows multiple listeners and clean separation.
-
-**2. Ref-Based Data Relationships**
-Book notes use `quotesRef` to link to external YAML files rather than embedding quotes in frontmatter. This keeps quotes independently manageable.
-
-**3. Type-Based Component Dispatch**
-Router components (like `PostPreview.astro`) check `postType` and render appropriate component. Never use if/else chains - use component selection pattern.
-
-**4. Utility-First Tag Processing**
-Generic `getUniqueValuesFromCollection()` underlies all tag systems. When adding new taxonomies, create a facade function that calls this utility rather than reimplementing logic.
-
-**5. Conditional Field Rendering**
-Form fields that only apply to certain post types are wrapped in conditional blocks that watch the `postType` field via react-hook-form's `watch()`.
-
-**6. Production Environment Guards**
-Admin pages and API routes check `import.meta.env.PROD` and return 404/403 in production. Never remove these guards.
-
-**7. Static Generation with Filtering**
-Use `getCollection()` with predicate functions to filter drafts in production while showing them in development.
+1. **Event-Driven Form Feedback** - Custom events vs direct UI state
+2. **Ref-Based Data Relationships** - `quotesRef` links to YAML vs embedding
+3. **Type-Based Component Dispatch** - Component selection vs if/else chains
+4. **Utility-First Tag Processing** - Facade `getUniqueValuesFromCollection()` vs reimplementing
+5. **Conditional Field Rendering** - Watch `postType` via react-hook-form
+6. **Production Guards** - Check `import.meta.env.PROD`, return 404/403
+7. **Static Generation with Filtering** - `getCollection()` predicates for drafts
