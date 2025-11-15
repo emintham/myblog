@@ -15,7 +15,6 @@ import {
   formatZodError,
 } from "../../schemas/responses";
 
-
 export const POST: APIRoute = async ({ request }) => {
   if (import.meta.env.PROD) {
     return createErrorResponse(
@@ -24,9 +23,34 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
+  let rawPayload: unknown;
   try {
-    const rawPayload = await request.json();
+    rawPayload = await request.json();
+  } catch (parseError) {
+    if (
+      parseError instanceof SyntaxError ||
+      (parseError instanceof Error &&
+        parseError.message.toLowerCase().includes("json"))
+    ) {
+      const errorMsg =
+        parseError instanceof Error
+          ? parseError.message
+          : "Unknown parsing error";
+      console.error("[API Update] JSON parsing failed:", errorMsg);
+      console.error(
+        "[API Update] Request headers:",
+        Object.fromEntries(request.headers.entries())
+      );
+      return createErrorResponse(
+        "Invalid JSON data received for update.",
+        400,
+        errorMsg
+      );
+    }
+    throw parseError;
+  }
 
+  try {
     // Validate payload with Zod
     const validationResult = UpdatePostPayloadSchema.safeParse(rawPayload);
 
@@ -169,18 +193,6 @@ export const POST: APIRoute = async ({ request }) => {
       title: frontmatterObject.title,
     });
   } catch (error: unknown) {
-    if (
-      error instanceof SyntaxError &&
-      error.message.toLowerCase().includes("json")
-    ) {
-      console.error("[API Update] Error parsing JSON body:", error);
-      return createErrorResponse(
-        "Invalid JSON data received for update.",
-        400,
-        error.message
-      );
-    }
-
     console.error("[API Update] Error updating post:", error);
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";

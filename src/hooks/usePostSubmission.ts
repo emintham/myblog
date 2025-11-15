@@ -79,11 +79,31 @@ export function usePostSubmission({
         );
       }
 
+      // Validate that payload can be serialized before sending
+      let requestBody: string;
+      try {
+        requestBody = JSON.stringify(payload);
+      } catch (serializeError) {
+        const errorMessage =
+          serializeError instanceof Error
+            ? serializeError.message
+            : "Unknown serialization error";
+        if (import.meta.env.DEV) {
+          console.error(
+            `[usePostSubmission:${actionType.toUpperCase()}] Failed to serialize payload:`,
+            serializeError,
+            "Payload:",
+            payload
+          );
+        }
+        throw new Error(`Failed to serialize form data: ${errorMessage}`);
+      }
+
       try {
         const response = await fetch(apiEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: requestBody,
         });
 
         const apiResult: ApiSuccessResponse | ApiErrorResponse =
@@ -160,7 +180,9 @@ export function usePostSubmission({
       } catch (error: unknown) {
         const errorPayload: ApiErrorResponse = {
           message:
-            error instanceof Error ? error.message : "An unknown error occurred",
+            error instanceof Error
+              ? error.message
+              : "An unknown error occurred",
           stack: error instanceof Error ? error.stack : undefined,
         };
 

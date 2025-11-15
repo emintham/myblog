@@ -15,15 +15,35 @@ import {
   formatZodError,
 } from "../../schemas/responses";
 
-
 export const POST: APIRoute = async ({ request }) => {
   if (import.meta.env.PROD) {
     return createErrorResponse("Not available in production", 403);
   }
 
+  let rawPayload: unknown;
   try {
-    const rawPayload = await request.json();
+    rawPayload = await request.json();
+  } catch (parseError) {
+    if (
+      parseError instanceof SyntaxError ||
+      (parseError instanceof Error &&
+        parseError.message.toLowerCase().includes("json"))
+    ) {
+      const errorMsg =
+        parseError instanceof Error
+          ? parseError.message
+          : "Unknown parsing error";
+      console.error("[API Create] JSON parsing failed:", errorMsg);
+      console.error(
+        "[API Create] Request headers:",
+        Object.fromEntries(request.headers.entries())
+      );
+      return createErrorResponse("Invalid JSON data received.", 400, errorMsg);
+    }
+    throw parseError;
+  }
 
+  try {
     // Validate payload with Zod
     const validationResult = CreatePostPayloadSchema.safeParse(rawPayload);
 
@@ -124,18 +144,6 @@ export const POST: APIRoute = async ({ request }) => {
 
     return createSuccessResponse(responsePayload, 201);
   } catch (error: unknown) {
-    if (
-      error instanceof SyntaxError &&
-      error.message.toLowerCase().includes("json")
-    ) {
-      console.error("[API Create] Error parsing JSON body:", error);
-      return createErrorResponse(
-        "Invalid JSON data received.",
-        400,
-        error.message
-      );
-    }
-
     console.error("[API Create] Error creating post:", error);
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
