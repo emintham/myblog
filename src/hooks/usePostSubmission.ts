@@ -5,6 +5,7 @@ import type {
   PostSourceData,
   PostApiPayload,
 } from "../types/admin";
+import type { ApiSuccessResponse, ApiErrorResponse } from "../types/api";
 
 interface UsePostSubmissionProps {
   // existingPostData is used to determine if it's an update and to pass original identifiers
@@ -51,8 +52,8 @@ export function usePostSubmission({
           alt: formData.bookCoverAlt,
         };
       }
-      delete (payload as any).bookCoverImageName;
-      delete (payload as any).bookCoverAlt;
+      delete (payload as Partial<PostApiPayload>).bookCoverImageName;
+      delete (payload as Partial<PostApiPayload>).bookCoverAlt;
 
       if (existingPostData?.originalSlug) {
         actionType = "update";
@@ -85,7 +86,8 @@ export function usePostSubmission({
           body: JSON.stringify(payload),
         });
 
-        const apiResult = await response.json(); // API response
+        const apiResult: ApiSuccessResponse | ApiErrorResponse =
+          await response.json();
 
         if (import.meta.env.DEV) {
           console.log(
@@ -98,15 +100,16 @@ export function usePostSubmission({
         }
 
         if (response.ok) {
+          const successResult = apiResult as ApiSuccessResponse;
           const finalFormState: PostFormData = {
             ...formData,
-            title: apiResult.title,
-            originalSlug: apiResult.newSlug,
-            originalFilePath: apiResult.newFilePath,
-            originalExtension: apiResult.newExtension,
+            title: successResult.title,
+            originalSlug: successResult.newSlug,
+            originalFilePath: successResult.newFilePath,
+            originalExtension: successResult.newExtension,
             quotesRef:
-              apiResult.quotesRef !== undefined
-                ? apiResult.quotesRef
+              successResult.quotesRef !== undefined
+                ? successResult.quotesRef
                 : formData.quotesRef,
           };
 
@@ -124,13 +127,15 @@ export function usePostSubmission({
               alt: finalFormState.bookCoverAlt,
             },
             // Add relevant fields from API response for consumers like FeedbackDisplay
-            message: apiResult.message,
-            path: apiResult.path,
+            message: successResult.message,
+            path: successResult.path,
             // Ensure newSlug is also directly available if needed, though originalSlug holds it post-creation/update
-            newSlug: apiResult.newSlug,
+            newSlug: successResult.newSlug,
           };
-          delete (eventDataForResult as any).bookCoverImageName;
-          delete (eventDataForResult as any).bookCoverAlt;
+          delete (eventDataForResult as Partial<PostSuccessEventResult>)
+            .bookCoverImageName;
+          delete (eventDataForResult as Partial<PostSuccessEventResult>)
+            .bookCoverAlt;
 
           window.dispatchEvent(
             new CustomEvent("postFormSuccess", {
@@ -138,20 +143,27 @@ export function usePostSubmission({
             })
           );
         } else {
+          const errorResult = apiResult as ApiErrorResponse;
           if (import.meta.env.DEV) {
             console.error(
               `[usePostSubmission:${actionType.toUpperCase()}] API Error:`,
-              apiResult.message || response.statusText,
-              apiResult
+              errorResult.message || response.statusText,
+              errorResult
             );
           }
           window.dispatchEvent(
             new CustomEvent("postFormError", {
-              detail: { error: apiResult, actionType, isAutoSave },
+              detail: { error: errorResult, actionType, isAutoSave },
             })
           );
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorPayload: ApiErrorResponse = {
+          message:
+            error instanceof Error ? error.message : "An unknown error occurred",
+          stack: error instanceof Error ? error.stack : undefined,
+        };
+
         if (import.meta.env.DEV) {
           console.error(
             `[usePostSubmission:${actionType.toUpperCase()}] Fetch/JSON Parse Error:`,
@@ -165,7 +177,7 @@ export function usePostSubmission({
         }
         window.dispatchEvent(
           new CustomEvent("postFormError", {
-            detail: { error, actionType, isAutoSave },
+            detail: { error: errorPayload, actionType, isAutoSave },
           })
         );
       } finally {

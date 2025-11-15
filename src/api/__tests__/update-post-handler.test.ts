@@ -17,18 +17,18 @@ let IS_PROD_ENV_FOR_UPDATE_HANDLER_TEST = false;
 
 // --- Mock the module being tested ---
 vi.mock('../../pages/api/update-post-handler', async (importOriginal) => {
-  const originalModule = await importOriginal();
+  const originalModule = await importOriginal() as { POST: Function };
   return {
-    ...(originalModule as any),
-    POST: vi.fn(async (args: any) => {
+    ...originalModule,
+    POST: vi.fn(async (args: unknown) => {
       if (IS_PROD_ENV_FOR_UPDATE_HANDLER_TEST) {
         return new Response(JSON.stringify({ message: "This feature is not available in production" }), {
           status: 403,
           headers: { "Content-Type": "application/json" },
         });
       }
-      if ((originalModule as any).POST && typeof (originalModule as any).POST === 'function') {
-        return (originalModule as any).POST(args);
+      if (originalModule.POST && typeof originalModule.POST === 'function') {
+        return originalModule.POST(args);
       }
       console.error("Original POST (update) could not be called from mock!");
       return new Response(JSON.stringify({ message: "Mocking error in update handler" }), { status: 500 });
@@ -42,7 +42,7 @@ describe('POST /api/update-post-handler', () => {
   const contentBlogDir = path.join(projectRoot, 'src', 'content', 'blog');
   const contentQuotesDir = path.join(projectRoot, 'src', 'content', 'bookQuotes');
 
-  let POST_underTest: any;
+  let POST_underTest: vi.Mock;
 
   beforeEach(async () => {
     IS_PROD_ENV_FOR_UPDATE_HANDLER_TEST = false;
@@ -88,7 +88,7 @@ describe('POST /api/update-post-handler', () => {
         if (p === payload.originalFilePath) return undefined;
         throw new Error('File not found for other paths');
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     const responseBody = await response.json();
     expect(response.status).toBe(200);
     expect(responseBody.filename).toBe('original-post.mdx');
@@ -104,7 +104,7 @@ describe('POST /api/update-post-handler', () => {
     const mockRequest = new Request('http://localhost', {
       method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(200);
     expect(mockFs.unlink).toHaveBeenCalledWith(originalFilePath);
   });
@@ -115,7 +115,7 @@ describe('POST /api/update-post-handler', () => {
     const mockRequest = new Request('http://localhost', {
       method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(200);
     expect(mockFs.unlink).not.toHaveBeenCalled();
   });
@@ -125,7 +125,7 @@ describe('POST /api/update-post-handler', () => {
     const mockRequest = new Request('http://localhost', {
       method: 'POST', body: JSON.stringify({ ...rest, originalFilePath: undefined }), headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(400);
   });
 
@@ -140,7 +140,7 @@ describe('POST /api/update-post-handler', () => {
     const mockRequest = new Request('http://localhost', {
       method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(409);
   });
 
@@ -154,7 +154,7 @@ describe('POST /api/update-post-handler', () => {
     const mockRequest = new Request('http://localhost', {
       method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(200);
     expect(mockFs.writeFile).toHaveBeenCalledTimes(2);
   });
@@ -165,7 +165,7 @@ describe('POST /api/update-post-handler', () => {
       body: '{"title": "Test Post", "originalFilePath": "path"' + ',"pubDate": "2024-01-01", "postType": "standard", "bodyContent": "This is a test post." // Invalid JSON',
       headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(400);
   });
 
@@ -182,7 +182,7 @@ describe('POST /api/update-post-handler', () => {
       method: 'POST', body: JSON.stringify(requestBody), headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     const responseBody = await response.json();
 
     expect(response.status).toBe(403);
@@ -197,7 +197,7 @@ describe('POST /api/update-post-handler', () => {
     const mockRequest = new Request('http://localhost', {
       method: 'POST', body: JSON.stringify(basePayload), headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(500);
   });
 
@@ -208,7 +208,7 @@ describe('POST /api/update-post-handler', () => {
     const mockRequest = new Request('http://localhost', {
       method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(200);
   });
 
@@ -219,7 +219,7 @@ describe('POST /api/update-post-handler', () => {
     const mockRequest = new Request('http://localhost', {
       method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(200);
   });
 });

@@ -234,33 +234,55 @@ const CloseReadingAnalyzer: React.FC = () => {
             alert("Error reading file content.");
             return;
           }
-          const imported = JSON.parse(importedResult) as any[];
+          const imported = JSON.parse(importedResult) as unknown;
 
           if (Array.isArray(imported)) {
-            const validatedData: AnalysisData = imported.map((p: any) => ({
-              id: p.id || uuidv4Func(),
-              sentences:
-                Array.isArray(p.sentences) && p.sentences.length > 0
-                  ? p.sentences.map((s: any) => ({
-                      id: s.id || uuidv4Func(),
-                      text: typeof s.text === "string" ? s.text : "",
-                      summary: typeof s.summary === "string" ? s.summary : "",
-                      purposeKey:
-                        typeof s.purposeKey === "string"
-                          ? s.purposeKey
-                          : "NONE",
-                      ties: typeof s.ties === "string" ? s.ties : "",
-                    }))
-                  : [
-                      {
-                        id: uuidv4Func(),
-                        text: "",
-                        summary: "",
-                        purposeKey: "NONE",
-                        ties: "",
-                      },
-                    ], // Ensure at least one sentence
-            }));
+            const validatedData: AnalysisData = imported.map((p: unknown) => {
+              const paragraph = p as Partial<ParagraphData>;
+              return {
+                id:
+                  typeof paragraph.id === "string"
+                    ? paragraph.id
+                    : uuidv4Func(),
+                sentences:
+                  Array.isArray(paragraph.sentences) &&
+                  paragraph.sentences.length > 0
+                    ? paragraph.sentences.map((s: unknown) => {
+                        const sentence = s as Partial<SentenceData>;
+                        return {
+                          id:
+                            typeof sentence.id === "string"
+                              ? sentence.id
+                              : uuidv4Func(),
+                          text:
+                            typeof sentence.text === "string"
+                              ? sentence.text
+                              : "",
+                          summary:
+                            typeof sentence.summary === "string"
+                              ? sentence.summary
+                              : "",
+                          purposeKey:
+                            typeof sentence.purposeKey === "string"
+                              ? sentence.purposeKey
+                              : "NONE",
+                          ties:
+                            typeof sentence.ties === "string"
+                              ? sentence.ties
+                              : "",
+                        };
+                      })
+                    : [
+                        {
+                          id: uuidv4Func(),
+                          text: "",
+                          summary: "",
+                          purposeKey: "NONE",
+                          ties: "",
+                        },
+                      ], // Ensure at least one sentence
+              };
+            });
             // Ensure at least one paragraph exists after import, even if imported data is empty array
             if (validatedData.length === 0) {
               const newPid = uuidv4Func();

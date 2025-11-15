@@ -11,10 +11,10 @@ let IS_PROD_ENV_FOR_HANDLER_TEST = false;
 // This is tricky. A common way is to import it as OriginalPOST first.
 // However, dynamic import within vi.mock factory is also an option.
 vi.mock('../../pages/api/create-post-handler', async (importOriginal) => {
-  const originalModule = await importOriginal(); // Import actual module
+  const originalModule = await importOriginal() as { POST: Function };
   return {
-    ...(originalModule as any), // Spread all original exports
-    POST: vi.fn(async (args: any) => { // Mock the POST export
+    ...originalModule, // Spread all original exports
+    POST: vi.fn(async (args: unknown) => { // Mock the POST export
       if (IS_PROD_ENV_FOR_HANDLER_TEST) {
         return new Response(JSON.stringify({ message: "Not available in production" }), {
           status: 403,
@@ -23,8 +23,8 @@ vi.mock('../../pages/api/create-post-handler', async (importOriginal) => {
       }
       // Call the original POST function from the actual module
       // Ensure originalModule.POST is the actual async function
-      if ((originalModule as any).POST && typeof (originalModule as any).POST === 'function') {
-        return (originalModule as any).POST(args);
+      if (originalModule.POST && typeof originalModule.POST === 'function') {
+        return originalModule.POST(args);
       }
       // Fallback if original POST cannot be called (should not happen)
       console.error("Original POST could not be called from mock!");
@@ -36,7 +36,7 @@ vi.mock('../../pages/api/create-post-handler', async (importOriginal) => {
 // --- Test Suite ---
 describe('POST /api/create-post-handler', () => {
   // Dynamically imported POST, which will be the mocked version.
-  let POST_underTest: any;
+  let POST_underTest: vi.Mock;
 
   beforeEach(async () => {
     IS_PROD_ENV_FOR_HANDLER_TEST = false; // Reset flag
@@ -69,7 +69,7 @@ describe('POST /api/create-post-handler', () => {
       }),
       headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     const responseBody = await response.json();
     expect(response.status).toBe(201);
     expect(responseBody.message).toBe('Post created successfully!');
@@ -80,7 +80,7 @@ describe('POST /api/create-post-handler', () => {
       method: 'POST', body: JSON.stringify({ pubDate: '2024-01-01', postType: 'standard' }),
       headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(400);
   });
 
@@ -89,7 +89,7 @@ describe('POST /api/create-post-handler', () => {
       method: 'POST', body: JSON.stringify({ title: 'Test Post', postType: 'standard' }),
       headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(400);
   });
 
@@ -98,7 +98,7 @@ describe('POST /api/create-post-handler', () => {
       method: 'POST', body: JSON.stringify({ title: 'Test Post', pubDate: '2024-01-01' }),
       headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(400);
   });
 
@@ -108,7 +108,7 @@ describe('POST /api/create-post-handler', () => {
       method: 'POST', body: JSON.stringify({ title: 'Existing Post', pubDate: '2024-01-01', postType: 'standard' }),
       headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(409);
   });
 
@@ -122,7 +122,7 @@ describe('POST /api/create-post-handler', () => {
       }),
       headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(201);
     expect(mockFs.writeFile).toHaveBeenCalledTimes(2);
   });
@@ -132,7 +132,7 @@ describe('POST /api/create-post-handler', () => {
       method: 'POST', body: '{"title": "Test Post", "pubDate": "2024-01-01", "postType": "standard", "bodyContent": "This is a test post." // Invalid JSON',
       headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(400);
   });
 
@@ -152,7 +152,7 @@ describe('POST /api/create-post-handler', () => {
     });
 
     // POST_underTest is already the mocked version due to top-level vi.mock and beforeEach import
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     const responseBody = await response.json();
 
     expect(response.status).toBe(403);
@@ -170,7 +170,7 @@ describe('POST /api/create-post-handler', () => {
       }),
       headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(500);
   });
 
@@ -185,7 +185,7 @@ describe('POST /api/create-post-handler', () => {
       }),
       headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(201);
   });
 
@@ -203,7 +203,7 @@ describe('POST /api/create-post-handler', () => {
       }),
       headers: { 'Content-Type': 'application/json' },
     });
-    const response = await POST_underTest({ request: mockRequest } as any);
+    const response = await POST_underTest({ request: mockRequest });
     expect(response.status).toBe(201);
   });
 });
