@@ -73,17 +73,72 @@ export function usePostSubmission({
         console.log(
           `[usePostSubmission:${actionType.toUpperCase()}] Submitting to: ${apiEndpoint}`
         );
-        console.log(
-          `[usePostSubmission:${actionType.toUpperCase()}] Payload:`,
-          JSON.stringify(payload, null, 2)
-        );
+      }
+
+      // Clean and validate payload before serialization
+      let requestBody: string;
+      try {
+        // Use a replacer to handle potential circular references and non-serializable values
+        requestBody = JSON.stringify(payload, (key, value) => {
+          // Handle null/undefined
+          if (value === null || value === undefined) {
+            return value;
+          }
+          // Filter out functions
+          if (typeof value === "function") {
+            if (import.meta.env.DEV) {
+              console.warn(
+                `[usePostSubmission:${actionType.toUpperCase()}] Removing function at key: ${key}`
+              );
+            }
+            return undefined;
+          }
+          // Filter out DOM nodes
+          if (typeof value === "object" && value instanceof Node) {
+            if (import.meta.env.DEV) {
+              console.warn(
+                `[usePostSubmission:${actionType.toUpperCase()}] Removing DOM node at key: ${key}`
+              );
+            }
+            return undefined;
+          }
+          return value;
+        });
+
+        if (import.meta.env.DEV) {
+          const payloadSizeKB = new Blob([requestBody]).size / 1024;
+          console.log(
+            `[usePostSubmission:${actionType.toUpperCase()}] Payload size: ${payloadSizeKB.toFixed(2)} KB`
+          );
+          if (payloadSizeKB > 1024) {
+            console.warn(
+              `[usePostSubmission:${actionType.toUpperCase()}] Large payload detected (> 1MB)`
+            );
+          }
+        }
+      } catch (serializeError) {
+        const errorMessage =
+          serializeError instanceof Error
+            ? serializeError.message
+            : "Unknown serialization error";
+        if (import.meta.env.DEV) {
+          console.error(
+            `[usePostSubmission:${actionType.toUpperCase()}] Failed to serialize payload:`,
+            serializeError
+          );
+          console.error(
+            `[usePostSubmission:${actionType.toUpperCase()}] Problematic payload keys:`,
+            Object.keys(payload)
+          );
+        }
+        throw new Error(`Failed to serialize form data: ${errorMessage}`);
       }
 
       try {
         const response = await fetch(apiEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: requestBody,
         });
 
         const apiResult: ApiSuccessResponse | ApiErrorResponse =
@@ -160,7 +215,9 @@ export function usePostSubmission({
       } catch (error: unknown) {
         const errorPayload: ApiErrorResponse = {
           message:
-            error instanceof Error ? error.message : "An unknown error occurred",
+            error instanceof Error
+              ? error.message
+              : "An unknown error occurred",
           stack: error instanceof Error ? error.stack : undefined,
         };
 

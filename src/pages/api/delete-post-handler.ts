@@ -9,6 +9,8 @@ import {
   formatZodError,
 } from "../../schemas/responses";
 
+// Mark as server-rendered endpoint (required for POST requests in dev mode)
+export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
   if (import.meta.env.PROD) {
@@ -22,12 +24,11 @@ export const POST: APIRoute = async ({ request }) => {
     const validationResult = DeletePostPayloadSchema.safeParse(rawPayload);
 
     if (!validationResult.success) {
-      // Check if slug is missing specifically
-      const slugError = validationResult.error.issues.find(
-        (err) => err.path[0] === "slug"
+      return createErrorResponse(
+        "Validation failed",
+        400,
+        formatZodError(validationResult.error)
       );
-      const message = slugError ? "Missing slug parameter" : "Validation failed";
-      return createErrorResponse(message, 400);
     }
 
     const { slug } = validationResult.data;
