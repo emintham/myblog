@@ -104,6 +104,7 @@ export interface PostApiPayload {
 export interface FrontmatterObject {
   title: string;
   pubDate: Date; // Stored as a Date object in the frontmatter
+  lastEdited?: Date; // Automatically set on updates
   author?: string; // Typically added by the API handler
   description?: string;
   postType: string;
@@ -132,6 +133,7 @@ export interface ParagraphData {
   sentences: SentenceData[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface AnalysisData extends Array<ParagraphData> {}
 
 export interface RhetoricalPurpose {
