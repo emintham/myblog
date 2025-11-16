@@ -100,6 +100,24 @@ const postUrlForComments = new URL(
                 day: "numeric",
               })}
             </time>
+            {frontmatter.lastEdited &&
+              new Date(frontmatter.lastEdited).toDateString() !==
+                new Date(frontmatter.pubDate).toDateString() && (
+                <>
+                  {" "}
+                  &bull; Updated{" "}
+                  <time datetime={frontmatter.lastEdited.toISOString()}>
+                    {new Date(frontmatter.lastEdited).toLocaleDateString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      }
+                    )}
+                  </time>
+                </>
+              )}{" "}
             by {frontmatter.author}
             {frontmatter.series && seriesLinkPath && (
               <span class="series-meta-inline">

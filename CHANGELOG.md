@@ -5,6 +5,7 @@
 - Auto-bump publication date when posts transition from draft to published.
 - Hide publication date from admin form (auto-populated in background).
 - Add lastEdited field that auto-updates on every post save (not shown in form).
+- Display "Updated" date next to publication date when post has been edited (skips if same as pub date).
 
 ## Nov 15, 2025
 

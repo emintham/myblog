@@ -11,7 +11,11 @@ const contentToDisplay = extractPreviewContent(post);
   <h2 class="preview-title">
     <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
   </h2>
-  <PostMeta pubDate={post.data.pubDate} author={post.data.author} />
+  <PostMeta
+    pubDate={post.data.pubDate}
+    lastEdited={post.data.lastEdited}
+    author={post.data.author}
+  />
   <div class="preview-content preview-text-content">
     <Fragment set:html={contentToDisplay} />
   </div>

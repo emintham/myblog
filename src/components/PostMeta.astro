@@ -1,19 +1,43 @@
 ---
-// src/components/PostMeta.astro
+// src/component/PostMeta.astro
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface Props {
   pubDate: Date;
+  lastEdited?: Date;
   author: string;
 }
 
-const { pubDate, author } = Astro.props;
+const { pubDate, lastEdited, author } = Astro.props;
 const formattedDate = new Date(pubDate).toLocaleDateString("en-US", {
   year: "numeric",
   month: "long",
   day: "numeric",
 });
+
+// Only show lastEdited if it exists and is different from pubDate
+const showLastEdited =
+  lastEdited &&
+  new Date(lastEdited).toDateString() !== new Date(pubDate).toDateString();
+
+const formattedLastEdited = lastEdited
+  ? new Date(lastEdited).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  : null;
 ---
 
 <p class="meta">
   <time datetime={pubDate.toISOString()}>{formattedDate}</time>
+  {
+    showLastEdited && formattedLastEdited && (
+      <>
+        {" "}
+        &bull; Updated{" "}
+        <time datetime={lastEdited!.toISOString()}>{formattedLastEdited}</time>
+      </>
+    )
+  }
   &bull; by {author}
 </p>

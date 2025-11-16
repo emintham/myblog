@@ -7,11 +7,13 @@ import Remark42Comments from "./Remark42Comments.astro";
 import BookQuotesSection from "./BookQuotesSection.astro";
 import ResponsiveImage from "./ResponsiveImage.astro";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface Props {
   entry: {
     data: {
       title: string;
       pubDate: Date;
+      lastEdited?: Date;
       author: string;
       bookTitle?: string;
       bookAuthor?: string;
@@ -19,6 +21,7 @@ interface Props {
       quotesRef?: string;
       bookTags?: string[];
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     render: () => Promise<{ Content: any }>;
     slug: string;
   };
@@ -89,7 +92,24 @@ const detailDefaultWidth = detailImageWidths.includes(800)
           })
         }
       </time>
-      by {frontmatter.author}
+      {
+        frontmatter.lastEdited &&
+          new Date(frontmatter.lastEdited).toDateString() !==
+            new Date(frontmatter.pubDate).toDateString() && (
+            <>
+              {" "}
+              &bull; Updated{" "}
+              <time datetime={frontmatter.lastEdited.toISOString()}>
+                {new Date(frontmatter.lastEdited).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </time>
+            </>
+          )
+      }
+      {" "}by {frontmatter.author}
     </p>
 
     {
