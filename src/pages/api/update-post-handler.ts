@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import fs from "node:fs/promises";
 import path from "node:path";
 import yaml from "js-yaml";
+import matter from "gray-matter";
 import { generateSlug } from "../../utils/slugify";
 import type { PostApiPayload } from "../../types/admin";
 import {
@@ -105,6 +106,39 @@ export const POST: APIRoute = async ({ request }) => {
 
     const payload: PostApiPayload = validationResult.data;
     const { originalFilePath, originalExtension, title, bodyContent } = payload;
+
+    // Check for draft-to-published transition and bump date if needed
+    if (originalFilePath) {
+      try {
+        const existingContent = await fs.readFile(originalFilePath, "utf-8");
+        const parsed = matter(existingContent);
+        const existingDraft = parsed.data.draft === true;
+        const newDraft =
+          payload.draft === true ||
+          payload.draft === "on" ||
+          (typeof payload.draft === "string" &&
+            payload.draft.toLowerCase() === "true");
+
+        // If transitioning from draft to published, bump the date to today
+        if (existingDraft && !newDraft) {
+          const today = new Date();
+          payload.pubDate = today.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+          if (import.meta.env.DEV) {
+            console.log(
+              `[API Update] Post transitioning from draft to published, updating pubDate to ${payload.pubDate}`
+            );
+          }
+        }
+      } catch (readError) {
+        // If we can't read the original file, just log and continue
+        // This might happen if the file was moved or deleted
+        if (import.meta.env.DEV) {
+          console.warn(
+            `[API Update] Could not read original file to check draft status: ${readError}`
+          );
+        }
+      }
+    }
 
     const currentTitle = title || "untitled"; // Should always have a title from the form
     const newSlug = generateSlug(currentTitle);
