@@ -225,6 +225,27 @@ const PostForm: React.FC<PostFormProps> = ({
     }
   }, [formId, handleSubmit, submitPost, inlineQuotes]);
 
+  // Add keyboard shortcut for Ctrl-S / Cmd-S to save
+  useEffect(() => {
+    const handleKeyboardSave = (event: KeyboardEvent) => {
+      // Check for Ctrl-S (Windows/Linux) or Cmd-S (Mac)
+      if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Trigger form submission
+        handleSubmit(async (data) => {
+          await submitPost({ ...data, inlineQuotes }, false);
+        })();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyboardSave);
+    return () => {
+      document.removeEventListener("keydown", handleKeyboardSave);
+    };
+  }, [handleSubmit, submitPost, inlineQuotes]);
+
   return (
     <>
       {/* Fieldset for Core Information */}
