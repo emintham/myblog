@@ -174,7 +174,10 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
-    const frontmatterObject = await transformApiPayloadToFrontmatter(payload); // Await the promise
+    const frontmatterObject = await transformApiPayloadToFrontmatter(
+      payload,
+      true
+    ); // Pass true for isUpdate
     const fileContent = generatePostFileContent(
       frontmatterObject,
       payload.bodyContent || "",

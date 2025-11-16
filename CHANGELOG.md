@@ -1,5 +1,11 @@
 # Changelog
 
+## Nov 16, 2025
+
+- Auto-bump publication date when posts transition from draft to published.
+- Hide publication date from admin form (auto-populated in background).
+- Add lastEdited field that auto-updates on every post save (not shown in form).
+
 ## Nov 15, 2025
 
 - Added collapsible sections to admin form (Core Information, Metadata, Book Note Details, Content).
