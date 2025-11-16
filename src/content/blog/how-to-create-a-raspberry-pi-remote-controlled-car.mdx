@@ -1,9 +1,12 @@
 ---
-title: How to create a Raspberry Pi Remote Controlled Car
+title: How to Create a Raspberry Pi Remote Controlled Car
 pubDate: 2025-10-25T00:00:00.000Z
 author: Emin Tham
 postType: standard
 draft: true
+description: >-
+  A guide to creating a Raspberry Pi Car controlled with a PS4 controller as a
+  programmer
 tags:
   - diy
   - robotics
@@ -13,24 +16,167 @@ tags:
 series: robotics with jay
 ---
 
+Jay recently expressed an interest in learning robotics and coding which presented an excellent opportunity for us to bond. This article is the result of our research and experiments with this project. It assumes no prior robotics, electronics, or mechanical engineering knowledge -- only a minimum technical background with computers.
+
+## Choices/Preamble
+
+There were three main categories based on my research: Lego Spike, robot kits, and free-form building from basic parts.
+
+Although the Lego route paired well with our existing Technic parts, Jay vehemently opposed the [cutesy look](https://www.lego.com/en-ca/product/lego-education-spike-prime-set-45678) and wanted something more "adult" and could conceivably be extended into a real robot. Of the two remaining options, there were a number of choices with different emphases.
+
+Some, like the [Picar-X](https://ca.robotshop.com/products/sunfounder-picarx-smart-robot-car-kit-raspberry-pi?gad_source=1&gad_campaignid=20151185247&gclid=Cj0KCQiA5uDIBhDAARIsAOxj0CEcaeVnpEdQ9RGAW1Sz92Rb_V09rS-9SPttCms3V4Lh4ufRmgvULTQaAh5xEALw_wcB) prioritized a cohesive guided experience with instructions that taught one to go from assembly to coding a robot car, providing parts that work well together, library code, and a custom mobile app to control the robot in most cases. [Others](https://www.makeblock.com/pages/mbot-ultimate-robotics-kit) were more free-form with a wealth of interesting parts but were more of a [walled garden](https://www.servocity.com/actobotics). In most cases, the coding was restricted to the manufacturer's ecosystem, limiting the potential of personally building a library of robotics code that could be evolved as one progressed. As such, I sold Jay on the idea that we would be able to learn much more about each step of the process if we built a robot car from scratch, using parts we sourced ourselves, and coding things ourselves without prebuilt libraries.
+
 ## Parts
 
-1. 18650 batteries x 2
+1. 2 x 18650 batteries
 2. 18650 battery charger
 3. 2-bay 18650 battery holder
-3. Raspberry Pi 5 16 GB
-4. Raspberry Pi Case
-5. Raspberry Pi Power Supply
-6. [Chassis](https://www.servocity.com/whippersnapper-runt-rover/)
-7. Driver HAT
-8. PS4 controller
-9. MicroSD >= 32GB
-10. MicroHDMI cable
+4. Raspberry Pi 5 16 GB
+5. Raspberry Pi Case
+6. Raspberry Pi Power Supply
+7. Chassis and motors
+8. Driver HAT (at least 2 connectors)
+9. PS4 controller
+10. MicroSD >= 32GB
+11. A MicroSD-USB adapter
+12. MicroHDMI cable
+13. Tiny screwdriver set
+14. Extra keyboard, mouse, monitor.
 
-## Notes
+## Setup
 
-1. Black powder, clean up. Follow video assembly instructions.
-2. Install Raspberry Pi OS using Imager.
-3. Setup environment.
-3. Hold share and Home button to pair. Don’t turn controller off.
-4. Install pyPS4Controller
+Assemble your chassis according to its instructions. Remember to wipe down your chassis first or you might end up with fine powder all over your hands if your have [the same one we did](https://www.servocity.com/whippersnapper-runt-rover/). Charge your batteries while working on the next couple of steps.
+
+Next, plug in your MicroSD card and flash the Raspberry Pi OS using the Raspberry Pi [Imager](https://www.raspberrypi.com/software/). You'll want to enter the advanced settings and set up SSH, WiFi, and the like to make it easier on yourself later. Once that's done, connect your RPi to a stable supply of power, your peripherals, and a monitor. You'll probably also want to setup your dev environment as you would any new computer.
+
+Once you've verified that the RPi is working properly, power it down and attach your [Driver HAT](https://www.pishop.ca/product/servo-driver-hat-for-raspberry-pi-16-channel-12-bit-i2c/?searchid=0&search_query=driver+hat) to its own battery power and attach it onto your RPi. You would want one that is able to drive at least 2 motors. For simplicity, we had opted for the non-encoder version of motors. This does not allow extremely fine-grained control of the car which precludes expansion to a self-driving car in future. In you are interested in [SLAM](https://www.flyability.com/blog/simultaneous-localization-and-mapping), you'll need to get encoder motors, LiDar, Inertial Measurement Unit (IMU), and an extra Encoder Driver Module to decode the encoder pulses. This would almost significantly drive up the initial costs of the project as well as introduce complexity during the coding step. If you are a complete beginner or unsure of whether you'd want to continue in robotics long-term, I would advise against this high initial investment.
+
+After powering it up and ensuring everything still boots, you'll want to hunt down the manufacturer of your HAT for driver software or libraries to interpret the signals to and from the HAT. Test the library to see if everything works as expected, cycling all motors with varying speeds. Note that you must supply power to the motor with batteries. Even tethered, the power to the RPi will not flow to the driver HAT module. The reverse direction is not true: with the car untethered, the battery is able to power both the motors and the RPi -- you do not need to supply additional power into the RPi's power jack during play.
+
+Test your controller next. The reason for going with a PS4 controller is the maturity of driver/library support. In addition, note that some older Xbox controllers do not support bluetooth and you may need additional hardware to pair it with your RPi. Two choices that came up in my research was [Pygame](https://www.pygame.org/news) and [PyPS4Controller](https://pypi.org/project/pyPS4Controller/). The latter had better ergonomics in my testing and was what we went with. Getting the DriverHAT library and PyPS4Controller library to work together is straightforward. We can now proceed to actually program the car.
+
+## Programming the Car
+
+If you're like me and not a gamer, it might surprise you that the PS4 controller's joystick is sensitive around the middle and less sensitive around the outside. This results in a jittery motor movement at rest if you map the joystick value linearly against motor movement. A simple solve is to define a "dead zone" around a small area of the middle that maps to 0 to avoid this sensitive jitter.
+
+Secondly, there's probably a minimum amount of drive you need to provide your motor in order for it to overcome its inertia. When mapping joystick value to motor value, the minimum drive should start at your motor's threshold.
+
+Thirdly, a linear map feels somewhat unnatural when actually controlling the car. Map it to a cubic or quadratic curve such that the sensitive inside area of the joystick shifts speed slowly while the outer area ramps up much quicker.
+
+I initially programmed the car to have the joysticks each control their respective motors directly (i.e. tank controls) given my familiarity with driving my zero-turn mower. However, the small range of motion on the joysticks made it much more difficult than I had anticipated. The more common control scheme seems to be to isolate forward-back into one joystick and left-right into another. The left-right value would then be added to or subtracted from the forward-back value to get the individual values for the left and right motors.
+
+Putting all these together, you'll end up with something akin to the following:
+
+```python
+class MyController(Controller):
+    # values of the controller run from negative at the top
+    # to positive at the bottom with at rest being 258
+    
+    BOTTOM = 32509
+    TOP = -33025
+    JOYSTICK_DEAD_ZONE = 0.05 # prevents drifting joystick from moving robot
+    EXPO_CURVE = 3.0 # Cubic, switch to quadratic (2.0) if too strong
+
+    def __init__(self, **kwargs):
+        Controller.__init__(self, **kwargs)
+        self.driver = Driver()
+        self.driver.start()
+        self.left_right = 0
+        self.up_down = 0
+
+    @classmethod
+    def map_joystick_to_motor(cls, joy):
+        if abs(joy) < cls.JOYSTICK_DEAD_ZONE:
+            return 0.0
+
+        exp_val = math.pow(abs(joy), cls.EXPO_CURVE)
+        motor_val = math.copysign(exp_val, joy)
+
+        min_val = 5
+        max_val = 95
+
+        mapped_val = abs(motor_val) * (max_val - min_val) + min_val
+
+        return math.copysign(mapped_val, joy)
+
+    @classmethod
+    def get_joystick_val(cls, val):
+        v = (val - 258) # rescale
+
+        # map up to (0, 1] and down to (-1, 0]
+        if v < 0:
+            v = v / cls.TOP
+        else:
+            v = -v / cls.BOTTOM
+
+        return v
+
+    def drive(self):
+        left = max(-1.0, min(1.0, self.up_down + self.left_right))
+        right = max(-1.0, min(1.0, self.up_down - self.left_right))
+        print(f"left={left}, right={right}")
+
+        left = self.map_joystick_to_motor(left)
+        right = self.map_joystick_to_motor(right)
+
+        self.driver.left(left)
+        self.driver.right(right)
+
+    def on_x_press(self): # emergency brake just in case
+        self.driver.stop()
+
+    def on_R3_left(self, value):
+        self.left_right = self.get_joystick_val(value)
+        self.drive()
+
+    def on_R3_right(self, value):
+        self.left_right = self.get_joystick_val(value)
+        self.drive()
+
+    def on_L3_up(self, value):
+        self.up_down = self.get_joystick_val(value)
+        self.drive()
+
+    def on_L3_down(self, value):
+        self.up_down = self.get_joystick_val(value)
+        self.drive()
+```
+
+## Running as a toy car
+
+After you're happy with your code, you'll want to ensure that your controller is able to automatically pair with the RPi across restarts and that your script for running the car starts upon boot up. To do that, you'll need to set up a systemd service.
+
+Create a file in `/etc/systemd/system/robot.service` similar to the following:
+
+```ini
+[Unit]
+Description=Robot Control
+After=network.target bluetooth.service
+Requires=bluetooth.service
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/my_robot/gamepad_control.py
+WorkingDirectory=/home/pi/my_robot
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then run the following:
+```bash
+# Reload the systemd manager
+sudo systemctl daemon-reload
+
+# Enable your service to start on every boot
+sudo systemctl enable robot.service
+
+# Start the service right now to test it
+sudo systemctl start robot.service
+
+# To check status
+sudo systemctl status robot.service
+```
