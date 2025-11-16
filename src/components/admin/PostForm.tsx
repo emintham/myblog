@@ -240,22 +240,8 @@ const PostForm: React.FC<PostFormProps> = ({
             <span className="field-error-message">{errors.title.message}</span>
           )}
         </div>
-        <div className="form-field">
-          <label htmlFor="pubDate">Publication Date*</label>
-          <input
-            type="date"
-            id="pubDate"
-            {...register("pubDate", {
-              required: "Publication date is required",
-              valueAsDate: true, // Ensures RHF treats it as a date for potential date-specific validation
-            })}
-          />
-          {errors.pubDate && (
-            <span className="field-error-message">
-              {errors.pubDate.message}
-            </span>
-          )}
-        </div>
+        {/* pubDate is now auto-populated and hidden from the form */}
+        <input type="hidden" {...register("pubDate")} />
         <div className="form-field">
           <label htmlFor="description">Description</label>
           <textarea id="description" {...register("description")}></textarea>

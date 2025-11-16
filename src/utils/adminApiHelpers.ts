@@ -13,10 +13,12 @@ const originalImagesDir = path.join(projectRoot, "images", "originals"); // Defi
  * Transforms the raw API payload (similar to PostFormData) into a structured
  * FrontmatterObject suitable for writing to a file.
  * @param payload The raw data received by the API endpoint.
+ * @param isUpdate Whether this is an update operation (sets lastEdited field).
  * @returns A structured object for frontmatter.
  */
 export async function transformApiPayloadToFrontmatter(
-  payload: PostApiPayload
+  payload: PostApiPayload,
+  isUpdate = false
 ): Promise<FrontmatterObject> {
   const frontmatter: FrontmatterObject = {
     title: payload.title,
@@ -29,6 +31,11 @@ export async function transformApiPayloadToFrontmatter(
       (typeof payload.draft === "string" &&
         payload.draft.toLowerCase() === "true"),
   };
+
+  // Set lastEdited to current date on updates
+  if (isUpdate) {
+    frontmatter.lastEdited = new Date();
+  }
 
   if (payload.description) {
     frontmatter.description = payload.description;

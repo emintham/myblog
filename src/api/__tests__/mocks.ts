@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi } from "vitest";
 
 // Mock fs module
 export const mockFs = {
@@ -6,8 +6,9 @@ export const mockFs = {
   writeFile: vi.fn(),
   unlink: vi.fn(),
   mkdir: vi.fn(),
+  readFile: vi.fn(),
 };
-vi.mock('node:fs/promises', () => ({
+vi.mock("node:fs/promises", () => ({
   default: mockFs,
   // For some reason, Astro/Vite needs named exports for internal node modules sometimes.
   // Let's ensure they are there if needed, though default should be primary.
@@ -15,35 +16,50 @@ vi.mock('node:fs/promises', () => ({
   writeFile: mockFs.writeFile,
   unlink: mockFs.unlink,
   mkdir: mockFs.mkdir,
+  readFile: mockFs.readFile,
 }));
 
 // Mock js-yaml
 export const mockJsYaml = {
   dump: vi.fn(),
 };
-vi.mock('js-yaml', () => ({
+vi.mock("js-yaml", () => ({
   default: mockJsYaml,
   dump: mockJsYaml.dump, // If it's used as a named import anywhere
+}));
+
+// Mock gray-matter
+export const mockMatter = vi.fn(() => ({
+  data: {},
+  content: "",
+}));
+vi.mock("gray-matter", () => ({
+  default: mockMatter,
 }));
 
 // Mock slugify
 // In the original tests, generateSlug was defined slightly differently for create vs update.
 // Using a common one now. If specific behavior is needed, tests can override the mock implementation per test.
-export const mockGenerateSlug = vi.fn((title: string) =>
-  title.toLowerCase().replace(/\s+/g, '-').replace(/[?'"]/g, '') // More generic slugify
+export const mockGenerateSlug = vi.fn(
+  (title: string) =>
+    title.toLowerCase().replace(/\s+/g, "-").replace(/[?'"]/g, "") // More generic slugify
 );
-vi.mock('../../../utils/slugify', () => ({
+vi.mock("../../../utils/slugify", () => ({
   generateSlug: mockGenerateSlug,
 }));
 
 // Mock adminApiHelpers
-export const mockTransformApiPayloadToFrontmatter = vi.fn(async (payload) => ({ ...payload })); // Simplified, actual was Promise.resolve
-export const mockGeneratePostFileContent = vi.fn((frontmatter, body) => `---
+export const mockTransformApiPayloadToFrontmatter = vi.fn(async (payload) => ({
+  ...payload,
+})); // Simplified, actual was Promise.resolve
+export const mockGeneratePostFileContent = vi.fn(
+  (frontmatter, body) => `---
 ${JSON.stringify(frontmatter)}
 ---
-${body}`);
+${body}`
+);
 
-vi.mock('../../../utils/adminApiHelpers', () => ({
+vi.mock("../../../utils/adminApiHelpers", () => ({
   transformApiPayloadToFrontmatter: mockTransformApiPayloadToFrontmatter,
   generatePostFileContent: mockGeneratePostFileContent,
 }));

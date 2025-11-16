@@ -5,12 +5,14 @@ import ResponsiveImage from "./ResponsiveImage.astro"; // Import the ResponsiveI
 import PostMeta from "./PostMeta.astro";
 import PreviewLinkWrapper from "./PreviewLinkWrapper.astro";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface Props {
   post: {
     slug: string;
     data: {
       title: string; // Title of the review/note
       pubDate: Date;
+      lastEdited?: Date;
       description?: string; // Description of the review/note
       author: string; // Author of the review/note
       postType?: string;
@@ -80,7 +82,11 @@ const previewDefaultWidth = previewImageWidths.includes(100)
         )
       }
 
-      <PostMeta pubDate={frontmatter.pubDate} author={frontmatter.author} />
+      <PostMeta
+        pubDate={frontmatter.pubDate}
+        lastEdited={frontmatter.lastEdited}
+        author={frontmatter.author}
+      />
 
       {
         frontmatter.description && (
