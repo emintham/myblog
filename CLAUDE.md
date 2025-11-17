@@ -9,6 +9,7 @@ An Astro-powered minimalist blog template inspired by Kinfolk magazine, featurin
 ## Commands
 
 ### Development
+
 ```bash
 pnpm dev          # Start Astro dev server with hot-reload
 pnpm start        # Alias for pnpm dev
@@ -16,11 +17,13 @@ pnpm preview      # Preview production build locally
 ```
 
 ### Build & Deploy
+
 ```bash
 pnpm build        # Build static site for production (outputs to dist/)
 ```
 
 ### Code Quality
+
 ```bash
 pnpm fmt          # Format code with Prettier (includes Astro files)
 pnpm check-format # Check formatting without modifying files
@@ -30,6 +33,7 @@ pnpm style:fix    # Fix CSS/SCSS with Stylelint
 ```
 
 ### Content Management Scripts
+
 ```bash
 pnpm new-post     # Interactive CLI to create new blog post
 pnpm clear-posts  # Remove all posts (use with caution)
@@ -39,7 +43,9 @@ pnpm img          # Process images: convert to WebP, generate responsive variant
 ```
 
 ### Testing
+
 Tests use Vitest with jsdom environment. Run tests with:
+
 ```bash
 pnpm vitest       # Run tests in watch mode
 pnpm vitest run   # Run tests once
@@ -77,6 +83,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 **Examples:**
+
 - Good: "feat: add toast notifications for save feedback"
 - Too verbose: "feat: add toast notifications to provide user feedback when saving posts in the admin interface"
 
@@ -94,16 +101,19 @@ Update CHANGELOG.md for user-facing features/fixes only. Add under current date 
 The codebase implements three distinct post types with conditional rendering throughout:
 
 **1. Standard Posts** (`postType: "standard"`)
+
 - Traditional long-form blog articles
 - Full metadata display (tags, series, comments)
 - Truncated previews with "Read more" links
 
 **2. Fleeting Thoughts** (`postType: "fleeting"`)
+
 - Short-form posts for quick insights
 - Fully displayed in preview cards (no truncation)
 - Minimal metadata display
 
 **3. Book Notes** (`postType: "bookNote"`)
+
 - Specialized content type for book reviews and knowledge curation
 - Requires: `bookTitle`, `bookAuthor`, `bookCover` (image metadata), `bookTags`
 - Associated quotes stored in separate YAML files via `quotesRef` field
@@ -124,16 +134,19 @@ All use `getUniqueValuesFromCollection()` in `contentUtils.ts`.
 ### Content-to-File Relationship
 
 **Posts:** `src/content/blog/{slug}.md` (or `.mdx`)
+
 - Frontmatter validated by Zod schema in `src/content/config.ts`
 - Content rendered via Astro's Content Collections API
 - File name = slug (generated via `src/utils/slugify.ts`)
 
 **Book Quotes:** `src/content/bookQuotes/{quotesRef}.yaml`
+
 - Separate data collection referenced by `quotesRef` field in book note frontmatter
 - Each quote has: `text`, `tags[]`, `quoteAuthor`, `quoteSource`
 - Loaded via `getEntry("bookQuotes", quotesRef)` in book note pages
 
 **Images:** Three-layer system
+
 1. Place originals in `images/originals/`
 2. Run `pnpm img` to generate responsive variants in `public/images/processed/`
 3. Reference in frontmatter as `imageName: "filename-base"` (without extension)
@@ -148,6 +161,36 @@ All use `getUniqueValuesFromCollection()` in `contentUtils.ts`.
 **Auto-Save:** Every 2 min when body changes (silent, via `useAutoSave()` hook)
 
 **Important:** Server-rendered (`prerender = false`), uses Node.js fs (dev only).
+
+### RAG System (Local Semantic Search)
+
+**Location:** `src/services/rag/`
+
+**Purpose:** Local semantic search across all content types for authoring assistance
+
+**Components:**
+
+- `index.ts` - Public RAG service API (query, upsert, delete, rebuild)
+- `storage.ts` - LanceDB vector database wrapper with Apache Arrow schemas
+- `chunking.ts` - Paragraph splitting (posts) and quote-level chunking
+- `embeddings.ts` - Embedding provider abstraction (transformers.js)
+- `fs-loader.ts` - File system content loader for CLI operations
+
+**Storage:** `data/rag/` (gitignored, persistent across restarts)
+
+- `posts.lance/` - Vector table for post paragraphs
+- `quotes.lance/` - Vector table for book quotes
+- `metadata.json` - Index configuration and statistics
+
+**CLI Tools:**
+
+- `pnpm rq "query text"` - Search for semantically similar content
+- `pnpm rrb` - Rebuild entire index from content collections
+- `pnpm rst` - View index statistics and storage info
+
+**Integration:** Phase 2 will hook into create/update/delete handlers for automatic indexing
+
+**Note:** Requires internet on first use to download embedding model (cached thereafter)
 
 ### API Handler Architecture
 
@@ -238,6 +281,7 @@ Pattern to follow (see existing book tags/quote tags implementation):
 ### Working with Content Collections
 
 **Always use Astro's Content Collections API:**
+
 ```typescript
 import { getCollection, getEntry } from "astro:content";
 
@@ -274,23 +318,25 @@ Via `slugify.ts`: lowercase, replace spaces/special chars with hyphens, deduplic
 
 ## Important Files Reference
 
-| Concern | Key Files |
-|---------|-----------|
-| Content schemas | `src/content/config.ts` |
-| Type definitions | `src/types/admin.d.ts` |
-| Slug generation | `src/utils/slugify.ts` |
-| Tag utilities | `src/utils/contentUtils.ts` |
-| Series utilities | `src/utils/seriesUtils.ts` |
-| Search utilities | `src/utils/searchUtils.ts` |
-| Content preview extraction | `src/utils/content.ts` |
-| API transformation logic | `src/utils/adminApiHelpers.ts` |
-| Form state management | `src/components/admin/PostForm.tsx`, `src/hooks/*.ts` |
-| Post routing | `src/components/PostPreview.astro` |
-| Pagination | `src/components/Pagination.astro`, `src/pages/[page].astro` |
-| Search | `src/components/SearchButton.tsx`, `src/components/SearchModal.tsx`, `src/pages/search-data.json.ts` |
-| Series navigation | `src/components/SeriesNavigation.astro` |
-| Image processing | `scripts/process-images.mjs`, `src/components/ResponsiveImage.astro` |
-| API handlers | `src/pages/api/*-handler.ts` |
+| Concern                    | Key Files                                                                                                                    |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Content schemas            | `src/content/config.ts`                                                                                                      |
+| Type definitions           | `src/types/admin.d.ts`                                                                                                       |
+| Slug generation            | `src/utils/slugify.ts`                                                                                                       |
+| Tag utilities              | `src/utils/contentUtils.ts`                                                                                                  |
+| Series utilities           | `src/utils/seriesUtils.ts`                                                                                                   |
+| Search utilities           | `src/utils/searchUtils.ts`                                                                                                   |
+| Content preview extraction | `src/utils/content.ts`                                                                                                       |
+| API transformation logic   | `src/utils/adminApiHelpers.ts`                                                                                               |
+| Form state management      | `src/components/admin/PostForm.tsx`, `src/hooks/*.ts`                                                                        |
+| Post routing               | `src/components/PostPreview.astro`                                                                                           |
+| Pagination                 | `src/components/Pagination.astro`, `src/pages/[page].astro`                                                                  |
+| Search                     | `src/components/SearchButton.tsx`, `src/components/SearchModal.tsx`, `src/pages/search-data.json.ts`                         |
+| Series navigation          | `src/components/SeriesNavigation.astro`                                                                                      |
+| Image processing           | `scripts/process-images.mjs`, `src/components/ResponsiveImage.astro`                                                         |
+| RAG system                 | `src/services/rag/index.ts`, `src/services/rag/storage.ts`, `src/services/rag/chunking.ts`, `src/services/rag/embeddings.ts` |
+| RAG CLI tools              | `scripts/rag-query.mjs`, `scripts/rag-rebuild.mjs`, `scripts/rag-stats.mjs`                                                  |
+| API handlers               | `src/pages/api/*-handler.ts`                                                                                                 |
 
 ## Known Patterns to Maintain
 

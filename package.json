@@ -13,6 +13,9 @@
     "img": "node scripts/process-images.mjs",
     "export-posts": "node scripts/export-posts.mjs",
     "import-posts": "node scripts/import-posts.mjs",
+    "rq": "tsx scripts/rag-query.mjs",
+    "rrb": "tsx scripts/rag-rebuild.mjs",
+    "rst": "tsx scripts/rag-stats.mjs",
     "fmt": "prettier --write . --plugin prettier-plugin-astro",
     "check-format": "prettier --check . --plugin prettier-plugin-astro",
     "lint": "eslint . --ext .js,.cjs,.mjs,.ts,.astro",
@@ -44,8 +47,11 @@
     "@codemirror/language": "^6.11.3",
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.38.6",
+    "@lancedb/lancedb": "^0.22.3",
     "@types/react": "^19.1.5",
     "@types/react-dom": "^19.1.5",
+    "@xenova/transformers": "^2.17.2",
+    "apache-arrow": "^18.1.0",
     "codemirror": "^6.0.2",
     "fuse.js": "^7.1.0",
     "glob": "^11.0.2",
@@ -56,7 +62,7 @@
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.56.4",
     "react-select": "^5.10.1",
-    "sharp": "^0.34.2",
+    "sharp": "0.34.2",
     "uuid": "^11.1.0",
     "vite": "^6.3.5",
     "zod": "^4.1.12"
@@ -85,7 +91,13 @@
     "prettier-plugin-astro": "^0.14.1",
     "stylelint": "^16.19.1",
     "stylelint-config-standard": "^38.0.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.8.3",
     "vitest": "^3.1.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "sharp": "0.34.2"
+    }
   }
 }
