@@ -14,6 +14,7 @@ import {
   createSuccessResponse,
   formatZodError,
 } from "../../schemas/responses";
+import { getRAGService } from "../../services/rag/index";
 
 // Mark as server-rendered endpoint (required for POST requests in dev mode)
 export const prerender = false;
@@ -173,6 +174,46 @@ export const POST: APIRoute = async ({ request }) => {
     );
 
     await fs.writeFile(filePath, fileContent);
+
+    // --- RAG Indexing ---
+    try {
+      const ragService = await getRAGService();
+
+      // Index the post content
+      await ragService.upsertPost(slug, {
+        title: frontmatterObject.title,
+        content: payload.bodyContent || "",
+        postType: payload.postType,
+        tags: frontmatterObject.tags,
+        series: frontmatterObject.series,
+        pubDate: frontmatterObject.pubDate,
+      });
+
+      // Index book quotes if this is a book note
+      if (payload.postType === "bookNote" && generatedQuotesRef) {
+        const quotes = (payload.inlineQuotes || []).map((q) => ({
+          text: q.text,
+          tags: q.tags,
+          quoteAuthor: q.quoteAuthor,
+          quoteSource: q.quoteSource,
+        }));
+
+        if (quotes.length > 0) {
+          await ragService.upsertQuotes(generatedQuotesRef, quotes, {
+            bookTitle: frontmatterObject.bookTitle || "Unknown",
+            bookAuthor: frontmatterObject.bookAuthor || "Unknown",
+          });
+        }
+      }
+
+      if (import.meta.env.DEV) {
+        console.log(`[RAG] Successfully indexed post: ${slug}`);
+      }
+    } catch (ragError) {
+      // Log but don't fail the request if RAG indexing fails
+      console.error(`[RAG] Failed to index post ${slug}:`, ragError);
+    }
+    // --- End RAG Indexing ---
 
     const responsePayload = {
       message: "Post created successfully!",

@@ -18,15 +18,24 @@ Persistent semantic search across all content types during local authoring, with
 - [x] Persistent storage in `data/rag/`
 - [x] CLI tools: `rq`, `rrb`, `rst`
 - [x] Unit tests (17 passing) and integration tests (14 passing)
-- [ ] Hook into create/update/delete handlers (deferred to Phase 2)
 
-**Phase 2 - Ollama MCP Integration:**
+**Phase 2 - Auto-Indexing:** ✅ **COMPLETED**
+
+- [x] Hook `ragService.upsertPost()` into create/update handlers
+- [x] Hook `ragService.deletePost()` into delete handler
+- [x] Handle book quotes separately (upsertQuotes/deleteQuotes)
+- [x] Add error handling and fallbacks
+- [x] Create `/api/rag-stats` endpoint
+- [x] Add logging for index operations
+- [x] Write tests for all CRUD operations (15 passing)
+
+**Phase 3 - Ollama MCP Integration:**
 
 - [ ] Auto-detect Ollama MCP server
 - [ ] Fallback to @xenova/transformers
 - [ ] Embedding provider abstraction
 
-**Phase 3 - Admin UI:**
+**Phase 4 - Admin UI:**
 
 - [ ] Related content panel in PostForm
 - [ ] Real-time semantic suggestions
