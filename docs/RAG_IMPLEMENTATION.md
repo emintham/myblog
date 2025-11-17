@@ -472,6 +472,154 @@ Suggested tags based on content:
 - Preview quote in context
 - Insert into post with citation
 
+## Documentation Update Plan
+
+Each phase requires specific documentation updates to keep all files in sync:
+
+### Phase 1: Core Infrastructure
+
+**Update after completion:**
+
+- **ROADMAP.md**: Check off Phase 1 tasks
+- **INSTALL.md**: Add optional Ollama setup section
+  ```markdown
+  ## Optional: Ollama for Better Embeddings (Recommended)
+
+  For higher-quality semantic search, install Ollama:
+  1. Install Ollama: https://ollama.com/download
+  2. Pull embedding model: `ollama pull nomic-embed-text`
+  3. RAG system will auto-detect and use Ollama when available
+  ```
+- **GUIDE.md**: Add new "RAG Index Management" section
+  ```markdown
+  ## RAG Index Management
+
+  The blog includes a local semantic search system that indexes your content:
+
+  - **Automatic indexing**: Posts/quotes are indexed when you save them
+  - **Manual rebuild**: `pnpm rag-rebuild` (run if index gets corrupted)
+  - **Query index**: `pnpm rag-query "search term"`
+  - **View stats**: `pnpm rag-stats`
+
+  The index is stored in `data/rag/` and persists between dev server restarts.
+  ```
+- **package.json**: Verify new scripts are documented
+- **CLAUDE.md**: Add RAG service to "Architecture Overview" and "Important Files Reference"
+  ```markdown
+  ### RAG System
+
+  **Location:** `src/services/rag/`
+
+  **Purpose:** Local semantic search across all content types
+
+  **Components:**
+  - `index.ts` - Public RAG service API
+  - `storage.ts` - LanceDB wrapper
+  - `chunking.ts` - Paragraph splitting
+  - `embeddings.ts` - Provider abstraction
+
+  **Integration:** Auto-indexes posts/quotes on save via API handlers
+
+  **CLI Tools:** `rag-query`, `rag-rebuild`, `rag-stats`
+  ```
+
+### Phase 2: Ollama MCP Integration
+
+**Update after completion:**
+
+- **ROADMAP.md**: Check off Phase 2 tasks
+- **INSTALL.md**: Enhance Ollama section with MCP server setup
+  ```markdown
+  ## Ollama MCP Server (Optional)
+
+  For automatic Ollama detection:
+  1. Install Ollama MCP server: `npm install -g @modelcontextprotocol/server-ollama`
+  2. RAG system will detect and use it automatically
+  3. Or force provider: `RAG_EMBEDDING_PROVIDER=ollama pnpm rag-rebuild`
+  ```
+- **GUIDE.md**: Update RAG section with provider info
+  ```markdown
+  ### Embedding Providers
+
+  The RAG system supports two embedding providers:
+  1. **Ollama** (preferred): Better quality, local models
+  2. **Transformers.js** (fallback): Zero-config, works offline
+
+  Check current provider: `pnpm rag-stats`
+  ```
+- **.env.example**: Create if doesn't exist, add RAG variables
+  ```bash
+  # RAG Configuration (optional)
+  RAG_EMBEDDING_PROVIDER=ollama  # or 'transformers'
+  RAG_DATA_DIR=./data/rag
+  RAG_OLLAMA_MODEL=nomic-embed-text
+  ```
+- **CLAUDE.md**: Update RAG section with provider details
+
+### Phase 3: Admin UI
+
+**Update after completion:**
+
+- **ROADMAP.md**: Check off Phase 3 tasks, mark entire RAG feature complete
+- **README.md**: Add RAG to "Advanced Content & Knowledge Management" section
+  ```markdown
+  - **Semantic Search & Related Content:**
+    - Real-time related content suggestions while writing
+    - Semantic search across all posts and book quotes
+    - Smart tag/series recommendations based on content
+    - Quote finder for quick reference insertion
+    ![Related Content Panel Screenshot](images/rag-panel.png)
+  ```
+- **GUIDE.md**: Add "Writing with RAG Assistance" section
+  ```markdown
+  ## Writing with RAG Assistance
+
+  When editing posts in the admin interface, the Related Content panel
+  shows semantically similar content as you type:
+
+  - **Related Posts**: Similar posts from your archive
+  - **Relevant Quotes**: Book quotes matching your content
+  - **Tag Suggestions**: Recommended tags based on similar posts
+  - **Insert Links**: Click to add markdown references
+
+  The panel updates automatically every 2 seconds while typing.
+  Toggle visibility with the sidebar button.
+  ```
+- **CLAUDE.md**: Add to "Development Patterns" section
+  ```markdown
+  ### Working with RAG Suggestions
+
+  The admin UI includes a RelatedContentPanel component:
+  - Auto-queries RAG index as user types (debounced 2s)
+  - Shows related posts and relevant quotes
+  - Enables quick reference insertion
+  - Gracefully degrades if RAG unavailable
+
+  Location: `src/components/admin/RelatedContentPanel.tsx`
+  Hook: `src/hooks/useRAGQuery.ts`
+  ```
+- **CHANGELOG.md**: Add entry for RAG feature
+  ```markdown
+  ## [Date]
+
+  ### Added
+  - Local RAG system for semantic search during authoring
+  - Related content panel in post editor
+  - Automatic content indexing on save
+  - CLI tools for index management
+  - Ollama MCP integration for better embeddings
+  ```
+
+### Post-Implementation (All Phases Complete)
+
+**Final documentation tasks:**
+
+- **README.md**: Add screenshots of RAG panel
+- **docs/RAG_IMPLEMENTATION.md**: Mark as "IMPLEMENTED" at top
+- **ROADMAP.md**: Move RAG to "Completed" section
+- **.gitignore**: Verify `data/rag/` is listed
+- **CLAUDE.md**: Final review of all RAG references
+
 ## Implementation Phases
 
 ### Phase 1: Core Infrastructure (Est: 8-12 hours)
