@@ -4,6 +4,34 @@
 
 ### High Priority
 
+#### Local RAG System for Authoring (High effort)
+
+**See `docs/RAG_IMPLEMENTATION.md` for detailed requirements and architecture.**
+
+Persistent semantic search across all content types during local authoring, with automatic indexing on save.
+
+**Phase 1 - Core Infrastructure:**
+- [ ] RAG service layer with LanceDB
+- [ ] Paragraph-level embedding (posts + quotes)
+- [ ] Hook into create/update/delete handlers
+- [ ] Persistent storage in `data/rag/`
+- [ ] CLI tools: `rag-query`, `rag-rebuild`, `rag-stats`
+
+**Phase 2 - Ollama MCP Integration:**
+- [ ] Auto-detect Ollama MCP server
+- [ ] Fallback to @xenova/transformers
+- [ ] Embedding provider abstraction
+
+**Phase 3 - Admin UI:**
+- [ ] Related content panel in PostForm
+- [ ] Real-time semantic suggestions
+- [ ] Tag/series recommendations
+- [ ] Quote finder for book notes
+
+**Replaces:** Related Posts, Idea Development Dashboard, Integrated Writing Assistant Phase 1 (RAG powers all these features)
+
+---
+
 #### Improve Image Processing Error Handling (Low effort)
 
 - [ ] Check for missing `images/originals/` directory
@@ -56,63 +84,7 @@ const posts = await getCollection("blog", ({ data }) => {
 
 ---
 
-#### Related Posts (Medium effort)
-
-Display 3-5 related posts via similarity scoring (series > tags > type).
-
-- [ ] Create `src/utils/relatedPosts.ts` with scoring logic
-- [ ] Create `RelatedPosts.astro` component
-- [ ] Add to post detail pages
-- [ ] Make count configurable
-
----
-
 ### Medium Priority
-
-#### Idea Development Dashboard (Medium effort)
-
-**Location:** Analyze tab (separate exploration mode)
-
-Query-driven interface to review and develop captured ideas into articles.
-
-**Core Features:**
-- [ ] **Undeveloped quotes**: Book highlights not yet referenced in posts
-- [ ] **Orphaned fleeting thoughts**: Quick notes that share tags but haven't been expanded
-- [ ] **Synthesis suggestions**: "These 3 fleeting thoughts all touch on [theme]"
-- [ ] **Evolution view**: How thinking on a tag/topic has progressed over time
-- [ ] **Query interface**: "Show me all quotes about X that I haven't written about"
-
-**Workflow:** Reading → Book Notes/Fleeting Thoughts → Dashboard → Standard Posts
-
-**Replaces:** Close reading feature (better aligned with actual workflow)
-
----
-
-#### Integrated Writing Assistant (Medium-High effort)
-
-**Location:** PostForm editor (active writing help, low-friction)
-
-Contextual suggestions and tools while writing, without breaking flow.
-
-**Phase 1 - Local/Passive (Medium effort):**
-- [ ] Related content sidebar (similar posts/quotes as you type)
-- [ ] Writing quality metrics (readability scores, word count, passive voice)
-- [ ] Tag co-occurrence suggestions
-- [ ] Internal link suggestions (posts that share themes)
-
-**Phase 2 - AI-Powered (High effort, opt-in):**
-- [ ] Text selection → rewrite suggestions
-- [ ] Idea expansion from fleeting thoughts
-- [ ] Auto-generated descriptions/summaries
-- [ ] Tone/style adjustments
-
-**Technical:**
-- Phase 1: Pure JavaScript/regex, TF-IDF similarity, local only
-- Phase 2: OpenAI/Claude/Ollama, API security, rate limits, graceful degradation
-
-**Design Principle:** Passive presence, no forced interaction, available when needed
-
----
 
 #### Link Helper (Low-Medium effort)
 
@@ -131,11 +103,13 @@ Quick link insertion with internal post search and validation.
 
 ## Implementation Priority
 
+**Highest:** Local RAG System (enables semantic search, related content, writing assistance)
+
 **Quick Wins:** Env config, image path utility, image processing errors
 
-**High Value:** Scheduled publishing, related posts, Idea Development Dashboard
+**High Value:** Scheduled publishing, link helper
 
-**Future:** Integrated Writing Assistant (Phase 1 → Phase 2), link helper
+**Future:** Advanced RAG features (idea synthesis, writing metrics, AI-powered suggestions)
 
 ---
 
