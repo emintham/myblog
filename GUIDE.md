@@ -15,7 +15,6 @@ This guide provides instructions on how to use, develop, and maintain your Kinfo
     ```
 
 2.  **Image Processing:**
-
     - Place your original high-resolution images (JPG, PNG) in the `images/originals/` directory at the root of your project.
     - Run the image processing script to generate optimized WebP versions and responsive sizes:
       ```bash
@@ -29,7 +28,18 @@ This guide provides instructions on how to use, develop, and maintain your Kinfo
 
     **Publishing:** All new content defaults to `draft: true`. Change to `draft: false` in the Markdown frontmatter (or via the admin edit interface) to publish.
 
-4.  **Linting & Formatting:**
+4.  **RAG Index Management:**
+
+    The blog includes a local semantic search system that indexes your content for intelligent similarity search:
+    - **Query index:** `pnpm rq "search term"` - Find semantically similar content
+    - **Rebuild index:** `pnpm rrb` - Rebuild from scratch (if corrupted or after bulk changes)
+    - **View statistics:** `pnpm rst` - See index stats and storage info
+
+    **Storage:** The index is stored in `data/rag/` (gitignored) and persists between dev server restarts.
+
+    **Note:** The system requires internet access on first use to download the embedding model (~25MB). This is cached locally for subsequent use. Future phases will add automatic indexing when you save posts through the admin interface.
+
+5.  **Linting & Formatting:**
     - Apply formatting: `pnpm run format`
     - Check for lint errors: `pnpm run lint`
     - Attempt to auto-fix lint errors: `pnpm run lint:fix`

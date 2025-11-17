@@ -28,3 +28,6 @@ pnpm-debug.log*
 .claude/
 
 .exported-content/
+
+# RAG index (do not commit)
+data/rag/

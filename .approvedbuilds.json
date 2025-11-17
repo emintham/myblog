@@ -1,0 +1,7 @@
+{
+  "approvedPackages": {
+    "sharp": true,
+    "esbuild": true,
+    "protobufjs": true
+  }
+}

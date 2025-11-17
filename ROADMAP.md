@@ -10,19 +10,24 @@
 
 Persistent semantic search across all content types during local authoring, with automatic indexing on save.
 
-**Phase 1 - Core Infrastructure:**
-- [ ] RAG service layer with LanceDB
-- [ ] Paragraph-level embedding (posts + quotes)
-- [ ] Hook into create/update/delete handlers
-- [ ] Persistent storage in `data/rag/`
-- [ ] CLI tools: `rag-query`, `rag-rebuild`, `rag-stats`
+**Phase 1 - Core Infrastructure:** ✅ **COMPLETED**
+
+- [x] RAG service layer with LanceDB
+- [x] Paragraph-level chunking (posts + quotes)
+- [x] Transformers.js embedding provider (384-dim)
+- [x] Persistent storage in `data/rag/`
+- [x] CLI tools: `rq`, `rrb`, `rst`
+- [x] Unit tests (17 passing) and integration tests (14 passing)
+- [ ] Hook into create/update/delete handlers (deferred to Phase 2)
 
 **Phase 2 - Ollama MCP Integration:**
+
 - [ ] Auto-detect Ollama MCP server
 - [ ] Fallback to @xenova/transformers
 - [ ] Embedding provider abstraction
 
 **Phase 3 - Admin UI:**
+
 - [ ] Related content panel in PostForm
 - [ ] Real-time semantic suggestions
 - [ ] Tag/series recommendations
@@ -78,7 +83,9 @@ Schedule posts for future publication with automated rebuilds.
 // Example filter
 const posts = await getCollection("blog", ({ data }) => {
   const publishDate = data.scheduledPublishDate || data.pubDate;
-  return import.meta.env.PROD ? data.draft !== true && publishDate <= now : true;
+  return import.meta.env.PROD
+    ? data.draft !== true && publishDate <= now
+    : true;
 });
 ```
 
