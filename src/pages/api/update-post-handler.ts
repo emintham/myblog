@@ -15,6 +15,7 @@ import {
   createSuccessResponse,
   formatZodError,
 } from "../../schemas/responses";
+import { getRAGService } from "../../services/rag/index";
 
 // Mark as server-rendered endpoint (required for POST requests in dev mode)
 export const prerender = false;
@@ -106,6 +107,16 @@ export const POST: APIRoute = async ({ request }) => {
 
     const payload: PostApiPayload = validationResult.data;
     const { originalFilePath, originalExtension, title, bodyContent } = payload;
+
+    // Extract original slug from originalFilePath for RAG cleanup
+    let originalSlug: string | undefined;
+    if (originalFilePath) {
+      const basename = path.basename(
+        originalFilePath,
+        path.extname(originalFilePath)
+      );
+      originalSlug = basename;
+    }
 
     // Check for draft-to-published transition and bump date if needed
     if (originalFilePath) {
@@ -260,6 +271,56 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
     // --- End Handle Inline Quotes Update ---
+
+    // --- RAG Indexing ---
+    try {
+      const ragService = await getRAGService();
+
+      // If slug changed, delete old index entry
+      if (originalSlug && originalSlug !== newSlug) {
+        await ragService.deletePost(originalSlug);
+        if (import.meta.env.DEV) {
+          console.log(`[RAG] Deleted old post from index: ${originalSlug}`);
+        }
+      }
+
+      // Index the updated post content
+      await ragService.upsertPost(newSlug, {
+        title: frontmatterObject.title,
+        content: payload.bodyContent || "",
+        postType: payload.postType,
+        tags: frontmatterObject.tags,
+        series: frontmatterObject.series,
+        pubDate: frontmatterObject.pubDate,
+      });
+
+      // Index book quotes if this is a book note
+      if (
+        payload.postType === "bookNote" &&
+        payload.quotesRef &&
+        payload.inlineQuotes !== undefined
+      ) {
+        const quotes = payload.inlineQuotes.map((q) => ({
+          text: q.text,
+          tags: q.tags,
+          quoteAuthor: q.quoteAuthor,
+          quoteSource: q.quoteSource,
+        }));
+
+        await ragService.upsertQuotes(payload.quotesRef, quotes, {
+          bookTitle: frontmatterObject.bookTitle || "Unknown",
+          bookAuthor: frontmatterObject.bookAuthor || "Unknown",
+        });
+      }
+
+      if (import.meta.env.DEV) {
+        console.log(`[RAG] Successfully indexed updated post: ${newSlug}`);
+      }
+    } catch (ragError) {
+      // Log but don't fail the request if RAG indexing fails
+      console.error(`[RAG] Failed to index updated post ${newSlug}:`, ragError);
+    }
+    // --- End RAG Indexing ---
 
     return createSuccessResponse({
       message: "Post updated successfully!",
