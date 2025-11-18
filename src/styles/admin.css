@@ -642,3 +642,79 @@ body.admin-scope .form-feedback-container.error-message {
     font-size: 0.75rem; /* Adjusted font size for better fit */
   }
 }
+
+/* -------------------------------------------------------------------------- */
+
+/* Error Boundary Styles                                                      */
+
+/* -------------------------------------------------------------------------- */
+
+body.admin-scope .error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: var(--spacing-xl-admin);
+}
+
+body.admin-scope .error-boundary-content {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: var(--border-radius-admin);
+  padding: var(--spacing-xl-admin);
+  max-width: 600px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+body.admin-scope .error-boundary-content h2 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-md-admin);
+  color: #856404;
+  font-size: 1.25rem;
+}
+
+body.admin-scope .error-boundary-content p {
+  margin-bottom: var(--spacing-md-admin);
+  color: #856404;
+}
+
+body.admin-scope .error-boundary-content details {
+  margin-top: var(--spacing-md-admin);
+  padding: var(--spacing-md-admin);
+  background-color: #fff;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+}
+
+body.admin-scope .error-boundary-content summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #856404;
+  margin-bottom: var(--spacing-sm-admin);
+}
+
+body.admin-scope .error-boundary-content pre {
+  margin: var(--spacing-sm-admin) 0;
+  padding: var(--spacing-sm-admin);
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  color: #212529;
+}
+
+body.admin-scope .error-boundary-reload {
+  background-color: #ffc107;
+  color: #212529;
+  border: none;
+  padding: var(--spacing-md-admin) var(--spacing-lg-admin);
+  border-radius: var(--border-radius-admin);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: background-color 0.2s ease-in-out;
+}
+
+body.admin-scope .error-boundary-reload:hover {
+  background-color: #e0a800;
+}

@@ -4,59 +4,17 @@
 
 ### High Priority
 
-#### Local RAG System for Authoring (High effort)
+#### Local RAG System for Authoring ✅ **COMPLETED**
 
 **See `docs/RAG_IMPLEMENTATION.md` for detailed requirements and architecture.**
 
-Persistent semantic search across all content types during local authoring, with automatic indexing on save.
+Persistent semantic search across all content types during local authoring, with automatic indexing on save. Full implementation includes:
+- RAG service layer with LanceDB and dual embedding providers (Ollama + Transformers.js)
+- Automatic indexing on create/update/delete operations
+- Content Intelligence Dashboard with semantic search and synthesis opportunities
+- AI Writing Assistant with Ollama integration and conversation history
 
-**Phase 1 - Core Infrastructure:** ✅ **COMPLETED**
-
-- [x] RAG service layer with LanceDB
-- [x] Paragraph-level chunking (posts + quotes)
-- [x] Transformers.js embedding provider (384-dim)
-- [x] Persistent storage in `data/rag/`
-- [x] CLI tools: `rq`, `rrb`, `rst`
-- [x] Unit tests (17 passing) and integration tests (14 passing)
-
-**Phase 2 - Auto-Indexing:** ✅ **COMPLETED**
-
-- [x] Hook `ragService.upsertPost()` into create/update handlers
-- [x] Hook `ragService.deletePost()` into delete handler
-- [x] Handle book quotes separately (upsertQuotes/deleteQuotes)
-- [x] Add error handling and fallbacks
-- [x] Create `/api/rag-stats` endpoint
-- [x] Add logging for index operations
-- [x] Write tests for all CRUD operations (15 passing)
-
-**Phase 3 - Ollama MCP Integration:** ✅ **COMPLETED**
-
-- [x] Auto-detect Ollama MCP server
-- [x] Fallback to @xenova/transformers
-- [x] Embedding provider abstraction
-- [x] Environment variable override support
-- [x] Unit tests for provider selection
-
-**Phase 4A - Content Intelligence Dashboard:**
-
-- [ ] Replace `/admin/analyze` with RAG-powered dashboard
-- [ ] Unified semantic search (posts + quotes)
-- [ ] Rich result cards with actions (open, insert, copy)
-- [ ] Synthesis opportunities (fleeting to expand, orphaned, unreferenced quotes)
-- [ ] Collapsible sections (synthesis, stats)
-- [ ] `/api/rag-query` and `/api/rag-synthesis` endpoints
-
-**Phase 4B - Ollama Writing Assistant:** ✅ **COMPLETED**
-
-- [x] AI assistant panel in PostForm (collapsible sidebar)
-- [x] Chat interface with Ollama
-- [x] Prompt library (`prompts.yaml`)
-- [x] Conversation history (SQLite)
-- [x] Context modes (current post, post + related, just prompt)
-- [x] `/api/ollama-chat`, `/api/ollama-status`, `/api/conversations` endpoints
-- [x] Error display if Ollama unavailable (required dependency)
-
-**Phase 4C - Advanced Features (Future):**
+**Advanced Features (Future):**
 
 - [ ] Content clusters (text-based)
 - [ ] Manual tag suggester in PostForm
@@ -64,25 +22,32 @@ Persistent semantic search across all content types during local authoring, with
 - [ ] Embedding visualization (2D/3D)
 - [ ] Writing metrics
 
-**Replaces:** Related Posts, Idea Development Dashboard, Integrated Writing Assistant Phase 1 (RAG powers all these features)
+---
+
+#### Improve Image Processing Error Handling ✅ **COMPLETED**
+
+- [x] Check for missing `images/originals/` directory
+- [x] Handle corrupted/invalid image files gracefully
+- [x] Add summary output (X succeeded, Y failed)
+- [x] Exit with proper codes (0 = success, 1 = error)
 
 ---
 
-#### Improve Image Processing Error Handling (Low effort)
+#### Environment Variables Configuration ✅ **COMPLETED**
 
-- [ ] Check for missing `images/originals/` directory
-- [ ] Handle corrupted/invalid image files gracefully
-- [ ] Add summary output (X succeeded, Y failed)
-- [ ] Exit with proper codes (0 = success, 1 = error)
+- [x] Create `.env.example` with: `SITE_TITLE`, `SITE_DESCRIPTION`, `AUTHOR_NAME`, `REMARK42_HOST`, `REMARK42_SITE_ID`, `PUBLIC_SITE_URL`
+- [x] Update `src/siteConfig.ts` to read from env with fallbacks
+- [ ] Add validation for required variables (future enhancement)
+- [x] Document in CLAUDE.md
 
 ---
 
-#### Environment Variables Configuration (Low effort)
+#### Refactor Large API Handlers (Medium effort)
 
-- [ ] Create `.env.example` with: `SITE_TITLE`, `SITE_DESCRIPTION`, `AUTHOR_NAME`, `REMARK42_HOST`, `REMARK42_SITE_ID`, `PUBLIC_SITE_URL`
-- [ ] Update `src/siteConfig.ts` to read from env with fallbacks
-- [ ] Add validation for required variables
-- [ ] Document in INSTALL.md and CLAUDE.md
+- [ ] Break down `update-post-handler.ts` (340 lines) into smaller, testable functions
+- [ ] Extract slug change logic to `src/utils/postUpdateHelpers.ts`
+- [ ] Extract quotes YAML update logic to separate function
+- [ ] Add unit tests for extracted helpers
 
 ---
 
@@ -151,8 +116,9 @@ Quick link insertion with internal post search and validation.
 
 ---
 
-## Completed
+## Recently Completed
 
+- ✅ Local RAG System (Phases 1-4B): Semantic search, auto-indexing, Ollama integration, Content Intelligence Dashboard, AI Writing Assistant
 - ✅ Test scripts in package.json
 - ✅ Error handling standardization
 - ✅ Remark42 configuration
