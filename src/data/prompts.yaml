@@ -1,0 +1,59 @@
+# AI Writing Assistant Prompt Library
+# These prompts are available in the AI assistant panel to help with brainstorming, editing, and critiquing.
+
+prompts:
+  - id: brainstorm
+    label: "Brainstorm ideas"
+    prompt: "Help me brainstorm ideas for this post. What angles, perspectives, or related topics could I explore? Suggest specific points I could develop further."
+    contextMode: "current"
+
+  - id: critique
+    label: "Critique this draft"
+    prompt: "Please critique this draft. What works well? What could be improved? Are there any logical gaps, unclear sections, or areas that need more development?"
+    contextMode: "current"
+
+  - id: grammar
+    label: "Check grammar & clarity"
+    prompt: "Review this text for grammar, spelling, and clarity. Suggest improvements to make it more readable and professional."
+    contextMode: "current"
+
+  - id: title
+    label: "Suggest better title"
+    prompt: "Suggest 5-7 alternative titles for this post. Make them compelling, clear, and SEO-friendly."
+    contextMode: "current"
+
+  - id: conclusion
+    label: "Help me conclude"
+    prompt: "I'm struggling to conclude this post. Based on the content, suggest 2-3 different approaches for a strong conclusion."
+    contextMode: "current"
+
+  - id: gaps
+    label: "Find gaps in argument"
+    prompt: "Analyze the logical flow and argumentation in this post. What assumptions am I making? What counterarguments should I address? What evidence or examples would strengthen the argument?"
+    contextMode: "current"
+
+  - id: expand
+    label: "Expand this section"
+    prompt: "Help me expand on this idea. What examples, anecdotes, or evidence could I add? How can I develop this point more thoroughly?"
+    contextMode: "current"
+
+  - id: simplify
+    label: "Simplify complex ideas"
+    prompt: "This section feels too complex or jargon-heavy. Help me simplify it while retaining the core meaning. Suggest analogies or examples that make it more accessible."
+    contextMode: "current"
+
+  - id: connections
+    label: "Find connections to other content"
+    prompt: "Based on this draft and my related content, what connections can I make? What other posts or quotes would be relevant to reference? How does this fit into my broader themes?"
+    contextMode: "withRAG"
+
+  - id: tags
+    label: "Suggest tags"
+    prompt: "Based on the content and my existing posts, suggest appropriate tags for this post. Consider tags I've used before and new ones that might be relevant."
+    contextMode: "withRAG"
+
+  - id: custom
+    label: "Custom prompt..."
+    prompt: ""
+    contextMode: "none"
+    allowCustom: true

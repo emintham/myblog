@@ -246,6 +246,21 @@ const PostForm: React.FC<PostFormProps> = ({
     };
   }, [handleSubmit, submitPost, inlineQuotes]);
 
+  // Listen for AI assistant insert text events
+  useEffect(() => {
+    const handleAIInsertText = (event: Event) => {
+      const customEvent = event as CustomEvent<{ content: string }>;
+      if (customEvent.detail?.content && markdownEditorRef.current) {
+        markdownEditorRef.current.insertText("\n\n" + customEvent.detail.content + "\n\n");
+      }
+    };
+
+    window.addEventListener("aiInsertText", handleAIInsertText);
+    return () => {
+      window.removeEventListener("aiInsertText", handleAIInsertText);
+    };
+  }, []);
+
   return (
     <>
       {/* Fieldset for Core Information */}
