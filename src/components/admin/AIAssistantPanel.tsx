@@ -30,6 +30,13 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
   const [currentPost, setCurrentPost] = useState<{ title: string; body: string } | undefined>(
     currentPostProp
   );
+  const [selectedModel, setSelectedModel] = useState<string>(() => {
+    // Load from localStorage or use default
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("ai-assistant-model") || "";
+    }
+    return "";
+  });
 
   // Monitor form changes to update current post context
   useEffect(() => {
@@ -56,9 +63,27 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
 
   const { messages, isLoading, error, ollamaStatus, sendMessage, clearConversation } =
     useOllamaChat(sessionId, {
+      model: selectedModel || undefined,
       contextMode: prompts.find((p) => p.id === selectedPromptId)?.contextMode || "none",
       currentPost,
     });
+
+  // Save selected model to localStorage
+  useEffect(() => {
+    if (selectedModel && typeof window !== "undefined") {
+      localStorage.setItem("ai-assistant-model", selectedModel);
+    }
+  }, [selectedModel]);
+
+  // Set default model when Ollama status loads
+  useEffect(() => {
+    if (ollamaStatus?.available && ollamaStatus.models && ollamaStatus.models.length > 0) {
+      // If no model selected or selected model not available, use first available model
+      if (!selectedModel || !ollamaStatus.models.includes(selectedModel)) {
+        setSelectedModel(ollamaStatus.models[0]);
+      }
+    }
+  }, [ollamaStatus, selectedModel]);
 
   // Load prompts on mount
   useEffect(() => {
@@ -163,6 +188,24 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
                   and ensure it's running.
                 </p>
               </div>
+            </div>
+          )}
+
+          {/* Model Selector */}
+          {ollamaStatus?.available && ollamaStatus.models && ollamaStatus.models.length > 0 && (
+            <div className="ai-model-selector">
+              <label htmlFor="model-select">Model:</label>
+              <select
+                id="model-select"
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+              >
+                {ollamaStatus.models.map((model) => (
+                  <option key={model} value={model}>
+                    {model}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
 
