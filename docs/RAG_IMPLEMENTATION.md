@@ -766,67 +766,141 @@ Each phase requires specific documentation updates to keep all files in sync:
 - [ ] Can force provider via env var
 - [ ] Logs which provider is used
 
-### Phase 4: Admin UI (Est: 10-12 hours)
+### Phase 4A: Content Intelligence Dashboard (Est: 8-10 hours)
 
-**Goal:** Related content panel in post editor
+**Goal:** Replace `/admin/analyze` with RAG-powered content discovery and synthesis
 
 **Tasks:**
 
-1. Create `/api/rag-query` endpoint
-2. Create `useRAGQuery` hook
-3. Build `RelatedContentPanel` component
-4. Add to `PostForm` layout (right sidebar)
-5. Implement debounced queries (2s)
-6. Add loading/error states
-7. Create "insert link" functionality
-8. Add show/hide toggle + localStorage
-9. Style to match admin theme
+1. Create unified semantic search interface (no filters)
+2. Build rich result cards for posts and quotes
+3. Implement synthesis opportunities detection:
+   - Fleeting thoughts to expand (3+ related posts)
+   - Orphaned content (<2 semantic connections)
+   - Unreferenced quotes
+4. Add collapsible sections (synthesis, stats)
+5. Create `/api/rag-query` endpoint (unified posts + quotes)
+6. Create `/api/rag-synthesis` endpoint
+7. Build action buttons (Open, Insert Link, Insert Quote, Copy)
+8. Update `/admin/analyze` route
+9. Style to match admin theme with collapsible sections
+
+**Components:**
+
+- `ContentIntelligenceDashboard.tsx` - Main container
+- `SemanticSearchBox.tsx` - Search input
+- `UnifiedSearchResults.tsx` - Results container
+- `PostResultCard.tsx` - Post result display
+- `QuoteResultCard.tsx` - Quote result display
+- `SynthesisOpportunities.tsx` - Collapsible synthesis section
+- `IndexStats.tsx` - Collapsible statistics
+- `useRAGQuery.ts` - Query hook
+- `useSynthesisData.ts` - Synthesis hook
 
 **Testing:**
 
-- Type in editor → see related content
-- Click insert link → verify markdown added
-- Test with long posts (performance)
-- Test with no results
-- Test error states
+- Search query → see unified results (posts + quotes)
+- Click actions → verify correct behavior
+- Test synthesis opportunities detection
+- Test collapsible sections
+- Test empty states
 
 **Success Criteria:**
 
-- [ ] Panel updates as user types
-- [ ] Shows relevant posts and quotes
-- [ ] Can insert references easily
-- [ ] Doesn't impact editor performance
-- [ ] Graceful degradation if RAG unavailable
+- [ ] Unified search returns both posts and quotes
+- [ ] Rich result cards show all relevant metadata
+- [ ] Synthesis opportunities correctly identify targets
+- [ ] Actions work correctly (open, insert, copy)
+- [ ] Collapsible sections persist state
+- [ ] Performance is acceptable with large result sets
 
-### Phase 5: Advanced Features (Future)
+### Phase 4B: Ollama Writing Assistant (Est: 10-12 hours)
 
-**Tag/Series Suggestions:**
+**Goal:** AI assistant panel in PostForm for idea bouncing and editing
 
-- Extract key phrases from draft
-- Query RAG for similar content
-- Suggest tags based on matches
-- Detect potential series relationships
+**Tasks:**
 
-**Quote Finder Modal:**
+1. Create `prompts.yaml` with initial prompt library
+2. Set up SQLite schema for conversation history (`data/assistant.db`)
+3. Build AI assistant panel with collapse/expand
+4. Create chat interface components
+5. Implement prompt selector dropdown
+6. Build conversation history with SQLite persistence
+7. Create `/api/ollama-chat` endpoint with context injection
+8. Create `/api/ollama-status` endpoint
+9. Create `/api/conversations` endpoint (CRUD)
+10. Add assistant panel to PostForm layout
+11. Style ai-assistant.css
+12. Show error message if Ollama unavailable (required dependency)
 
-- Search all quotes by semantic similarity
-- Filter by book, author, tags
-- Preview in context
-- Insert with formatted citation
+**Components:**
 
-**Idea Synthesis:**
+- `AIAssistantPanel.tsx` - Main panel
+- `ChatInterface.tsx` - Message display and input
+- `PromptSelector.tsx` - Dropdown with YAML prompts
+- `ConversationHistory.tsx` - Message list
+- `useOllamaChat.ts` - Ollama API + conversation hook
+- `useConversationStore.ts` - SQLite CRUD hook
 
-- Find "orphaned" fleeting thoughts
-- Detect quotes never referenced
-- Suggest connections between posts
-- "Evolution view" for topics over time
+**Context Modes:**
 
-**Writing Metrics:**
+- **Current Post**: Sends title + body
+- **Post + Related**: Includes RAG results
+- **Just Prompt**: No context
 
-- Readability scores (Flesch-Kincaid)
-- Passive voice detection
-- Word/paragraph count stats
-- Estimated reading time
+**Prompt Library Examples:**
+
+- Brainstorm ideas
+- Critique this draft
+- Check grammar & clarity
+- Suggest better title
+- Help me conclude
+- Find gaps in argument
+
+**Testing:**
+
+- Send message → verify Ollama response
+- Switch prompts → verify context changes
+- Reload page → verify conversation persists
+- Test collapse/expand functionality
+- Test with Ollama unavailable → verify error message
+- Test insert response into editor
+
+**Success Criteria:**
+
+- [ ] Chat interface works with Ollama
+- [ ] Conversations persist in SQLite
+- [ ] Prompt library loads from YAML
+- [ ] Context injection works correctly
+- [ ] Panel collapses/expands smoothly
+- [ ] Error shown if Ollama unavailable
+- [ ] Can insert AI responses into editor
+
+### Phase 4C: Advanced Features (Future)
+
+**Content Clusters:**
+
+- Detect content clusters using k-means or DBSCAN on embeddings
+- List clusters with metadata (post count, latest post)
+- Click cluster to view all posts in that cluster
+- Convert cluster to tag or series
+- Text-based display (defer visualization to later phase)
+
+**Manual Tag Suggester (PostForm):**
+
+- Button in PostForm: "Suggest Tags from Content"
+- Only shows when body has 200+ characters
+- Extract key phrases, query RAG for similar posts
+- Show tag suggestions with confidence scores
+- One-click to add suggested tags
+- Component: `TagSuggester.tsx`
+
+**Series Builder:**
+
+- Detect posts that form natural sequences
+- Suggest ordering based on content progression
+- Generate series metadata automatically
+- Create series TOC/overview post
 
 **Embedding Visualization:**
 
@@ -835,7 +909,7 @@ Each phase requires specific documentation updates to keep all files in sync:
 - Color-code posts by tags, series, or post type
 - Click to navigate to posts from visualization
 - Zoom/pan controls for exploring the embedding space
-- Integration with admin analyze page
+- Integration with content intelligence dashboard
 - Export visualization as static image or interactive HTML
 - Temporal view showing how topics evolve over time
 
@@ -849,10 +923,17 @@ Each phase requires specific documentation updates to keep all files in sync:
 
 **Technical approach:**
 
-- Use `umap-js` or `tsne-js` for dimensionality reduction (384→2 or 3 dimensions)
+- Use `umap-js` or `tsne-js` for dimensionality reduction (768→2 or 3 dimensions)
 - Render with D3.js, Plotly.js, or Three.js for 3D
 - Cache reduced embeddings to avoid recomputation
 - Update visualization incrementally as new posts are added
+
+**Writing Metrics:**
+
+- Readability scores (Flesch-Kincaid)
+- Passive voice detection
+- Word/paragraph count stats
+- Estimated reading time
 
 ## Configuration
 

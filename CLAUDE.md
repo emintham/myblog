@@ -198,6 +198,99 @@ All use `getUniqueValuesFromCollection()` in `contentUtils.ts`.
 
 **Note:** Transformers.js requires internet on first use to download model (~25MB, cached thereafter). Ollama requires separate installation and the `nomic-embed-text` model (see INSTALL.md).
 
+### Content Intelligence Dashboard (RAG Phase 4A)
+
+**Location:** `/admin/analyze` (replaces CloseReadingAnalyzer)
+
+**Purpose:** RAG-powered content discovery, synthesis opportunities, and semantic search interface
+
+**Features:**
+
+- **Unified Semantic Search**: Search across all posts and quotes simultaneously
+- **Rich Result Cards**: Display posts and quotes with full metadata, similarity scores, and action buttons
+- **Synthesis Opportunities**: Identify fleeting thoughts to expand, orphaned content, unreferenced quotes
+- **Collapsible Sections**: Synthesis opportunities and index statistics with persistent state
+- **Action Buttons**: Open in editor, insert link, insert quote, copy to clipboard
+
+**Components:**
+
+- `ContentIntelligenceDashboard.tsx` - Main container with section management
+- `SemanticSearchBox.tsx` - Search input with examples
+- `UnifiedSearchResults.tsx` - Results list container
+- `PostResultCard.tsx` - Post result display with metadata
+- `QuoteResultCard.tsx` - Quote result display with book cover
+- `SynthesisOpportunities.tsx` - Collapsible synthesis section
+- `IndexStats.tsx` - Collapsible statistics section
+
+**Hooks:**
+
+- `useRAGQuery.ts` - Query RAG index with filtering
+- `useSynthesisData.ts` - Fetch synthesis opportunities
+
+**API Endpoints:**
+
+- `/api/rag-query` - Unified search (posts + quotes)
+- `/api/rag-synthesis` - Get synthesis opportunities
+
+**Use Cases:**
+
+- Find related content while writing
+- Identify fleeting thoughts ready to expand into full posts
+- Discover orphaned content needing more connections
+- Find unreferenced book quotes to use in posts
+
+### AI Writing Assistant (RAG Phase 4B)
+
+**Location:** Right sidebar in `/admin/create-post` and `/admin/edit/[slug]` (author mode only)
+
+**Purpose:** Ollama-powered AI assistant for brainstorming, critiquing, and editing assistance
+
+**Features:**
+
+- **Chat Interface**: Conversational AI assistant with context awareness
+- **Prompt Library**: YAML-based prompt templates (`src/data/prompts.yaml`)
+- **Context Modes**: Current post, post + RAG results, or no context
+- **Conversation History**: SQLite persistence per post/session
+- **Collapsible Panel**: Expand/collapse to maximize editor space
+- **Insert Responses**: Copy AI responses into editor at cursor
+
+**Components:**
+
+- `AIAssistantPanel.tsx` - Main collapsible panel
+- `ChatInterface.tsx` - Message display and input
+- `PromptSelector.tsx` - Dropdown with YAML prompts
+- `ConversationHistory.tsx` - Message list display
+
+**Hooks:**
+
+- `useOllamaChat.ts` - Ollama API integration with context injection
+- `useConversationStore.ts` - SQLite CRUD for conversation history
+
+**API Endpoints:**
+
+- `/api/ollama-chat` - Proxy to Ollama with context injection
+- `/api/ollama-status` - Check Ollama availability
+- `/api/conversations` - CRUD for conversation history
+
+**Storage:** `data/assistant.db` (SQLite, gitignored)
+
+**Prompt Library Examples:**
+
+- Brainstorm ideas
+- Critique this draft
+- Check grammar & clarity
+- Suggest better title
+- Help me conclude
+- Find gaps in argument
+
+**Context Injection:**
+
+- **Current Post**: Sends current title + body to AI
+- **Post + Related**: Includes RAG search results for current content
+- **Just Prompt**: No context (for general questions)
+
+**Note:** Ollama is a required dependency. If unavailable, panel displays error message (app doesn't crash).
+
 ### API Handler Architecture
 
 **`/api/create-post-handler`** - Validate, generate slug, write file (+ quotes YAML for bookNote)
@@ -342,6 +435,8 @@ Via `slugify.ts`: lowercase, replace spaces/special chars with hyphens, deduplic
 | Image processing           | `scripts/process-images.mjs`, `src/components/ResponsiveImage.astro`                                                         |
 | RAG system                 | `src/services/rag/index.ts`, `src/services/rag/storage.ts`, `src/services/rag/chunking.ts`, `src/services/rag/embeddings.ts` |
 | RAG CLI tools              | `scripts/rag-query.mjs`, `scripts/rag-rebuild.mjs`, `scripts/rag-stats.mjs`                                                  |
+| Content Intelligence       | `src/components/admin/ContentIntelligenceDashboard.tsx`, `src/hooks/useRAGQuery.ts`, `src/hooks/useSynthesisData.ts`         |
+| AI Writing Assistant       | `src/components/admin/AIAssistantPanel.tsx`, `src/hooks/useOllamaChat.ts`, `src/data/prompts.yaml`, `data/assistant.db`      |
 | API handlers               | `src/pages/api/*-handler.ts`                                                                                                 |
 
 ## Known Patterns to Maintain

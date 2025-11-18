@@ -37,12 +37,32 @@ Persistent semantic search across all content types during local authoring, with
 - [x] Environment variable override support
 - [x] Unit tests for provider selection
 
-**Phase 4 - Admin UI:**
+**Phase 4A - Content Intelligence Dashboard:**
 
-- [ ] Related content panel in PostForm
-- [ ] Real-time semantic suggestions
-- [ ] Tag/series recommendations
-- [ ] Quote finder for book notes
+- [ ] Replace `/admin/analyze` with RAG-powered dashboard
+- [ ] Unified semantic search (posts + quotes)
+- [ ] Rich result cards with actions (open, insert, copy)
+- [ ] Synthesis opportunities (fleeting to expand, orphaned, unreferenced quotes)
+- [ ] Collapsible sections (synthesis, stats)
+- [ ] `/api/rag-query` and `/api/rag-synthesis` endpoints
+
+**Phase 4B - Ollama Writing Assistant:**
+
+- [ ] AI assistant panel in PostForm (collapsible sidebar)
+- [ ] Chat interface with Ollama
+- [ ] Prompt library (`prompts.yaml`)
+- [ ] Conversation history (SQLite)
+- [ ] Context modes (current post, post + related, just prompt)
+- [ ] `/api/ollama-chat`, `/api/ollama-status`, `/api/conversations` endpoints
+- [ ] Error display if Ollama unavailable (required dependency)
+
+**Phase 4C - Advanced Features (Future):**
+
+- [ ] Content clusters (text-based)
+- [ ] Manual tag suggester in PostForm
+- [ ] Series builder
+- [ ] Embedding visualization (2D/3D)
+- [ ] Writing metrics
 
 **Replaces:** Related Posts, Idea Development Dashboard, Integrated Writing Assistant Phase 1 (RAG powers all these features)
 
