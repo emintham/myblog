@@ -1,5 +1,8 @@
 /* Content Intelligence Dashboard Styles */
 
+/* Import shared admin design tokens */
+@import url("./admin-variables.css");
+
 /* Dashboard Container */
 .content-intelligence-dashboard {
   max-width: 1200px;
