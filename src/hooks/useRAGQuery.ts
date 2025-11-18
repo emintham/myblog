@@ -1,4 +1,8 @@
 import { useState, useCallback } from "react";
+import {
+  extractErrorMessage,
+  validateFetchResponse,
+} from "../utils/api-helpers";
 
 export interface RAGQueryResult {
   content: string;
@@ -63,17 +67,13 @@ export function useRAGQuery() {
           }),
         });
 
-        if (!response.ok) {
-          throw new Error(`Query failed: ${response.statusText}`);
-        }
+        await validateFetchResponse(response, "Query");
 
         const data: { data: RAGQueryResponse } = await response.json();
         setResults(data.data.results);
         setQueryTime(data.data.queryTime);
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Unknown error";
-        setError(errorMessage);
+        setError(extractErrorMessage(err));
         setResults([]);
       } finally {
         setIsLoading(false);

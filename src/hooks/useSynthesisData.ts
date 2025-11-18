@@ -1,4 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
+import {
+  extractErrorMessage,
+  validateFetchResponse,
+} from "../utils/api-helpers";
 
 export interface FleetingThought {
   slug: string;
@@ -49,17 +53,12 @@ export function useSynthesisData() {
     try {
       const response = await fetch("/api/rag-synthesis");
 
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch synthesis data: ${response.statusText}`
-        );
-      }
+      await validateFetchResponse(response, "Fetch synthesis data");
 
       const result: { data: SynthesisData } = await response.json();
       setData(result.data);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Unknown error";
-      setError(errorMessage);
+      setError(extractErrorMessage(err));
       setData(null);
     } finally {
       setIsLoading(false);

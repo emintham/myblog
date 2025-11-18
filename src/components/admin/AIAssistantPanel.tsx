@@ -5,8 +5,14 @@
 
 import React, { useState, useEffect } from "react";
 import { useOllamaChat } from "../../hooks/useOllamaChat";
-import { ChevronLeft, ChevronRight, MessageSquare, AlertCircle } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  MessageSquare,
+  AlertCircle,
+} from "lucide-react";
 import type { Prompt } from "../../utils/prompts";
+import { copyToClipboard } from "../../utils/clipboard";
 
 interface AIAssistantPanelProps {
   sessionId: string; // e.g., post slug or "new-post"
@@ -20,16 +26,16 @@ interface AIAssistantPanelProps {
 export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
   sessionId,
   currentPost: currentPostProp,
-  onInsertText,
+  onInsertText, // eslint-disable-line @typescript-eslint/no-unused-vars
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [selectedPromptId, setSelectedPromptId] = useState<string>("");
   const [customPrompt, setCustomPrompt] = useState("");
   const [inputMessage, setInputMessage] = useState("");
-  const [currentPost, setCurrentPost] = useState<{ title: string; body: string } | undefined>(
-    currentPostProp
-  );
+  const [currentPost, setCurrentPost] = useState<
+    { title: string; body: string } | undefined
+  >(currentPostProp);
   const [selectedModel, setSelectedModel] = useState<string>(() => {
     // Load from localStorage or use default
     if (typeof window !== "undefined") {
@@ -42,7 +48,9 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
   useEffect(() => {
     const updateCurrentPost = () => {
       const titleInput = document.getElementById("title") as HTMLInputElement;
-      const bodyContent = document.querySelector('[name="bodyContent"]') as HTMLTextAreaElement;
+      const bodyContent = document.querySelector(
+        '[name="bodyContent"]'
+      ) as HTMLTextAreaElement;
 
       if (titleInput && bodyContent) {
         setCurrentPost({
@@ -61,12 +69,19 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
     return () => clearInterval(interval);
   }, []);
 
-  const { messages, isLoading, error, ollamaStatus, sendMessage, clearConversation } =
-    useOllamaChat(sessionId, {
-      model: selectedModel || undefined,
-      contextMode: prompts.find((p) => p.id === selectedPromptId)?.contextMode || "none",
-      currentPost,
-    });
+  const {
+    messages,
+    isLoading,
+    error,
+    ollamaStatus,
+    sendMessage,
+    clearConversation,
+  } = useOllamaChat(sessionId, {
+    model: selectedModel || undefined,
+    contextMode:
+      prompts.find((p) => p.id === selectedPromptId)?.contextMode || "none",
+    currentPost,
+  });
 
   // Save selected model to localStorage
   useEffect(() => {
@@ -77,7 +92,11 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
 
   // Set default model when Ollama status loads
   useEffect(() => {
-    if (ollamaStatus?.available && ollamaStatus.models && ollamaStatus.models.length > 0) {
+    if (
+      ollamaStatus?.available &&
+      ollamaStatus.models &&
+      ollamaStatus.models.length > 0
+    ) {
       // If no model selected or selected model not available, use first available model
       if (!selectedModel || !ollamaStatus.models.includes(selectedModel)) {
         setSelectedModel(ollamaStatus.models[0]);
@@ -134,8 +153,8 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
     }
   };
 
-  const handleCopyResponse = (content: string) => {
-    navigator.clipboard.writeText(content);
+  const handleCopyResponse = async (content: string) => {
+    await copyToClipboard(content);
   };
 
   const handleInsertText = (content: string) => {
@@ -154,7 +173,9 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
           type="button"
           className="collapse-button"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          aria-label={isCollapsed ? "Expand AI Assistant" : "Collapse AI Assistant"}
+          aria-label={
+            isCollapsed ? "Expand AI Assistant" : "Collapse AI Assistant"
+          }
         >
           {isCollapsed ? (
             <>
@@ -182,7 +203,11 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
                 <p>{ollamaStatus.error}</p>
                 <p className="ai-assistant-help">
                   Install Ollama from{" "}
-                  <a href="https://ollama.com" target="_blank" rel="noopener noreferrer">
+                  <a
+                    href="https://ollama.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     ollama.com
                   </a>{" "}
                   and ensure it's running.
@@ -192,22 +217,24 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
           )}
 
           {/* Model Selector */}
-          {ollamaStatus?.available && ollamaStatus.models && ollamaStatus.models.length > 0 && (
-            <div className="ai-model-selector">
-              <label htmlFor="model-select">Model:</label>
-              <select
-                id="model-select"
-                value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
-              >
-                {ollamaStatus.models.map((model) => (
-                  <option key={model} value={model}>
-                    {model}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+          {ollamaStatus?.available &&
+            ollamaStatus.models &&
+            ollamaStatus.models.length > 0 && (
+              <div className="ai-model-selector">
+                <label htmlFor="model-select">Model:</label>
+                <select
+                  id="model-select"
+                  value={selectedModel}
+                  onChange={(e) => setSelectedModel(e.target.value)}
+                >
+                  {ollamaStatus.models.map((model) => (
+                    <option key={model} value={model}>
+                      {model}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
           {/* Prompt Selector */}
           {ollamaStatus?.available && (
@@ -246,7 +273,10 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
           {/* Conversation */}
           <div className="ai-conversation">
             {messages.map((message, index) => (
-              <div key={index} className={`ai-message ai-message-${message.role}`}>
+              <div
+                key={index}
+                className={`ai-message ai-message-${message.role}`}
+              >
                 <div className="ai-message-role">
                   {message.role === "user" ? "You" : "AI"}
                 </div>
