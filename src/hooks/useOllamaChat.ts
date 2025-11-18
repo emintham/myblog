@@ -4,20 +4,11 @@
  */
 
 import { useState, useCallback, useEffect } from "react";
+import { extractErrorMessage } from "../utils/api-helpers";
+import type { ChatMessage, OllamaChatOptions } from "../types/phase4";
 
-interface Message {
-  role: "user" | "assistant" | "system";
-  content: string;
-}
-
-interface OllamaChatOptions {
-  model?: string;
-  contextMode?: "current" | "withRAG" | "none";
-  currentPost?: {
-    title: string;
-    body: string;
-  };
-}
+// Local alias for convenience
+type Message = ChatMessage;
 
 interface OllamaStatus {
   available: boolean;
@@ -25,7 +16,10 @@ interface OllamaStatus {
   error?: string;
 }
 
-export function useOllamaChat(sessionId: string, options: OllamaChatOptions = {}) {
+export function useOllamaChat(
+  sessionId: string,
+  options: OllamaChatOptions = {}
+) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,11 +29,14 @@ export function useOllamaChat(sessionId: string, options: OllamaChatOptions = {}
   useEffect(() => {
     const loadConversation = async () => {
       try {
-        const response = await fetch(`/api/conversations?session_id=${encodeURIComponent(sessionId)}`);
+        const response = await fetch(
+          `/api/conversations?session_id=${encodeURIComponent(sessionId)}`
+        );
         const data = await response.json();
 
         if (data.messages) {
           setMessages(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             data.messages.map((m: any) => ({
               role: m.role,
               content: m.content,
@@ -62,6 +59,7 @@ export function useOllamaChat(sessionId: string, options: OllamaChatOptions = {}
         const data = await response.json();
         setOllamaStatus(data);
       } catch (err) {
+        // eslint-disable-line @typescript-eslint/no-unused-vars
         setOllamaStatus({
           available: false,
           error: "Failed to check Ollama status",
@@ -122,7 +120,9 @@ export function useOllamaChat(sessionId: string, options: OllamaChatOptions = {}
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to get response from Ollama");
+          throw new Error(
+            errorData.error || "Failed to get response from Ollama"
+          );
         }
 
         const data = await response.json();
@@ -152,9 +152,7 @@ export function useOllamaChat(sessionId: string, options: OllamaChatOptions = {}
           }),
         });
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Unknown error occurred";
-        setError(errorMessage);
+        setError(extractErrorMessage(err));
         console.error("[useOllamaChat] Error:", err);
       } finally {
         setIsLoading(false);
@@ -168,9 +166,12 @@ export function useOllamaChat(sessionId: string, options: OllamaChatOptions = {}
    */
   const clearConversation = useCallback(async () => {
     try {
-      await fetch(`/api/conversations?session_id=${encodeURIComponent(sessionId)}`, {
-        method: "DELETE",
-      });
+      await fetch(
+        `/api/conversations?session_id=${encodeURIComponent(sessionId)}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       setMessages([]);
       setError(null);

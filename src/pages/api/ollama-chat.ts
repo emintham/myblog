@@ -16,19 +16,18 @@
 
 import type { APIRoute } from "astro";
 import { ragService } from "../../services/rag/index.js";
-
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
-const DEFAULT_MODEL = process.env.OLLAMA_MODEL || "llama3.2";
-
-interface ChatMessage {
-  role: "system" | "user" | "assistant";
-  content: string;
-}
+import { OLLAMA_CONFIG } from "../../config/ollama";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+} from "../../schemas/responses";
+import { extractErrorMessage } from "../../utils/api-helpers";
+import type { ChatMessage, ContextMode } from "../../types/phase4";
 
 interface ChatRequest {
   model?: string;
   messages: ChatMessage[];
-  contextMode?: "current" | "withRAG" | "none";
+  contextMode?: ContextMode;
   currentPost?: {
     title: string;
     body: string;
@@ -39,24 +38,14 @@ interface ChatRequest {
 export const POST: APIRoute = async ({ request }) => {
   // Production guard: disable in production
   if (import.meta.env.PROD) {
-    return new Response(
-      JSON.stringify({
-        error: "API not available in production",
-      }),
-      {
-        status: 403,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return createErrorResponse("API not available in production", 403);
   }
 
   try {
     const body: ChatRequest = await request.json();
 
     const {
-      model = DEFAULT_MODEL,
+      model = OLLAMA_CONFIG.defaultModel,
       messages,
       contextMode = "none",
       currentPost,
@@ -64,21 +53,14 @@ export const POST: APIRoute = async ({ request }) => {
     } = body;
 
     if (!messages || !Array.isArray(messages)) {
-      return new Response(
-        JSON.stringify({
-          error: "Invalid request: messages array required",
-        }),
-        {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      return createErrorResponse(
+        "Invalid request: messages array required",
+        400
       );
     }
 
     // Inject context based on mode
-    let contextMessages: ChatMessage[] = [];
+    const contextMessages: ChatMessage[] = [];
 
     if (contextMode === "current" && currentPost) {
       contextMessages.push({
@@ -95,10 +77,13 @@ Provide helpful, concise feedback and suggestions based on this context.`,
       });
     } else if (contextMode === "withRAG" && currentPost) {
       // Get related content via RAG
-      const ragResults = await ragService.query(currentPost.body || currentPost.title, {
-        topK: 5,
-        contentType: "all",
-      });
+      const ragResults = await ragService.query(
+        currentPost.body || currentPost.title,
+        {
+          topK: 5,
+          contentType: "all",
+        }
+      );
 
       const relatedContent = ragResults.results
         .map((r, i) => {
@@ -133,7 +118,7 @@ Provide helpful, concise feedback and suggestions. You may reference the related
     const finalMessages = [...contextMessages, ...messages];
 
     // Forward to Ollama
-    const ollamaResponse = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+    const ollamaResponse = await fetch(`${OLLAMA_CONFIG.baseUrl}/api/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -143,49 +128,29 @@ Provide helpful, concise feedback and suggestions. You may reference the related
         messages: finalMessages,
         stream,
       }),
-      signal: AbortSignal.timeout(60000), // 60 second timeout
+      signal: AbortSignal.timeout(OLLAMA_CONFIG.timeout),
     });
 
     if (!ollamaResponse.ok) {
       const errorText = await ollamaResponse.text();
-      return new Response(
-        JSON.stringify({
-          error: `Ollama error: ${errorText}`,
-        }),
-        {
-          status: ollamaResponse.status,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      return createErrorResponse(
+        `Ollama error: ${errorText}`,
+        ollamaResponse.status
       );
     }
 
     // Return Ollama's response
     const data = await ollamaResponse.json();
 
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    return createSuccessResponse(data);
   } catch (error) {
     console.error("[ollama-chat] Error:", error);
 
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = extractErrorMessage(error);
 
-    return new Response(
-      JSON.stringify({
-        error: `Failed to communicate with Ollama: ${errorMessage}`,
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+    return createErrorResponse(
+      `Failed to communicate with Ollama: ${errorMessage}`,
+      500
     );
   }
 };

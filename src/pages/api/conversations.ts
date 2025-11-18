@@ -12,197 +12,89 @@ import {
   clearConversation,
   type Message,
 } from "../../services/db.js";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+} from "../../schemas/responses";
 
 export const GET: APIRoute = async ({ url }) => {
   // Production guard: disable in production
   if (import.meta.env.PROD) {
-    return new Response(
-      JSON.stringify({
-        error: "API not available in production",
-      }),
-      {
-        status: 403,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return createErrorResponse("API not available in production", 403);
   }
 
   const sessionId = url.searchParams.get("session_id");
 
   if (!sessionId) {
-    return new Response(
-      JSON.stringify({
-        error: "session_id query parameter required",
-      }),
-      {
-        status: 400,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return createErrorResponse("session_id query parameter required", 400);
   }
 
   try {
     const messages = getConversation(sessionId);
 
-    return new Response(JSON.stringify({ messages }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    return createSuccessResponse({ messages });
   } catch (error) {
     console.error("[conversations GET] Error:", error);
 
-    return new Response(
-      JSON.stringify({
-        error: "Failed to retrieve conversation",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return createErrorResponse("Failed to retrieve conversation", 500);
   }
 };
 
 export const POST: APIRoute = async ({ request }) => {
   // Production guard: disable in production
   if (import.meta.env.PROD) {
-    return new Response(
-      JSON.stringify({
-        error: "API not available in production",
-      }),
-      {
-        status: 403,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return createErrorResponse("API not available in production", 403);
   }
 
   try {
     const body: Omit<Message, "id" | "created_at"> = await request.json();
 
     if (!body.session_id || !body.role || !body.content) {
-      return new Response(
-        JSON.stringify({
-          error: "session_id, role, and content are required",
-        }),
-        {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      return createErrorResponse(
+        "session_id, role, and content are required",
+        400
       );
     }
 
     if (!["user", "assistant", "system"].includes(body.role)) {
-      return new Response(
-        JSON.stringify({
-          error: 'role must be "user", "assistant", or "system"',
-        }),
-        {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      return createErrorResponse(
+        'role must be "user", "assistant", or "system"',
+        400
       );
     }
 
     const message = addMessage(body);
 
-    return new Response(JSON.stringify({ message }), {
-      status: 201,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    return createSuccessResponse({ message }, 201);
   } catch (error) {
     console.error("[conversations POST] Error:", error);
 
-    return new Response(
-      JSON.stringify({
-        error: "Failed to add message",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return createErrorResponse("Failed to add message", 500);
   }
 };
 
 export const DELETE: APIRoute = async ({ url }) => {
   // Production guard: disable in production
   if (import.meta.env.PROD) {
-    return new Response(
-      JSON.stringify({
-        error: "API not available in production",
-      }),
-      {
-        status: 403,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return createErrorResponse("API not available in production", 403);
   }
 
   const sessionId = url.searchParams.get("session_id");
 
   if (!sessionId) {
-    return new Response(
-      JSON.stringify({
-        error: "session_id query parameter required",
-      }),
-      {
-        status: 400,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return createErrorResponse("session_id query parameter required", 400);
   }
 
   try {
     clearConversation(sessionId);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: "Conversation cleared",
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return createSuccessResponse({
+      success: true,
+      message: "Conversation cleared",
+    });
   } catch (error) {
     console.error("[conversations DELETE] Error:", error);
 
-    return new Response(
-      JSON.stringify({
-        error: "Failed to clear conversation",
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return createErrorResponse("Failed to clear conversation", 500);
   }
 };

@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import type {
   SynthesisData,
   FleetingThought,
   OrphanedContent,
   UnreferencedQuote,
 } from "../../hooks/useSynthesisData";
+import CollapsibleSection from "./CollapsibleSection";
+import { formatScore } from "../../utils/formatting";
+import { copyQuoteMarkdown } from "../../utils/clipboard";
+import { openInEditor } from "../../utils/navigation";
 
 interface SynthesisOpportunitiesProps {
   data: SynthesisData | null;
@@ -15,8 +19,6 @@ export default function SynthesisOpportunities({
   data,
   isLoading,
 }: SynthesisOpportunitiesProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   if (isLoading) {
     return (
       <div className="synthesis-section">
@@ -36,88 +38,75 @@ export default function SynthesisOpportunities({
     data.counts.unreferencedQuotes;
 
   return (
-    <div className="synthesis-section collapsible-section">
-      <button
-        className="section-header"
-        onClick={() => setIsExpanded(!isExpanded)}
-        aria-expanded={isExpanded}
-      >
-        <h2>
-          Synthesis Opportunities
-          <span className="opportunity-count">({totalOpportunities})</span>
-        </h2>
-        <span className="toggle-icon">{isExpanded ? "−" : "+"}</span>
-      </button>
-
-      {isExpanded && (
-        <div className="section-content">
-          {/* Fleeting Thoughts to Expand */}
-          {data.fleetingThoughts.length > 0 && (
-            <div className="opportunity-category">
-              <h3>
-                Fleeting Thoughts to Expand ({data.counts.fleetingThoughts})
-              </h3>
-              <p className="category-description">
-                These fleeting thoughts have 3+ related posts and could be
-                expanded into full articles.
-              </p>
-              <div className="opportunity-list">
-                {data.fleetingThoughts.map((thought) => (
-                  <FleetingThoughtCard key={thought.slug} thought={thought} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Orphaned Content */}
-          {data.orphanedContent.length > 0 && (
-            <div className="opportunity-category">
-              <h3>Orphaned Content ({data.counts.orphanedContent})</h3>
-              <p className="category-description">
-                Posts with few semantic connections that could benefit from more
-                context or linking.
-              </p>
-              <div className="opportunity-list">
-                {data.orphanedContent.map((content) => (
-                  <OrphanedContentCard key={content.slug} content={content} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Unreferenced Quotes */}
-          {data.unreferencedQuotes.length > 0 && (
-            <div className="opportunity-category">
-              <h3>Unreferenced Quotes ({data.counts.unreferencedQuotes})</h3>
-              <p className="category-description">
-                Book quotes that haven't been referenced in any posts yet.
-              </p>
-              <div className="opportunity-list">
-                {data.unreferencedQuotes.map((quote, index) => (
-                  <UnreferencedQuoteCard
-                    key={`${quote.quotesRef}-${index}`}
-                    quote={quote}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {totalOpportunities === 0 && (
-            <p className="no-opportunities">
-              No synthesis opportunities found. Great job keeping your content
-              connected!
-            </p>
-          )}
+    <CollapsibleSection
+      title="Synthesis Opportunities"
+      badge={totalOpportunities}
+      defaultExpanded={false}
+      className="synthesis-section"
+    >
+      {/* Fleeting Thoughts to Expand */}
+      {data.fleetingThoughts.length > 0 && (
+        <div className="opportunity-category">
+          <h3>Fleeting Thoughts to Expand ({data.counts.fleetingThoughts})</h3>
+          <p className="category-description">
+            These fleeting thoughts have 3+ related posts and could be expanded
+            into full articles.
+          </p>
+          <div className="opportunity-list">
+            {data.fleetingThoughts.map((thought) => (
+              <FleetingThoughtCard key={thought.slug} thought={thought} />
+            ))}
+          </div>
         </div>
       )}
-    </div>
+
+      {/* Orphaned Content */}
+      {data.orphanedContent.length > 0 && (
+        <div className="opportunity-category">
+          <h3>Orphaned Content ({data.counts.orphanedContent})</h3>
+          <p className="category-description">
+            Posts with few semantic connections that could benefit from more
+            context or linking.
+          </p>
+          <div className="opportunity-list">
+            {data.orphanedContent.map((content) => (
+              <OrphanedContentCard key={content.slug} content={content} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Unreferenced Quotes */}
+      {data.unreferencedQuotes.length > 0 && (
+        <div className="opportunity-category">
+          <h3>Unreferenced Quotes ({data.counts.unreferencedQuotes})</h3>
+          <p className="category-description">
+            Book quotes that haven't been referenced in any posts yet.
+          </p>
+          <div className="opportunity-list">
+            {data.unreferencedQuotes.map((quote, index) => (
+              <UnreferencedQuoteCard
+                key={`${quote.quotesRef}-${index}`}
+                quote={quote}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {totalOpportunities === 0 && (
+        <p className="no-opportunities">
+          No synthesis opportunities found. Great job keeping your content
+          connected!
+        </p>
+      )}
+    </CollapsibleSection>
   );
 }
 
 function FleetingThoughtCard({ thought }: { thought: FleetingThought }) {
   const handleOpen = () => {
-    window.open(`/admin/edit/${thought.slug}`, "_blank");
+    openInEditor(thought.slug);
   };
 
   return (
@@ -134,7 +123,7 @@ function FleetingThoughtCard({ thought }: { thought: FleetingThought }) {
           {thought.relatedPosts.slice(0, 3).map((post) => (
             <li key={post.slug}>
               {post.title}{" "}
-              <span className="score">({(post.score * 100).toFixed(0)}%)</span>
+              <span className="score">({formatScore(post.score)}%)</span>
             </li>
           ))}
         </ul>
@@ -148,7 +137,7 @@ function FleetingThoughtCard({ thought }: { thought: FleetingThought }) {
 
 function OrphanedContentCard({ content }: { content: OrphanedContent }) {
   const handleOpen = () => {
-    window.open(`/admin/edit/${content.slug}`, "_blank");
+    openInEditor(content.slug);
   };
 
   return (
@@ -170,9 +159,11 @@ function OrphanedContentCard({ content }: { content: OrphanedContent }) {
 }
 
 function UnreferencedQuoteCard({ quote }: { quote: UnreferencedQuote }) {
-  const handleCopy = () => {
-    const quoteMarkdown = `> ${quote.quoteText}\n> \n> — ${quote.bookAuthor}`;
-    navigator.clipboard.writeText(quoteMarkdown);
+  const handleCopy = async () => {
+    await copyQuoteMarkdown({
+      text: quote.quoteText,
+      author: quote.bookAuthor,
+    });
   };
 
   return (

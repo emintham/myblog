@@ -1,5 +1,8 @@
 import React from "react";
 import type { RAGQueryResult } from "../../hooks/useRAGQuery";
+import { formatScore } from "../../utils/formatting";
+import { copyToClipboard, copyQuoteMarkdown } from "../../utils/clipboard";
+import ResultCardActions from "./ResultCardActions";
 
 interface QuoteResultCardProps {
   result: RAGQueryResult;
@@ -8,18 +11,30 @@ interface QuoteResultCardProps {
 export default function QuoteResultCard({ result }: QuoteResultCardProps) {
   const { content, score, metadata } = result;
 
-  const handleInsertQuote = () => {
-    const quoteMarkdown = `> ${content}\n> \n> — ${metadata.quoteAuthor || metadata.bookAuthor}${metadata.quoteSource ? `, ${metadata.quoteSource}` : ""}`;
-    navigator.clipboard.writeText(quoteMarkdown);
+  const handleInsertQuote = async () => {
+    await copyQuoteMarkdown({
+      text: content,
+      author: metadata.quoteAuthor || metadata.bookAuthor || "",
+      source: metadata.quoteSource,
+    });
   };
 
-  const handleCopyText = () => {
-    navigator.clipboard.writeText(content);
+  const handleCopyText = async () => {
+    await copyToClipboard(content);
   };
 
-  const formatScore = (score: number) => {
-    return (score * 100).toFixed(0);
-  };
+  const actions = [
+    {
+      label: "Insert Quote",
+      onClick: handleInsertQuote,
+      title: "Copy formatted quote",
+    },
+    {
+      label: "Copy",
+      onClick: handleCopyText,
+      title: "Copy text to clipboard",
+    },
+  ];
 
   return (
     <div className="result-card quote-result-card">
@@ -59,22 +74,7 @@ export default function QuoteResultCard({ result }: QuoteResultCardProps) {
         </div>
       )}
 
-      <div className="result-actions">
-        <button
-          onClick={handleInsertQuote}
-          className="action-button"
-          title="Copy formatted quote"
-        >
-          Insert Quote
-        </button>
-        <button
-          onClick={handleCopyText}
-          className="action-button"
-          title="Copy text to clipboard"
-        >
-          Copy
-        </button>
-      </div>
+      <ResultCardActions actions={actions} />
     </div>
   );
 }

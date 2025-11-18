@@ -1,5 +1,9 @@
 import React from "react";
 import type { RAGQueryResult } from "../../hooks/useRAGQuery";
+import { formatScore, formatDate } from "../../utils/formatting";
+import { copyToClipboard, copyMarkdownLink } from "../../utils/clipboard";
+import { openInEditor } from "../../utils/navigation";
+import ResultCardActions from "./ResultCardActions";
 
 interface PostResultCardProps {
   result: RAGQueryResult;
@@ -10,36 +14,37 @@ export default function PostResultCard({ result }: PostResultCardProps) {
 
   const handleOpenInEditor = () => {
     if (metadata.slug) {
-      window.open(`/admin/edit/${metadata.slug}`, "_blank");
+      openInEditor(metadata.slug);
     }
   };
 
-  const handleInsertLink = () => {
-    if (url) {
-      navigator.clipboard.writeText(`[${metadata.title}](${url})`);
+  const handleInsertLink = async () => {
+    if (url && metadata.title) {
+      await copyMarkdownLink(metadata.title, url);
     }
   };
 
-  const handleCopyText = () => {
-    navigator.clipboard.writeText(content);
+  const handleCopyText = async () => {
+    await copyToClipboard(content);
   };
 
-  const formatScore = (score: number) => {
-    return (score * 100).toFixed(0);
-  };
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return null;
-    try {
-      const date = new Date(dateStr);
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-      });
-    } catch {
-      return null;
-    }
-  };
+  const actions = [
+    {
+      label: "Open",
+      onClick: handleOpenInEditor,
+      title: "Open in editor",
+    },
+    {
+      label: "Insert Link",
+      onClick: handleInsertLink,
+      title: "Copy markdown link",
+    },
+    {
+      label: "Copy",
+      onClick: handleCopyText,
+      title: "Copy text to clipboard",
+    },
+  ];
 
   return (
     <div className="result-card post-result-card">
@@ -76,29 +81,7 @@ export default function PostResultCard({ result }: PostResultCardProps) {
         </div>
       )}
 
-      <div className="result-actions">
-        <button
-          onClick={handleOpenInEditor}
-          className="action-button"
-          title="Open in editor"
-        >
-          Open
-        </button>
-        <button
-          onClick={handleInsertLink}
-          className="action-button"
-          title="Copy markdown link"
-        >
-          Insert Link
-        </button>
-        <button
-          onClick={handleCopyText}
-          className="action-button"
-          title="Copy text to clipboard"
-        >
-          Copy
-        </button>
-      </div>
+      <ResultCardActions actions={actions} />
     </div>
   );
 }
