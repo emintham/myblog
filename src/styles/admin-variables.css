@@ -1,0 +1,30 @@
+/**
+ * Admin Design Tokens
+ * Shared CSS variables for all admin pages and components
+ */
+
+:root {
+  /* Admin Color Palette */
+  --color-background-admin: #faf8f5; /* Warm off-white */
+  --color-text-admin-primary: #4a4a4a; /* Dark, soft gray */
+  --color-text-admin-secondary: #8c8c8c; /* Lighter, muted gray */
+  --color-accent-admin: #a3b1a1; /* Desaturated, earthy green */
+  --color-border-admin-subtle: #ededed; /* Very light gray for subtle lines/borders */
+  --color-admin-fieldset-border: #c8cfc7; /* Unified fieldset border color */
+  --color-focus-admin: #93a191; /* Slightly darker accent for focus */
+  --color-success-admin: #5a7d5a; /* Muted green for success text/icon */
+  --color-error-admin: #b7564f; /* Muted red for error text/icon */
+  --color-warning-admin: #b28a3e; /* Muted yellow/brown for warning text/icon */
+
+  /* Admin Spacing Scale */
+  --spacing-unit-admin: 8px;
+  --spacing-xs-admin: calc(var(--spacing-unit-admin) * 0.5); /* 4px */
+  --spacing-sm-admin: var(--spacing-unit-admin); /* 8px */
+  --spacing-md-admin: calc(var(--spacing-unit-admin) * 2); /* 16px */
+  --spacing-lg-admin: calc(var(--spacing-unit-admin) * 3); /* 24px */
+  --spacing-xl-admin: calc(var(--spacing-unit-admin) * 4); /* 32px */
+  --spacing-xxl-admin: calc(var(--spacing-unit-admin) * 6); /* 48px */
+
+  /* Admin UI Properties */
+  --border-radius-admin: 3px;
+}

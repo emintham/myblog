@@ -1,31 +1,14 @@
 /* src/styles/admin.css - Kinfolk Inspired Minimalism Redesign (Reconciled) */
 
+/* Import shared admin design tokens */
+@import url("./admin-variables.css");
+
 /* -------------------------------------------------------------------------- */
 
-/* Admin Scope Base Styles & Variables                                        */
+/* Admin Scope Base Styles                                                   */
 
 /* -------------------------------------------------------------------------- */
 body.admin-scope {
-  /* Admin-specific Color Palette & Theme Variables */
-  --color-background-admin: #faf8f5; /* Warm off-white */
-  --color-text-admin-primary: #4a4a4a; /* Dark, soft gray */
-  --color-text-admin-secondary: #8c8c8c; /* Lighter, muted gray */
-  --color-accent-admin: #a3b1a1; /* Desaturated, earthy green */
-  --color-border-admin-subtle: #ededed; /* Very light gray for subtle lines/borders */
-  --color-admin-fieldset-border: #c8cfc7; /* New unified fieldset border color */
-  --color-focus-admin: #93a191; /* Slightly darker accent for focus */
-  --color-success-admin: #5a7d5a; /* Muted green for success text/icon */
-  --color-error-admin: #b7564f; /* Muted red for error text/icon */
-  --color-warning-admin: #b28a3e; /* Muted yellow/brown for warning text/icon */
-  --spacing-unit-admin: 8px;
-  --spacing-xs-admin: calc(var(--spacing-unit-admin) * 0.5); /* 4px */
-  --spacing-sm-admin: var(--spacing-unit-admin); /* 8px */
-  --spacing-md-admin: calc(var(--spacing-unit-admin) * 2); /* 16px */
-  --spacing-lg-admin: calc(var(--spacing-unit-admin) * 3); /* 24px */
-  --spacing-xl-admin: calc(var(--spacing-unit-admin) * 4); /* 32px */
-  --spacing-xxl-admin: calc(var(--spacing-unit-admin) * 6); /* 48px */
-  --border-radius-admin: 3px;
-
   /* Base styles for admin pages */
   background-color: var(--color-background-admin);
   font-family: var(--font-sans); /* Uses global Montserrat */
@@ -293,30 +276,58 @@ body.admin-scope .admin-post-list .list-item-entry:last-child {
 
 body.admin-scope .admin-post-list .list-item-entry .post-info-column {
   flex-grow: 1; /* Allows this column to take up all available space on the left */
-  margin-right: var(--spacing-md-admin); /* Space between text content and the first button */
+  margin-right: var(
+    --spacing-md-admin
+  ); /* Space between text content and the first button */
+
   min-width: 0; /* Important for flex items containing text that might overflow/wrap */
 }
 
-body.admin-scope .admin-post-list .list-item-entry .post-info-column .title-line {
-  margin-bottom: var(--spacing-xs-admin); /* Small space between title and meta details */
+body.admin-scope
+  .admin-post-list
+  .list-item-entry
+  .post-info-column
+  .title-line {
+  margin-bottom: var(
+    --spacing-xs-admin
+  ); /* Small space between title and meta details */
+
   display: flex; /* Helps align badge and title if badge is tall */
   align-items: center; /* Vertically align badge and title */
 }
 
-body.admin-scope .admin-post-list .list-item-entry .post-info-column .list-item-name {
+body.admin-scope
+  .admin-post-list
+  .list-item-entry
+  .post-info-column
+  .list-item-name {
   font-weight: 500; /* Or your preferred weight for post titles in the list */
   color: var(--color-text-admin-primary); /* Using primary text color */
   text-decoration: none; /* Removing underline from link */
 }
 
-body.admin-scope .admin-post-list .list-item-entry .post-info-column .list-item-name:hover {
+body.admin-scope
+  .admin-post-list
+  .list-item-entry
+  .post-info-column
+  .list-item-name:hover {
   color: var(--color-accent-admin); /* Standard link hover */
   text-decoration: underline; /* Add underline on hover */
 }
 
-body.admin-scope .admin-post-list .list-item-entry .post-info-column .status-draft-badge {
-  background-color: var(--color-warning-admin); /* Using warning color for draft status */
-  color: var(--color-background-admin); /* Text color that contrasts with badge background */
+body.admin-scope
+  .admin-post-list
+  .list-item-entry
+  .post-info-column
+  .status-draft-badge {
+  background-color: var(
+    --color-warning-admin
+  ); /* Using warning color for draft status */
+
+  color: var(
+    --color-background-admin
+  ); /* Text color that contrasts with badge background */
+
   padding: calc(var(--spacing-xs-admin) / 2) var(--spacing-xs-admin); /* Small padding */
   border-radius: var(--border-radius-admin);
   font-size: 0.75rem; /* Smaller font for the badge */
@@ -352,37 +363,21 @@ body.admin-scope .admin-post-list .list-item-entry .button-edit + .button-delete
 
 /* -------------------------------------------------------------------------- */
 body.admin-scope fieldset {
-  /* border: none; */
-
- /* Replaced */
-
-  /* padding: 0; */
-
- /* Replaced */
   margin: 0 0 var(--spacing-xl-admin) 0;
-  border: 1px solid var(--color-admin-fieldset-border); /* Use new unified color */
+  border: 1px solid var(--color-admin-fieldset-border);
   padding: var(--spacing-xl-admin) var(--spacing-lg-admin)
-    var(--spacing-lg-admin); /* Adjusted padding, especially top */
-
+    var(--spacing-lg-admin);
   position: relative; /* For legend positioning */
-  border-radius: var(--border-radius-admin); /* Added for consistency */
+  border-radius: var(--border-radius-admin);
 }
 
 /* Ensure .book-note-fields within admin also uses the unified styles */
 body.admin-scope .post-form .book-note-fields {
-  border-color: var(
-    --color-admin-fieldset-border
-  ); /* Use new unified border color */
+  border-color: var(--color-admin-fieldset-border);
 }
 
 body.admin-scope .post-form .book-note-fields legend {
-  color: var(--color-text-admin-primary); /* Match other admin legends */
-
-  /* Ensure other legend styles (positioning, background) are inherited or consistent */
-
-  /* The existing legend rule should cover positioning if specificity is right. */
-
-  /* If not, copy relevant properties from the main legend rule. */
+  color: var(--color-text-admin-primary);
 }
 
 body.admin-scope .form-field {
@@ -460,7 +455,9 @@ body.admin-scope .button-primary:focus {
   /* Opaque on hover - fill with accent color */
   background-color: var(--color-accent-admin); /* Accent green background */
   color: var(--color-background-admin); /* Light text for contrast */
-  border-color: var(--color-focus-admin); /* Slightly darker accent green border for focus, or use var(--color-accent-admin) */
+  border-color: var(
+    --color-focus-admin
+  ); /* Slightly darker accent green border for focus, or use var(--color-accent-admin) */
 }
 
 body.admin-scope .button-edit,
@@ -531,7 +528,10 @@ body.admin-scope .button-delete {
 body.admin-scope .button-delete:hover,
 body.admin-scope .button-delete:focus {
   /* ---- MODIFIED: Hover state for new muted red ---- */
-  background-color: rgb(199 140 134 / 5%); /* Very light transparent version of #c78c86 */
+  background-color: rgb(
+    199 140 134 / 5%
+  ); /* Very light transparent version of #c78c86 */
+
   color: #af746e; /* Slightly darker/desaturated version of #c78c86 for hover text */
   border-color: #af746e; /* Slightly darker/desaturated version of #c78c86 for hover border */
 
@@ -540,7 +540,11 @@ body.admin-scope .button-delete:focus {
 }
 
 /* Spacing for the delete button when it follows an edit button in the admin post list */
-body.admin-scope .admin-post-list .list-item-entry .button-edit + .button-delete {
+body.admin-scope
+  .admin-post-list
+  .list-item-entry
+  .button-edit
+  + .button-delete {
   margin-left: var(--spacing-sm-admin);
 }
 
@@ -559,14 +563,10 @@ body.admin-scope .inline-quotes-manager .button-add-quote {
 
 /* Styles for individual quote items within the manager */
 body.admin-scope .inline-quotes-manager .quote-item {
-  background-color: var(--color-background-admin); /* Match admin background */
+  background-color: var(--color-background-admin);
   padding: var(--spacing-lg-admin);
   border-radius: var(--border-radius-admin);
-
-  /* border: 1px solid var(--color-border-admin-subtle); */
-
- /* Keep or remove based on preference */
-  margin-bottom: var(--spacing-lg-admin); /* Space between quote items */
+  margin-bottom: var(--spacing-lg-admin);
   position: relative; /* For the pseudo-element divider */
 }
 
@@ -594,10 +594,6 @@ body.admin-scope .inline-quotes-manager .quote-item:not(:first-child)::before {
 body.admin-scope .inline-quotes-manager > .inline-quotes-label {
   margin-bottom: var(--spacing-lg-admin);
 }
-
-/* Optional: if you want a border around each quote item, uncomment the border property above */
-
-/* and adjust padding if necessary. The current setup focuses on the divider. */
 
 /* -------------------------------------------------------------------------- */
 

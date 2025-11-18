@@ -1,0 +1,75 @@
+/**
+ * Base Element Styles
+ * Default styling for HTML elements
+ */
+
+body {
+  font-family: var(--font-serif);
+  font-size: 1.125rem; /* Approx 18px, adjust as needed */
+  line-height: 1.7;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-sans);
+  font-weight: 400; /* Or a lighter weight for a more airy feel */
+  line-height: 0.6;
+  margin-bottom: 1em;
+  color: var(--color-text); /* Or a slightly darker shade for emphasis */
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+p {
+  margin-bottom: 1.5em;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+a:hover,
+a:focus {
+  text-decoration: underline;
+  color: var(--color-text); /* Or slightly darken accent */
+}
+
+/* Main content container for centering and max-width */
+.content-wrapper {
+  max-width: var(--content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem 1rem; /* Adjust padding */
+}
+
+/* Minimalist styling for code blocks if needed */
+pre {
+  background-color: var(--color-code-background);
+  padding: 1em;
+  overflow-x: auto;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
