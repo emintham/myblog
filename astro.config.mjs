@@ -4,6 +4,21 @@ import sitemap from "@astrojs/sitemap";
 import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
 
+/**
+ * Vite plugin to log RAG configuration on dev server start
+ */
+function ragConfigLogger() {
+  return {
+    name: "rag-config-logger",
+    configureServer() {
+      // Dynamic import to avoid issues during build
+      import("./src/ragConfig.ts").then((module) => {
+        module.logRagConfig();
+      });
+    },
+  };
+}
+
 // https://astro.build/config
 export default defineConfig({
   site: "https://your-blog-url.com", // TODO: Replace with your actual site URL
@@ -11,6 +26,7 @@ export default defineConfig({
   exclude: ["**/__tests__/**", "**/*.test.ts", "**/*.spec.ts"],
   integrations: [sitemap(), mdx(), react()],
   vite: {
+    plugins: [ragConfigLogger()],
     server: {
       watch: {
         // Ignore content directory to prevent HMR refresh during auto-save

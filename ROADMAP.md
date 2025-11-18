@@ -29,11 +29,13 @@ Persistent semantic search across all content types during local authoring, with
 - [x] Add logging for index operations
 - [x] Write tests for all CRUD operations (15 passing)
 
-**Phase 3 - Ollama MCP Integration:**
+**Phase 3 - Ollama MCP Integration:** ✅ **COMPLETED**
 
-- [ ] Auto-detect Ollama MCP server
-- [ ] Fallback to @xenova/transformers
-- [ ] Embedding provider abstraction
+- [x] Auto-detect Ollama MCP server
+- [x] Fallback to @xenova/transformers
+- [x] Embedding provider abstraction
+- [x] Environment variable override support
+- [x] Unit tests for provider selection
 
 **Phase 4 - Admin UI:**
 

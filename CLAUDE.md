@@ -173,8 +173,14 @@ All use `getUniqueValuesFromCollection()` in `contentUtils.ts`.
 - `index.ts` - Public RAG service API (query, upsert, delete, rebuild)
 - `storage.ts` - LanceDB vector database wrapper with Apache Arrow schemas
 - `chunking.ts` - Paragraph splitting (posts) and quote-level chunking
-- `embeddings.ts` - Embedding provider abstraction (transformers.js)
+- `embeddings.ts` - Dual embedding provider system (Ollama + transformers.js)
 - `fs-loader.ts` - File system content loader for CLI operations
+
+**Embedding Providers:**
+
+- **Ollama** (preferred): 768-dimensional embeddings via local Ollama HTTP API (port 11434)
+- **Transformers.js** (fallback): 384-dimensional embeddings, zero-config, offline-capable
+- Auto-detection with graceful fallback, configurable via `RAG_EMBEDDING_PROVIDER` env var
 
 **Storage:** `data/rag/` (gitignored, persistent across restarts)
 
@@ -186,11 +192,11 @@ All use `getUniqueValuesFromCollection()` in `contentUtils.ts`.
 
 - `pnpm rq "query text"` - Search for semantically similar content
 - `pnpm rrb` - Rebuild entire index from content collections
-- `pnpm rst` - View index statistics and storage info
+- `pnpm rst` - View index statistics, storage info, and active provider
 
-**Integration:** Phase 2 will hook into create/update/delete handlers for automatic indexing
+**Integration:** Automatic indexing on create/update/delete via API handlers (Phase 2 complete)
 
-**Note:** Requires internet on first use to download embedding model (cached thereafter)
+**Note:** Transformers.js requires internet on first use to download model (~25MB, cached thereafter). Ollama requires separate installation and the `nomic-embed-text` model (see INSTALL.md).
 
 ### API Handler Architecture
 

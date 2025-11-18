@@ -4,6 +4,8 @@
  * RAG Index Rebuild Tool
  *
  * Rebuilds the entire RAG index from scratch
+ *
+ * Environment variables are loaded via `tsx --import dotenv/config`
  */
 
 import { loadAllPosts, loadBookQuotes } from "../src/services/rag/fs-loader.ts";

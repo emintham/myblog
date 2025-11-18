@@ -4,6 +4,8 @@
  * RAG Query Tool
  *
  * Query the RAG index for related content
+ *
+ * Environment variables are loaded via `tsx --import dotenv/config`
  */
 
 import { getEmbeddingProvider } from "../src/services/rag/embeddings.ts";

@@ -4,6 +4,8 @@
  * RAG Statistics Tool
  *
  * Display statistics about the RAG index
+ *
+ * Environment variables are loaded via `tsx --import dotenv/config`
  */
 
 import { getEmbeddingProvider } from "../src/services/rag/embeddings.ts";

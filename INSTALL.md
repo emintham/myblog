@@ -37,9 +37,13 @@ This guide explains how to set up the Kinfolk Inspired Astro Blog Template.
 
 5.  **Optional: Enhanced Semantic Search with Ollama (Recommended):**
 
-    The blog includes a RAG (Retrieval-Augmented Generation) system for semantic search. By default, it uses a smaller transformer model that downloads automatically. For better quality embeddings, you can optionally install Ollama:
-    - **Install Ollama:** Visit [https://ollama.com/download](https://ollama.com/download) and follow instructions for your OS
-    - **Pull embedding model:** `ollama pull nomic-embed-text`
-    - **Future:** Phase 2 will auto-detect and use Ollama when available (768-dimensional embeddings vs. 384)
+    The blog includes a RAG (Retrieval-Augmented Generation) system for semantic search. By default, it uses transformers.js (384-dimensional embeddings) which downloads automatically. For better quality embeddings, you can optionally install Ollama:
 
-    The system works without Ollama, but you'll get higher-quality semantic search results with it installed.
+    - **Install Ollama:** Visit [https://ollama.com/download](https://ollama.com/download) and follow instructions for your OS
+    - **Pull embedding model:** `ollama pull nomic-embed-text` (or any other embedding model like `mxbai-embed-large`, `snowflake-arctic-embed`, etc.)
+    - **Start Ollama:** Run `ollama serve` (or Ollama starts automatically on macOS/Windows)
+    - **Automatic detection:** The RAG system will auto-detect Ollama, the model, and embedding dimensions
+    - **Configuration:** Edit `src/ragConfig.ts` to change the embedding model (no need to specify dimensions!)
+    - **On dev start:** The system displays active provider and model configuration
+
+    The system works perfectly without Ollama, but you'll get higher-quality semantic search results with it installed. The configuration is shown when you run `pnpm dev`.
