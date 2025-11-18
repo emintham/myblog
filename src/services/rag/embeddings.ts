@@ -1,11 +1,13 @@
 /**
  * Embedding providers for RAG system
  *
- * Supports transformers.js as the primary provider
- * Future: Ollama MCP integration (Phase 2)
+ * Supports:
+ * - Ollama (preferred, better quality via HTTP API)
+ * - Transformers.js (fallback, zero-config)
  */
 
 import { pipeline, Pipeline } from "@xenova/transformers";
+import { ragConfig } from "../../ragConfig.js";
 
 export interface EmbeddingProvider {
   name: string;
@@ -118,29 +120,189 @@ class TransformersEmbeddingProvider implements EmbeddingProvider {
 }
 
 /**
+ * Ollama embedding provider (preferred, better quality)
+ * Uses Ollama's HTTP API directly
+ */
+class OllamaEmbeddingProvider implements EmbeddingProvider {
+  name = "ollama";
+  dimensions = 0; // Will be auto-detected on first use
+  private model: string;
+  private baseUrl: string;
+
+  constructor(
+    baseUrl = ragConfig.ollama.baseUrl,
+    model = ragConfig.ollama.model
+  ) {
+    this.baseUrl = baseUrl;
+    this.model = model;
+  }
+
+  /**
+   * Generate embeddings for multiple texts
+   */
+  async embed(texts: string[]): Promise<number[][]> {
+    try {
+      const embeddings: number[][] = [];
+
+      // Process in batches to avoid overwhelming the server
+      const batchSize = 10;
+      for (let i = 0; i < texts.length; i += batchSize) {
+        const batch = texts.slice(i, i + batchSize);
+        const batchEmbeddings = await Promise.all(
+          batch.map((text) => this.embedSingle(text))
+        );
+        embeddings.push(...batchEmbeddings);
+
+        // Log progress for large batches
+        if (texts.length > 20 && (i + batchSize) % 50 === 0) {
+          console.log(`[RAG] Embedded ${i + batchSize}/${texts.length} texts`);
+        }
+      }
+
+      return embeddings;
+    } catch (error) {
+      console.error("[RAG] Error generating embeddings via Ollama:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Generate embedding for a single text
+   */
+  async embedSingle(text: string): Promise<number[]> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/embeddings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: this.model,
+          prompt: text,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Ollama API error: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+
+      if (!data.embedding || !Array.isArray(data.embedding)) {
+        throw new Error("Invalid response from Ollama API");
+      }
+
+      // Auto-detect dimensions on first use
+      if (this.dimensions === 0) {
+        this.dimensions = data.embedding.length;
+        console.log(
+          `[RAG] Auto-detected embedding dimensions: ${this.dimensions}d for model '${this.model}'`
+        );
+      }
+
+      // Validate dimensions match expected
+      if (data.embedding.length !== this.dimensions) {
+        throw new Error(
+          `Embedding dimension mismatch: expected ${this.dimensions}d, got ${data.embedding.length}d`
+        );
+      }
+
+      return data.embedding;
+    } catch (error) {
+      console.error("[RAG] Error generating single embedding via Ollama:", error);
+      throw error;
+    }
+  }
+}
+
+/**
+ * Check if Ollama is available via HTTP API
+ */
+async function isOllamaAvailable(
+  baseUrl = ragConfig.ollama.baseUrl,
+  requiredModel = ragConfig.ollama.model
+): Promise<boolean> {
+  // Skip auto-detection in test environment for faster tests
+  if (process.env.VITEST || process.env.NODE_ENV === "test") {
+    return false;
+  }
+
+  try {
+    // Set a timeout for the health check
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
+    const response = await fetch(`${baseUrl}/api/tags`, {
+      method: "GET",
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      return false;
+    }
+
+    // Check if the configured model is available
+    const data = await response.json();
+    const hasModel = data.models?.some((m: { name: string }) =>
+      m.name.includes(requiredModel)
+    );
+
+    if (!hasModel) {
+      console.log(
+        `[RAG] Ollama detected but model '${requiredModel}' not found. Run: ollama pull ${requiredModel}`
+      );
+    }
+
+    return hasModel;
+  } catch (error) {
+    // Ollama not available (connection refused, timeout, etc.)
+    return false;
+  }
+}
+
+/**
  * Get the active embedding provider
  *
- * Future: Will auto-detect Ollama MCP and fall back to transformers.js
- * For now, always returns transformers.js provider
+ * Auto-detects Ollama and falls back to transformers.js
  */
 export async function getEmbeddingProvider(): Promise<EmbeddingProvider> {
-  // Check for environment variable override
-  const forcedProvider = process.env.RAG_EMBEDDING_PROVIDER;
+  const provider = ragConfig.provider;
 
-  if (forcedProvider === "transformers") {
-    console.log("[RAG] Using transformers.js provider (forced by env)");
+  if (provider === "transformers") {
+    console.log("[RAG] Using transformers.js provider (forced by config)");
+    console.log(`[RAG] Model: ${ragConfig.transformers.model} (${ragConfig.transformers.dimensions}d)`);
     return new TransformersEmbeddingProvider();
   }
 
-  // Phase 2: Add Ollama MCP detection here
-  // const ollamaProvider = await detectOllamaMCP();
-  // if (ollamaProvider) {
-  //   console.log('[RAG] Using Ollama MCP provider');
-  //   return ollamaProvider;
-  // }
+  if (provider === "ollama") {
+    console.log("[RAG] Using Ollama provider (forced by config)");
+    console.log(`[RAG] Model: ${ragConfig.ollama.model} (dimensions will be auto-detected)`);
+    try {
+      return new OllamaEmbeddingProvider();
+    } catch (error) {
+      console.error("[RAG] Failed to create Ollama provider:", error);
+      console.log("[RAG] Falling back to transformers.js");
+      return new TransformersEmbeddingProvider();
+    }
+  }
 
-  // Default to transformers.js
-  console.log("[RAG] Using transformers.js provider (default)");
+  // Auto-detect Ollama availability
+  console.log("[RAG] Auto-detecting embedding provider...");
+  const ollamaAvailable = await isOllamaAvailable();
+
+  if (ollamaAvailable) {
+    console.log("[RAG] Ollama detected, using Ollama provider");
+    console.log(`[RAG] Model: ${ragConfig.ollama.model} (dimensions will be auto-detected)`);
+    return new OllamaEmbeddingProvider();
+  }
+
+  // Fallback to transformers.js
+  console.log("[RAG] Ollama not available, using transformers.js provider");
+  console.log(`[RAG] Model: ${ragConfig.transformers.model} (${ragConfig.transformers.dimensions}d)`);
   return new TransformersEmbeddingProvider();
 }
 

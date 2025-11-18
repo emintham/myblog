@@ -33,11 +33,25 @@ This guide provides instructions on how to use, develop, and maintain your Kinfo
     The blog includes a local semantic search system that indexes your content for intelligent similarity search:
     - **Query index:** `pnpm rq "search term"` - Find semantically similar content
     - **Rebuild index:** `pnpm rrb` - Rebuild from scratch (if corrupted or after bulk changes)
-    - **View statistics:** `pnpm rst` - See index stats and storage info
+    - **View statistics:** `pnpm rst` - See index stats, storage info, and active embedding provider
+
+    **Embedding Providers:**
+    The system supports two embedding providers:
+    1. **Ollama** (preferred): Higher quality embeddings via local Ollama HTTP API
+    2. **Transformers.js** (fallback): Zero-config 384-dimensional embeddings, works offline
+
+    **Configuration:** Edit `src/ragConfig.ts` to customize:
+    - Embedding model (e.g., `nomic-embed-text`, `mxbai-embed-large`, `snowflake-arctic-embed`)
+    - Provider selection (auto-detect, force ollama, or force transformers)
+    - Ollama base URL
+
+    **Note:** Model dimensions are auto-detected from Ollama's response - no manual configuration needed!
+
+    The system auto-detects Ollama and displays the active configuration on dev server start (`pnpm dev`).
 
     **Storage:** The index is stored in `data/rag/` (gitignored) and persists between dev server restarts.
 
-    **Note:** The system requires internet access on first use to download the embedding model (~25MB). This is cached locally for subsequent use. Future phases will add automatic indexing when you save posts through the admin interface.
+    **Auto-indexing:** Posts and quotes are automatically indexed when you create, update, or delete them through the admin interface. Manual rebuild is only needed if the index becomes corrupted.
 
 5.  **Linting & Formatting:**
     - Apply formatting: `pnpm run format`
