@@ -46,15 +46,15 @@ Persistent semantic search across all content types during local authoring, with
 - [ ] Collapsible sections (synthesis, stats)
 - [ ] `/api/rag-query` and `/api/rag-synthesis` endpoints
 
-**Phase 4B - Ollama Writing Assistant:**
+**Phase 4B - Ollama Writing Assistant:** ✅ **COMPLETED**
 
-- [ ] AI assistant panel in PostForm (collapsible sidebar)
-- [ ] Chat interface with Ollama
-- [ ] Prompt library (`prompts.yaml`)
-- [ ] Conversation history (SQLite)
-- [ ] Context modes (current post, post + related, just prompt)
-- [ ] `/api/ollama-chat`, `/api/ollama-status`, `/api/conversations` endpoints
-- [ ] Error display if Ollama unavailable (required dependency)
+- [x] AI assistant panel in PostForm (collapsible sidebar)
+- [x] Chat interface with Ollama
+- [x] Prompt library (`prompts.yaml`)
+- [x] Conversation history (SQLite)
+- [x] Context modes (current post, post + related, just prompt)
+- [x] `/api/ollama-chat`, `/api/ollama-status`, `/api/conversations` endpoints
+- [x] Error display if Ollama unavailable (required dependency)
 
 **Phase 4C - Advanced Features (Future):**
 

@@ -14,6 +14,8 @@ import {
 } from "../../../utils/contentUtils"; // Updated path
 import FeedbackDisplay from "../../../components/admin/FeedbackDisplay";
 import ToastContainer from "../../../components/admin/ToastContainer";
+import { AIAssistantPanel } from "../../../components/admin/AIAssistantPanel";
+import "../../../styles/ai-assistant.css";
 
 // Return empty paths in production (admin only available in dev)
 export async function getStaticPaths() {
@@ -219,5 +221,6 @@ const pageDescription = `Edit the post: ${pageTitleDisplay}. This page is availa
   </div>
   <FeedbackDisplay client:only="react" formId="editPostForm" />
   <ToastContainer client:only="react" formId="editPostForm" />
+  <AIAssistantPanel client:load sessionId={slug || "unknown"} />
   {/* Changed to client:only="react" */}
 </BaseLayout>
