@@ -31,3 +31,6 @@ pnpm-debug.log*
 
 # RAG index (do not commit)
 data/rag/
+
+# AI assistant conversation history (do not commit)
+data/assistant.db
