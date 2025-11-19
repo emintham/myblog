@@ -99,7 +99,7 @@ export class RAGService {
       // Initialize storage
       this.storage = await createStorage(
         this.provider.dimensions,
-        this.provider.name
+        this.provider.modelName
       );
 
       // Verify provider compatibility with existing index (should match now)
@@ -476,12 +476,20 @@ export class RAGService {
         return null;
       }
 
+      // Get actual counts from database (more accurate than metadata)
+      const dbStats = await this.storage.getStats();
+
       return {
         version: metadata.version,
         embeddingModel: metadata.embeddingModel,
         embeddingDim: metadata.embeddingDim,
         provider: this.provider.name,
-        stats: metadata.stats,
+        stats: {
+          totalPosts: metadata.stats.totalPosts,
+          totalParagraphs: dbStats.postsCount, // Actual count from database
+          totalQuotes: dbStats.quotesCount, // Actual count from database
+          lastUpdated: metadata.lastUpdated,
+        },
       };
     } catch (error) {
       console.error("[RAG] Failed to get stats:", error);
