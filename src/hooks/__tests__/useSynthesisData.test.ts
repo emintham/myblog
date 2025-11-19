@@ -9,29 +9,36 @@ describe("useSynthesisData", () => {
     vi.clearAllMocks();
   });
 
-  it("should initialize with loading state", () => {
-    const { result } = renderHook(() => useSynthesisData());
-
-    expect(result.current.isLoading).toBe(true);
-    expect(result.current.data).toBeNull();
-    expect(result.current.error).toBeNull();
-  });
-
   it("should fetch synthesis data on mount", async () => {
     const mockData = {
-      fleetingToExpand: [
-        { slug: "post1", title: "Post 1", wordCount: 50 },
+      fleetingThoughts: [
+        {
+          slug: "post1",
+          title: "Post 1",
+          relatedCount: 2,
+          relatedPosts: [],
+        },
       ],
       orphanedContent: [],
       unreferencedQuotes: [],
+      counts: {
+        fleetingThoughts: 1,
+        orphanedContent: 0,
+        unreferencedQuotes: 0,
+      },
     };
 
-    (global.fetch as any).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockData,
-    });
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      {
+        ok: true,
+        json: async () => ({ data: mockData }),
+      }
+    );
 
     const { result } = renderHook(() => useSynthesisData());
+
+    // Initially loading
+    expect(result.current.isLoading).toBe(true);
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -42,7 +49,7 @@ describe("useSynthesisData", () => {
   });
 
   it("should handle errors when fetch fails", async () => {
-    (global.fetch as any).mockRejectedValueOnce(
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
       new Error("API error")
     );
 
@@ -56,27 +63,51 @@ describe("useSynthesisData", () => {
     expect(result.current.data).toBeNull();
   });
 
-  it("should refetch data when refresh is called", async () => {
+  it("should refetch data when refetch is called", async () => {
     const mockData1 = {
-      fleetingToExpand: [{ slug: "post1", title: "Post 1", wordCount: 50 }],
+      fleetingThoughts: [
+        {
+          slug: "post1",
+          title: "Post 1",
+          relatedCount: 2,
+          relatedPosts: [],
+        },
+      ],
       orphanedContent: [],
       unreferencedQuotes: [],
+      counts: {
+        fleetingThoughts: 1,
+        orphanedContent: 0,
+        unreferencedQuotes: 0,
+      },
     };
 
     const mockData2 = {
-      fleetingToExpand: [{ slug: "post2", title: "Post 2", wordCount: 60 }],
+      fleetingThoughts: [
+        {
+          slug: "post2",
+          title: "Post 2",
+          relatedCount: 3,
+          relatedPosts: [],
+        },
+      ],
       orphanedContent: [],
       unreferencedQuotes: [],
+      counts: {
+        fleetingThoughts: 1,
+        orphanedContent: 0,
+        unreferencedQuotes: 0,
+      },
     };
 
-    (global.fetch as any)
+    (global.fetch as unknown as ReturnType<typeof vi.fn>)
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockData1,
+        json: async () => ({ data: mockData1 }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockData2,
+        json: async () => ({ data: mockData2 }),
       });
 
     const { result } = renderHook(() => useSynthesisData());
@@ -85,12 +116,25 @@ describe("useSynthesisData", () => {
       expect(result.current.data).toEqual(mockData1);
     });
 
-    await result.current.refresh();
+    await result.current.refetch();
 
     await waitFor(() => {
       expect(result.current.data).toEqual(mockData2);
     });
 
     expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it("should have correct initial state", () => {
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockImplementation(
+      () => new Promise(() => {}) // Never resolves
+    );
+
+    const { result } = renderHook(() => useSynthesisData());
+
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.data).toBeNull();
+    expect(result.current.error).toBeNull();
+    expect(typeof result.current.refetch).toBe("function");
   });
 });

@@ -1,6 +1,7 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import { act } from "react";
 import { useAutoSave } from "../useAutoSave";
+import type { PostFormData } from "../../types/admin";
 
 describe("useAutoSave", () => {
   beforeEach(() => {
@@ -12,127 +13,152 @@ describe("useAutoSave", () => {
     vi.useRealTimers();
   });
 
-  it("should initialize with default state", () => {
-    const mockOnSave = vi.fn();
-    const { result } = renderHook(() =>
+  it("should set up interval and call submitFn when body changes", async () => {
+    const mockSubmitFn = vi.fn().mockResolvedValue(undefined);
+    const mockGetValues = vi.fn().mockReturnValue({
+      title: "Test Post",
+      bodyContent: "new content",
+    } as PostFormData);
+
+    renderHook(() =>
       useAutoSave({
-        onSave: mockOnSave,
-        delay: 2000,
-        enabled: true,
+        isSubmitting: false,
+        getValues: mockGetValues,
+        lastSavedBodyContent: "old content",
+        submitFn: mockSubmitFn,
+        intervalMs: 2000,
       })
     );
 
-    expect(result.current.isSaving).toBe(false);
-    expect(result.current.lastSavedAt).toBeNull();
-  });
-
-  it("should trigger auto-save after delay when content changes", async () => {
-    const mockOnSave = vi.fn().mockResolvedValue(undefined);
-    const { result } = renderHook(() =>
-      useAutoSave({
-        onSave: mockOnSave,
-        delay: 2000,
-        enabled: true,
-      })
-    );
-
-    act(() => {
-      result.current.trackChange("new content");
-    });
-
-    // Fast-forward time
-    act(() => {
+    // Fast-forward time to trigger interval
+    await act(async () => {
       vi.advanceTimersByTime(2000);
     });
 
-    await waitFor(() => {
-      expect(mockOnSave).toHaveBeenCalledWith("new content");
+    // Wait for async submitFn to resolve
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(mockSubmitFn).toHaveBeenCalledWith({
+      title: "Test Post",
+      bodyContent: "new content",
     });
   });
 
-  it("should not trigger auto-save when disabled", () => {
-    const mockOnSave = vi.fn();
-    const { result } = renderHook(() =>
+  it("should not call submitFn when isSubmitting is true", async () => {
+    const mockSubmitFn = vi.fn().mockResolvedValue(undefined);
+    const mockGetValues = vi.fn().mockReturnValue({
+      title: "Test Post",
+      bodyContent: "new content",
+    } as PostFormData);
+
+    renderHook(() =>
       useAutoSave({
-        onSave: mockOnSave,
-        delay: 2000,
-        enabled: false,
+        isSubmitting: true,
+        getValues: mockGetValues,
+        lastSavedBodyContent: "old content",
+        submitFn: mockSubmitFn,
+        intervalMs: 2000,
       })
     );
 
-    act(() => {
-      result.current.trackChange("new content");
-    });
-
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(2000);
     });
 
-    expect(mockOnSave).not.toHaveBeenCalled();
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(mockSubmitFn).not.toHaveBeenCalled();
   });
 
-  it("should debounce multiple rapid changes", async () => {
-    const mockOnSave = vi.fn().mockResolvedValue(undefined);
-    const { result } = renderHook(() =>
+  it("should not call submitFn when body content has not changed", async () => {
+    const mockSubmitFn = vi.fn().mockResolvedValue(undefined);
+    const mockGetValues = vi.fn().mockReturnValue({
+      title: "Test Post",
+      bodyContent: "same content",
+    } as PostFormData);
+
+    renderHook(() =>
       useAutoSave({
-        onSave: mockOnSave,
-        delay: 2000,
-        enabled: true,
+        isSubmitting: false,
+        getValues: mockGetValues,
+        lastSavedBodyContent: "same content",
+        submitFn: mockSubmitFn,
+        intervalMs: 2000,
       })
     );
 
-    // Trigger multiple changes rapidly
-    act(() => {
-      result.current.trackChange("content 1");
-    });
-
-    act(() => {
-      vi.advanceTimersByTime(500);
-    });
-
-    act(() => {
-      result.current.trackChange("content 2");
-    });
-
-    act(() => {
-      vi.advanceTimersByTime(500);
-    });
-
-    act(() => {
-      result.current.trackChange("content 3");
-    });
-
-    // Fast-forward to trigger save
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(2000);
     });
 
-    await waitFor(() => {
-      expect(mockOnSave).toHaveBeenCalledTimes(1);
-      expect(mockOnSave).toHaveBeenCalledWith("content 3");
+    await act(async () => {
+      await Promise.resolve();
     });
+
+    expect(mockSubmitFn).not.toHaveBeenCalled();
   });
 
-  it("should update lastSavedAt after successful save", async () => {
-    const mockOnSave = vi.fn().mockResolvedValue(undefined);
-    const { result } = renderHook(() =>
+  it("should not call submitFn when title is empty", async () => {
+    const mockSubmitFn = vi.fn().mockResolvedValue(undefined);
+    const mockGetValues = vi.fn().mockReturnValue({
+      title: "",
+      bodyContent: "new content",
+    } as PostFormData);
+
+    renderHook(() =>
       useAutoSave({
-        onSave: mockOnSave,
-        delay: 2000,
-        enabled: true,
+        isSubmitting: false,
+        getValues: mockGetValues,
+        lastSavedBodyContent: "old content",
+        submitFn: mockSubmitFn,
+        intervalMs: 2000,
       })
     );
 
-    act(() => {
-      result.current.trackChange("new content");
-    });
-
-    act(() => {
+    await act(async () => {
       vi.advanceTimersByTime(2000);
     });
 
-    await waitFor(() => {
-      expect(result.current.lastSavedAt).not.toBeNull();
+    await act(async () => {
+      await Promise.resolve();
     });
+
+    expect(mockSubmitFn).not.toHaveBeenCalled();
+  });
+
+  it("should clear interval on unmount", async () => {
+    const mockSubmitFn = vi.fn().mockResolvedValue(undefined);
+    const mockGetValues = vi.fn().mockReturnValue({
+      title: "Test Post",
+      bodyContent: "new content",
+    } as PostFormData);
+
+    const { unmount } = renderHook(() =>
+      useAutoSave({
+        isSubmitting: false,
+        getValues: mockGetValues,
+        lastSavedBodyContent: "old content",
+        submitFn: mockSubmitFn,
+        intervalMs: 2000,
+      })
+    );
+
+    // Unmount before interval fires
+    unmount();
+
+    await act(async () => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    // Should not be called after unmount
+    expect(mockSubmitFn).not.toHaveBeenCalled();
   });
 });
