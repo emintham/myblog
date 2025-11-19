@@ -83,21 +83,33 @@ export class LanceDBStorage {
           },
         };
         await this.saveMetadata(metadata);
-      } else if (metadata.embeddingDim !== embeddingDim) {
-        // Special case: 0d means dimensions weren't detected during initial creation
-        if (metadata.embeddingDim === 0 && embeddingDim > 0) {
+      } else {
+        // Check if model name needs updating (dimensions match but model changed)
+        if (metadata.embeddingModel !== embeddingModel) {
           console.log(
-            `[RAG Storage] Updating metadata with detected dimensions: ${embeddingDim}d`
+            `[RAG Storage] Updating embedding model: ${metadata.embeddingModel} -> ${embeddingModel}`
           );
-          metadata.embeddingDim = embeddingDim;
           metadata.embeddingModel = embeddingModel;
           await this.saveMetadata(metadata);
-        } else {
-          // Metadata exists but dimensions don't match - log warning but don't overwrite
-          console.warn(
-            `[RAG Storage] Dimension mismatch: existing index has ${metadata.embeddingDim}d, ` +
-              `but initializing with ${embeddingDim}d. Keeping existing metadata.`
-          );
+        }
+
+        // Check for dimension mismatch
+        if (metadata.embeddingDim !== embeddingDim) {
+          // Special case: 0d means dimensions weren't detected during initial creation
+          if (metadata.embeddingDim === 0 && embeddingDim > 0) {
+            console.log(
+              `[RAG Storage] Updating metadata with detected dimensions: ${embeddingDim}d`
+            );
+            metadata.embeddingDim = embeddingDim;
+            metadata.embeddingModel = embeddingModel;
+            await this.saveMetadata(metadata);
+          } else {
+            // Metadata exists but dimensions don't match - log warning but don't overwrite
+            console.warn(
+              `[RAG Storage] Dimension mismatch: existing index has ${metadata.embeddingDim}d, ` +
+                `but initializing with ${embeddingDim}d. Keeping existing metadata.`
+            );
+          }
         }
       }
 

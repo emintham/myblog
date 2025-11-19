@@ -73,9 +73,7 @@ export default function IndexStats() {
                   <dt>Model:</dt>
                   <dd>{statsData.embeddingModel}</dd>
                   <dt>Dimensions:</dt>
-                  <dd>{statsData.embeddingDim}</dd>
-                  <dt>Version:</dt>
-                  <dd>{statsData.version}</dd>
+                  <dd>{statsData.embeddingDim}d</dd>
                 </dl>
               </div>
 

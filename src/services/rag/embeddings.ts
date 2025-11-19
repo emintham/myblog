@@ -11,6 +11,7 @@ import { ragConfig } from "../../ragConfig.js";
 
 export interface EmbeddingProvider {
   name: string;
+  modelName: string;
   dimensions: number;
   embed(texts: string[]): Promise<number[][]>;
   embedSingle(text: string): Promise<number[]>;
@@ -21,10 +22,16 @@ export interface EmbeddingProvider {
  */
 class TransformersEmbeddingProvider implements EmbeddingProvider {
   name = "transformers";
+  modelName: string;
   dimensions = 384;
-  private model = "Xenova/all-MiniLM-L6-v2";
+  private model: string;
   private embedder: Pipeline | null = null;
   private initPromise: Promise<void> | null = null;
+
+  constructor(model = ragConfig.transformers.model) {
+    this.model = model;
+    this.modelName = model;
+  }
 
   /**
    * Initialize the embedding model (lazy loading)
@@ -125,6 +132,7 @@ class TransformersEmbeddingProvider implements EmbeddingProvider {
  */
 class OllamaEmbeddingProvider implements EmbeddingProvider {
   name = "ollama";
+  modelName: string;
   dimensions = 0; // Will be auto-detected on first use
   private model: string;
   private baseUrl: string;
@@ -135,6 +143,7 @@ class OllamaEmbeddingProvider implements EmbeddingProvider {
   ) {
     this.baseUrl = baseUrl;
     this.model = model;
+    this.modelName = model;
   }
 
   /**
