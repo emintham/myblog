@@ -18,6 +18,11 @@
 
 .ai-assistant-panel.collapsed {
   transform: translateX(360px);
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.ai-assistant-panel.collapsed:hover {
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
 }
 
 .ai-assistant-header {
@@ -49,6 +54,15 @@
   writing-mode: vertical-rl;
   text-orientation: mixed;
   padding: 1rem 0.5rem;
+  background: var(--color-primary, #2563eb);
+  color: white;
+  border-radius: 6px 0 0 6px;
+  transition: all 0.2s;
+}
+
+.ai-assistant-panel.collapsed .collapse-button:hover {
+  background: var(--color-primary-hover, #1d4ed8);
+  padding-left: 0.75rem;
 }
 
 .ai-assistant-content {
