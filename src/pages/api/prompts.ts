@@ -8,6 +8,9 @@
 import type { APIRoute } from "astro";
 import { loadPrompts } from "../../utils/prompts.js";
 
+// Mark as server-rendered endpoint (required for POST requests in dev mode)
+export const prerender = false;
+
 export const GET: APIRoute = async () => {
   // Production guard: disable in production
   if (import.meta.env.PROD) {

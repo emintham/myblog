@@ -15,7 +15,7 @@ import {
 } from "../../schemas/responses";
 import { extractErrorMessage } from "../../utils/api-helpers";
 
-// Mark as server-rendered endpoint
+// Mark as server-rendered endpoint (required for POST requests in dev mode)
 export const prerender = false;
 
 export const GET: APIRoute = async () => {

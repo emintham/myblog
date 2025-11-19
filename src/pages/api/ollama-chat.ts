@@ -24,7 +24,7 @@ import {
 import { extractErrorMessage } from "../../utils/api-helpers";
 import type { ChatMessage, ContextMode } from "../../types/phase4";
 
-// Mark as server-rendered endpoint
+// Mark as server-rendered endpoint (required for POST requests in dev mode)
 export const prerender = false;
 
 interface ChatRequest {
