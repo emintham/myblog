@@ -1,5 +1,5 @@
 import React from "react";
-import type { Quote } from "../../types/admin";
+import type { Quote } from "../../../types/admin";
 import TagsComponent from "./TagsComponent"; // Import TagsComponent
 
 interface InlineQuotesManagerProps {

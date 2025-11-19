@@ -1,5 +1,5 @@
 import React from "react";
-import type { RAGQueryResult } from "../../hooks/useRAGQuery";
+import type { RAGQueryResult } from "../../../hooks/useRAGQuery";
 import PostResultCard from "./PostResultCard";
 import QuoteResultCard from "./QuoteResultCard";
 

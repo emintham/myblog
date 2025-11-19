@@ -5,9 +5,6 @@ import {
 } from "../../schemas/responses";
 import { getRAGService } from "../../services/rag/index";
 
-// Mark as server-rendered endpoint
-export const prerender = false;
-
 interface RAGQueryRequest {
   query: string;
   topK?: number;

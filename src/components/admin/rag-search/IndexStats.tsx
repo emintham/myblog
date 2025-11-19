@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import CollapsibleSection from "./CollapsibleSection";
-import { formatDateWithTime } from "../../utils/formatting";
+import CollapsibleSection from "../shared/CollapsibleSection";
+import { formatDateWithTime } from "../../../utils/formatting";
 import {
   extractErrorMessage,
   validateFetchResponse,
-} from "../../utils/api-helpers";
+} from "../../../utils/api-helpers";
 
 interface IndexStatsData {
   initialized: boolean;

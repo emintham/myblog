@@ -7,8 +7,8 @@ import "../../styles/admin.css";
 import "../../styles/content-intelligence.css";
 
 // Import the Content Intelligence Dashboard
-import ContentIntelligenceDashboard from "../../components/admin/rag-search/ContentIntelligenceDashboard.tsx";
-import { ErrorBoundary } from "../../components/admin/shared/ErrorBoundary.tsx";
+import ContentIntelligenceDashboard from "../../components/admin/rag-search/ContentIntelligenceDashboard";
+import { ErrorBoundary } from "../../components/admin/shared/ErrorBoundary";
 
 if (import.meta.env.PROD) {
   return new Response(null, { status: 404, statusText: "Not Found" });

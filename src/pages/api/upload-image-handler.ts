@@ -5,8 +5,6 @@ import path from "path";
 import sharp from "sharp";
 import { createErrorResponse } from "../../schemas/responses";
 
-export const prerender = false;
-
 const TARGET_WIDTHS = [100, 150, 200, 480, 800, 1200, 1600, 1920].sort(
   (a, b) => a - b
 );

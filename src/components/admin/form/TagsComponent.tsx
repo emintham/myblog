@@ -4,7 +4,7 @@ import type { OnChangeValue } from "react-select";
 import {
   customReactSelectStyles,
   type SelectOption,
-} from "./sharedSelectStyles"; // UPDATED import
+} from "../sharedSelectStyles"; // UPDATED import
 
 interface TagsComponentProps {
   id: string;

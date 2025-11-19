@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useForm, type UseFormReturn, Controller } from "react-hook-form";
-import type { PostSourceData, PostFormData } from "../../types/admin";
-import { usePostSubmission } from "../../hooks/usePostSubmission";
-import { useInlineQuotes } from "../../hooks/useInlineQuotes";
-import { useAutoSave } from "../../hooks/useAutoSave";
-import { usePostFormInitialization } from "../../hooks/usePostFormInitialization"; // Import the new hook
+import type { PostSourceData, PostFormData } from "../../../types/admin";
+import { usePostSubmission } from "../../../hooks/usePostSubmission";
+import { useInlineQuotes } from "../../../hooks/useInlineQuotes";
+import { useAutoSave } from "../../../hooks/useAutoSave";
+import { usePostFormInitialization } from "../../../hooks/usePostFormInitialization"; // Import the new hook
 import InlineQuotesManager from "./InlineQuotesManager";
 import TagsComponent from "./TagsComponent";
 import SeriesComponent from "./SeriesComponent"; // IMPORT SeriesComponent
-import MarkdownEditor, { type MarkdownEditorRef } from "./MarkdownEditor";
+import MarkdownEditor, { type MarkdownEditorRef } from "../shared/MarkdownEditor";
 import { ImageUploadZone } from "./ImageUploadZone";
-import CollapsibleFieldset from "./CollapsibleFieldset";
+import CollapsibleFieldset from "../shared/CollapsibleFieldset";
 
 export interface PostFormProps {
   postData?: PostSourceData;

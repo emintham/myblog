@@ -1,8 +1,8 @@
 import React from "react";
-import type { RAGQueryResult } from "../../hooks/useRAGQuery";
-import { formatScore, formatDate } from "../../utils/formatting";
-import { copyToClipboard, copyMarkdownLink } from "../../utils/clipboard";
-import { openInEditor } from "../../utils/navigation";
+import type { RAGQueryResult } from "../../../hooks/useRAGQuery";
+import { formatScore, formatDate } from "../../../utils/formatting";
+import { copyToClipboard, copyMarkdownLink } from "../../../utils/clipboard";
+import { openInEditor } from "../../../utils/navigation";
 import ResultCardActions from "./ResultCardActions";
 
 interface PostResultCardProps {
