@@ -15,6 +15,9 @@ import {
 } from "../../schemas/responses";
 import { extractErrorMessage } from "../../utils/api-helpers";
 
+// Mark as server-rendered endpoint
+export const prerender = false;
+
 export const GET: APIRoute = async () => {
   // Production guard: disable in production
   if (import.meta.env.PROD) {

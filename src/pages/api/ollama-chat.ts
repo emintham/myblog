@@ -24,6 +24,9 @@ import {
 import { extractErrorMessage } from "../../utils/api-helpers";
 import type { ChatMessage, ContextMode } from "../../types/phase4";
 
+// Mark as server-rendered endpoint
+export const prerender = false;
+
 interface ChatRequest {
   model?: string;
   messages: ChatMessage[];
