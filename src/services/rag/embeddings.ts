@@ -211,7 +211,10 @@ class OllamaEmbeddingProvider implements EmbeddingProvider {
 
       return data.embedding;
     } catch (error) {
-      console.error("[RAG] Error generating single embedding via Ollama:", error);
+      console.error(
+        "[RAG] Error generating single embedding via Ollama:",
+        error
+      );
       throw error;
     }
   }
@@ -258,7 +261,7 @@ async function isOllamaAvailable(
     }
 
     return hasModel;
-  } catch (error) {
+  } catch {
     // Ollama not available (connection refused, timeout, etc.)
     return false;
   }
@@ -284,22 +287,34 @@ export async function getEmbeddingProvider(
 
     // Check if it's a transformers model
     if (embeddingDim === 384) {
-      console.log("[RAG] Using transformers.js provider to match existing index");
+      console.log(
+        "[RAG] Using transformers.js provider to match existing index"
+      );
       return new TransformersEmbeddingProvider();
     }
 
-    // Check if it's an Ollama model (768d for nomic-embed-text)
-    if (embeddingDim === 768) {
+    // Check if it's an Ollama model (768d for nomic-embed-text, 1024d for mxbai-embed-large)
+    if (embeddingDim === 768 || embeddingDim === 1024) {
       const ollamaAvailable = await isOllamaAvailable();
       if (ollamaAvailable) {
         console.log("[RAG] Using Ollama provider to match existing index");
-        return new OllamaEmbeddingProvider();
+        const provider = new OllamaEmbeddingProvider();
+        // Set dimensions from existing index to avoid auto-detection
+        provider.dimensions = embeddingDim;
+        console.log(
+          `[RAG] Detected: ${embeddingDim}d for model '${embeddingModel}'`
+        );
+        return provider;
       } else {
         console.warn(
-          "[RAG] Existing index uses Ollama (768d) but Ollama is not available!"
+          `[RAG] Existing index uses Ollama (${embeddingDim}d) but Ollama is not available!`
         );
-        console.warn("[RAG] Please start Ollama or rebuild index with transformers.js");
-        console.warn("[RAG] To force transformers.js: Set RAG_EMBEDDING_PROVIDER=transformers and run 'pnpm rrb'");
+        console.warn(
+          "[RAG] Please start Ollama or rebuild index with transformers.js"
+        );
+        console.warn(
+          "[RAG] To force transformers.js: Set RAG_EMBEDDING_PROVIDER=transformers and run 'pnpm rrb'"
+        );
         throw new Error(
           "Existing index requires Ollama but it's not available. Start Ollama or rebuild index."
         );

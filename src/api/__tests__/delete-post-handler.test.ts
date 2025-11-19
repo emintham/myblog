@@ -17,17 +17,20 @@ vi.mock("astro:content", () => {
 // The actual default export of 'node:fs/promises' is an object with methods like access, unlink, etc.
 
 vi.mock("node:fs/promises", () => ({
-  // This structure is crucial for default imports (`import fs from '...'`)
-  // The `fs` variable in the code under test (and in this test file via import)
-  // will point to this `default` object.
+  // Mock both default export (for `import fs from ...`) and named exports (for `import * as fs ...`)
   default: {
     access: vi.fn(),
     unlink: vi.fn(),
-    // Add other fs methods here if the handler starts using them,
-    // otherwise they will be undefined if called by the handler.
-    // For this handler, only access and unlink are used.
+    mkdir: vi.fn(),
+    readFile: vi.fn(),
+    writeFile: vi.fn(),
   },
-  // If the handler used named exports like `import { access } from ...`, they would be mocked here.
+  // Named exports for namespace imports (import * as fs) and named imports (import { mkdir })
+  access: vi.fn(),
+  unlink: vi.fn(),
+  mkdir: vi.fn(),
+  readFile: vi.fn(),
+  writeFile: vi.fn(),
 }));
 
 // Helper to create a mock APIContext

@@ -69,9 +69,9 @@ export function useRAGQuery() {
 
         await validateFetchResponse(response, "Query");
 
-        const data: { data: RAGQueryResponse } = await response.json();
-        setResults(data.data.results);
-        setQueryTime(data.data.queryTime);
+        const data: RAGQueryResponse = await response.json();
+        setResults(data.results);
+        setQueryTime(data.queryTime);
       } catch (err) {
         setError(extractErrorMessage(err));
         setResults([]);

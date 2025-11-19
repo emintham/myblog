@@ -10,6 +10,27 @@
 
 import { getEmbeddingProvider } from "../src/services/rag/embeddings.ts";
 import { createStorage } from "../src/services/rag/storage.ts";
+import * as fs from "fs/promises";
+import * as path from "path";
+
+/**
+ * Load existing index metadata without initializing storage
+ */
+async function loadExistingMetadata() {
+  try {
+    const RAG_DATA_DIR = process.env.RAG_DATA_DIR || "./data/rag";
+    const metadataPath = path.join(RAG_DATA_DIR, "metadata.json");
+    const data = await fs.readFile(metadataPath, "utf-8");
+    const metadata = JSON.parse(data);
+    return {
+      embeddingModel: metadata.embeddingModel,
+      embeddingDim: metadata.embeddingDim,
+    };
+  } catch {
+    // No existing metadata
+    return null;
+  }
+}
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -47,8 +68,20 @@ console.log(`🔍 Searching for: "${queryText}"\n`);
 try {
   const startTime = Date.now();
 
+  // Load existing index metadata to guide provider selection
+  const existingMetadata = await loadExistingMetadata();
+
   // Initialize provider and storage
-  const provider = await getEmbeddingProvider();
+  const provider = await getEmbeddingProvider(existingMetadata);
+
+  // If provider dimensions are not set (e.g., Ollama with auto-detection),
+  // do a test embedding to detect dimensions before creating storage
+  if (provider.dimensions === 0) {
+    console.log("[RAG] Detecting embedding dimensions...");
+    await provider.embedSingle("test");
+    console.log(`[RAG] Dimensions detected: ${provider.dimensions}d`);
+  }
+
   const storage = await createStorage(provider.dimensions, provider.name);
 
   // Generate query embedding

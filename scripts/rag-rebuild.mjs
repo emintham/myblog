@@ -33,6 +33,15 @@ try {
 
   // Initialize provider and storage
   const provider = await getEmbeddingProvider();
+
+  // If provider dimensions are not set (e.g., Ollama with auto-detection),
+  // do a test embedding to detect dimensions before creating storage
+  if (provider.dimensions === 0) {
+    console.log("🔍 Detecting embedding dimensions...");
+    await provider.embedSingle("test");
+    console.log(`   Detected: ${provider.dimensions}d\n`);
+  }
+
   const storage = await createStorage(provider.dimensions, provider.name);
 
   console.log("📂 Scanning content...");
