@@ -292,13 +292,14 @@ export class LanceDBStorage {
       // Use toArray() to get plain JavaScript objects instead of Arrow RecordBatches
       const results = await this.postsTable
         .search(queryVector)
-        .metricType("cosine")
+        .distanceType("cosine")
         .limit(limit)
         .toArray();
 
       return results.map((result: Record<string, unknown>) => ({
         content: result.content as string,
-        score: 1 - ((result._distance as number) || 0), // Convert cosine distance to similarity
+        // Cosine distance range is [0, 2], convert to similarity [1, -1]
+        score: 1 - ((result._distance as number) || 0),
         metadata: result.metadata ? JSON.parse(result.metadata as string) : {},
       }));
     } catch (error) {
@@ -322,13 +323,14 @@ export class LanceDBStorage {
       // Use toArray() to get plain JavaScript objects instead of Arrow RecordBatches
       const results = await this.quotesTable
         .search(queryVector)
-        .metricType("cosine")
+        .distanceType("cosine")
         .limit(limit)
         .toArray();
 
       return results.map((result: Record<string, unknown>) => ({
         content: result.content as string,
-        score: 1 - ((result._distance as number) || 0), // Convert cosine distance to similarity
+        // Cosine distance range is [0, 2], convert to similarity [1, -1]
+        score: 1 - ((result._distance as number) || 0),
         metadata: result.metadata ? JSON.parse(result.metadata as string) : {},
       }));
     } catch (error) {

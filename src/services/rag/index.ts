@@ -87,6 +87,14 @@ export class RAGService {
       // Get embedding provider (will try to match existing index if found)
       this.provider = await getEmbeddingProvider(existingMetadata);
 
+      // If provider dimensions are not set (e.g., Ollama with auto-detection),
+      // do a test embedding to detect dimensions before creating storage
+      if (this.provider.dimensions === 0) {
+        console.log("[RAG] Detecting embedding dimensions...");
+        await this.provider.embedSingle("test");
+        console.log(`[RAG] Dimensions detected: ${this.provider.dimensions}d`);
+      }
+
       // Initialize storage
       this.storage = await createStorage(
         this.provider.dimensions,

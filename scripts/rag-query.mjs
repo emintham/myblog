@@ -73,6 +73,15 @@ try {
 
   // Initialize provider and storage
   const provider = await getEmbeddingProvider(existingMetadata);
+
+  // If provider dimensions are not set (e.g., Ollama with auto-detection),
+  // do a test embedding to detect dimensions before creating storage
+  if (provider.dimensions === 0) {
+    console.log("[RAG] Detecting embedding dimensions...");
+    await provider.embedSingle("test");
+    console.log(`[RAG] Dimensions detected: ${provider.dimensions}d`);
+  }
+
   const storage = await createStorage(provider.dimensions, provider.name);
 
   // Generate query embedding
