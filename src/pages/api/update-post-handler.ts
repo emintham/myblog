@@ -21,6 +21,9 @@ import {
   handleRAGIndexUpdate,
 } from "../../utils/postUpdateHelpers";
 
+// Mark as server-rendered endpoint (required for POST requests in dev mode)
+export const prerender = false;
+
 export const POST: APIRoute = async ({ request }) => {
   if (import.meta.env.PROD) {
     return createErrorResponse(

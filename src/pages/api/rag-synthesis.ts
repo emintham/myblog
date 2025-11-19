@@ -7,6 +7,9 @@ import {
 import { getRAGService } from "../../services/rag/index";
 import type { ChunkMetadata } from "../../services/rag/chunking";
 
+// Mark as server-rendered endpoint
+export const prerender = false;
+
 // Type guard to check if metadata is ChunkMetadata (post)
 function isPostMetadata(metadata: unknown): metadata is ChunkMetadata {
   return (
