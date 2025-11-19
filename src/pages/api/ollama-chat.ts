@@ -15,7 +15,7 @@
  */
 
 import type { APIRoute } from "astro";
-import { ragService } from "../../services/rag/index.js";
+import { getRAGService } from "../../services/rag/index.js";
 import { OLLAMA_CONFIG } from "../../config/ollama";
 import {
   createErrorResponse,
@@ -77,6 +77,7 @@ Provide helpful, concise feedback and suggestions based on this context.`,
       });
     } else if (contextMode === "withRAG" && currentPost) {
       // Get related content via RAG
+      const ragService = await getRAGService();
       const ragResults = await ragService.query(
         currentPost.body || currentPost.title,
         {

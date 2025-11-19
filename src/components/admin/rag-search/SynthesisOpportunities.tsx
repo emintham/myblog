@@ -4,11 +4,11 @@ import type {
   FleetingThought,
   OrphanedContent,
   UnreferencedQuote,
-} from "../../hooks/useSynthesisData";
-import CollapsibleSection from "./CollapsibleSection";
-import { formatScore } from "../../utils/formatting";
-import { copyQuoteMarkdown } from "../../utils/clipboard";
-import { openInEditor } from "../../utils/navigation";
+} from "../../../hooks/useSynthesisData";
+import CollapsibleSection from "../shared/CollapsibleSection";
+import { formatScore } from "../../../utils/formatting";
+import { copyQuoteMarkdown } from "../../../utils/clipboard";
+import { openInEditor } from "../../../utils/navigation";
 
 interface SynthesisOpportunitiesProps {
   data: SynthesisData | null;

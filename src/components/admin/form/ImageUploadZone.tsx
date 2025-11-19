@@ -1,6 +1,6 @@
 // src/components/admin/ImageUploadZone.tsx
 import React, { useState, useCallback, useRef } from "react";
-import "./ImageUploadZone.css";
+import "./image-upload-zone.css";
 
 interface ImageUploadZoneProps {
   onImageUploaded: (markdown: string) => void;

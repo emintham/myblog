@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useRef, useState } from "react";
-import type { ApiSuccessResponse, ApiErrorResponse } from "../../types/api";
+import type { ApiSuccessResponse, ApiErrorResponse } from "../../../types/api";
 
 interface FeedbackDisplayProps {
   formId: string;

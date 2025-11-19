@@ -1,6 +1,6 @@
 import React from "react";
-import { useRAGQuery } from "../../hooks/useRAGQuery";
-import { useSynthesisData } from "../../hooks/useSynthesisData";
+import { useRAGQuery } from "../../../hooks/useRAGQuery";
+import { useSynthesisData } from "../../../hooks/useSynthesisData";
 import SemanticSearchBox from "./SemanticSearchBox";
 import UnifiedSearchResults from "./UnifiedSearchResults";
 import SynthesisOpportunities from "./SynthesisOpportunities";

@@ -4,15 +4,15 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { useOllamaChat } from "../../hooks/useOllamaChat";
+import { useOllamaChat } from "../../../hooks/useOllamaChat";
 import {
   ChevronLeft,
   ChevronRight,
   MessageSquare,
   AlertCircle,
 } from "lucide-react";
-import type { Prompt } from "../../utils/prompts";
-import { copyToClipboard } from "../../utils/clipboard";
+import type { Prompt } from "../../../utils/prompts";
+import { copyToClipboard } from "../../../utils/clipboard";
 
 interface AIAssistantPanelProps {
   sessionId: string; // e.g., post slug or "new-post"

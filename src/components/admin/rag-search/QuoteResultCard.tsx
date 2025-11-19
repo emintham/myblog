@@ -1,7 +1,7 @@
 import React from "react";
-import type { RAGQueryResult } from "../../hooks/useRAGQuery";
-import { formatScore } from "../../utils/formatting";
-import { copyToClipboard, copyQuoteMarkdown } from "../../utils/clipboard";
+import type { RAGQueryResult } from "../../../hooks/useRAGQuery";
+import { formatScore } from "../../../utils/formatting";
+import { copyToClipboard, copyQuoteMarkdown } from "../../../utils/clipboard";
 import ResultCardActions from "./ResultCardActions";
 
 interface QuoteResultCardProps {
