@@ -31,7 +31,7 @@ describe("useSynthesisData", () => {
     (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
       {
         ok: true,
-        json: async () => ({ data: mockData }),
+        json: async () => mockData,
       }
     );
 
@@ -103,11 +103,11 @@ describe("useSynthesisData", () => {
     (global.fetch as unknown as ReturnType<typeof vi.fn>)
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ data: mockData1 }),
+        json: async () => mockData1,
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ data: mockData2 }),
+        json: async () => mockData2,
       });
 
     const { result } = renderHook(() => useSynthesisData());
