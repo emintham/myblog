@@ -31,7 +31,7 @@ try {
 
   console.log("📂 Initializing RAG service...\n");
 
-  // Initialize provider and storage
+  // Initialize provider and detect dimensions
   const provider = await getEmbeddingProvider();
 
   // If provider dimensions are not set (e.g., Ollama with auto-detection),
