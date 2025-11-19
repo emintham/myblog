@@ -126,12 +126,16 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
 
     let messageToSend = "";
 
-    if (selectedPrompt?.allowCustom) {
+    // Priority: user's typed input > custom prompt > selected prompt
+    if (inputMessage.trim()) {
+      // If user typed something in the main input, use that
+      messageToSend = inputMessage;
+    } else if (selectedPrompt?.allowCustom && customPrompt.trim()) {
+      // If custom prompt is allowed and provided, use that
       messageToSend = customPrompt;
     } else if (selectedPrompt) {
+      // Otherwise, use the selected prompt's default text
       messageToSend = selectedPrompt.prompt;
-    } else if (inputMessage) {
-      messageToSend = inputMessage;
     }
 
     if (!messageToSend.trim()) return;
@@ -139,18 +143,13 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
     await sendMessage(messageToSend);
     setInputMessage("");
     setCustomPrompt("");
+    setSelectedPromptId(""); // Clear prompt selection after sending
   };
 
   const handlePromptChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const promptId = e.target.value;
     setSelectedPromptId(promptId);
-
-    const selectedPrompt = prompts.find((p) => p.id === promptId);
-    if (selectedPrompt && !selectedPrompt.allowCustom) {
-      setInputMessage(selectedPrompt.prompt);
-    } else {
-      setInputMessage("");
-    }
+    // Don't override inputMessage - let user type freely
   };
 
   const handleCopyResponse = async (content: string) => {
@@ -347,7 +346,12 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
                   type="button"
                   onClick={handleSendMessage}
                   className="ai-primary-button"
-                  disabled={isLoading || !inputMessage.trim()}
+                  disabled={
+                    isLoading ||
+                    (!inputMessage.trim() &&
+                      !customPrompt.trim() &&
+                      !selectedPromptId)
+                  }
                 >
                   Send
                 </button>
