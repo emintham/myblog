@@ -17,6 +17,9 @@ import {
   createSuccessResponse,
 } from "../../schemas/responses";
 
+// Mark as server-rendered endpoint
+export const prerender = false;
+
 export const GET: APIRoute = async ({ url }) => {
   // Production guard: disable in production
   if (import.meta.env.PROD) {
