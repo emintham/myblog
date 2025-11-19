@@ -268,19 +268,62 @@ async function isOllamaAvailable(
  * Get the active embedding provider
  *
  * Auto-detects Ollama and falls back to transformers.js
+ * If an existing index is found, prioritizes matching its provider/dimensions
  */
-export async function getEmbeddingProvider(): Promise<EmbeddingProvider> {
+export async function getEmbeddingProvider(
+  existingMetadata?: { embeddingModel: string; embeddingDim: number } | null
+): Promise<EmbeddingProvider> {
   const provider = ragConfig.provider;
+
+  // If there's existing metadata, try to match it first (unless explicitly forced)
+  if (existingMetadata && provider === "auto") {
+    const { embeddingModel, embeddingDim } = existingMetadata;
+    console.log(
+      `[RAG] Found existing index: ${embeddingModel} (${embeddingDim}d)`
+    );
+
+    // Check if it's a transformers model
+    if (embeddingDim === 384) {
+      console.log("[RAG] Using transformers.js provider to match existing index");
+      return new TransformersEmbeddingProvider();
+    }
+
+    // Check if it's an Ollama model (768d for nomic-embed-text)
+    if (embeddingDim === 768) {
+      const ollamaAvailable = await isOllamaAvailable();
+      if (ollamaAvailable) {
+        console.log("[RAG] Using Ollama provider to match existing index");
+        return new OllamaEmbeddingProvider();
+      } else {
+        console.warn(
+          "[RAG] Existing index uses Ollama (768d) but Ollama is not available!"
+        );
+        console.warn("[RAG] Please start Ollama or rebuild index with transformers.js");
+        console.warn("[RAG] To force transformers.js: Set RAG_EMBEDDING_PROVIDER=transformers and run 'pnpm rrb'");
+        throw new Error(
+          "Existing index requires Ollama but it's not available. Start Ollama or rebuild index."
+        );
+      }
+    }
+
+    console.warn(
+      `[RAG] Unknown embedding dimension: ${embeddingDim}d. Will auto-detect provider.`
+    );
+  }
 
   if (provider === "transformers") {
     console.log("[RAG] Using transformers.js provider (forced by config)");
-    console.log(`[RAG] Model: ${ragConfig.transformers.model} (${ragConfig.transformers.dimensions}d)`);
+    console.log(
+      `[RAG] Model: ${ragConfig.transformers.model} (${ragConfig.transformers.dimensions}d)`
+    );
     return new TransformersEmbeddingProvider();
   }
 
   if (provider === "ollama") {
     console.log("[RAG] Using Ollama provider (forced by config)");
-    console.log(`[RAG] Model: ${ragConfig.ollama.model} (dimensions will be auto-detected)`);
+    console.log(
+      `[RAG] Model: ${ragConfig.ollama.model} (dimensions will be auto-detected)`
+    );
     try {
       return new OllamaEmbeddingProvider();
     } catch (error) {
@@ -296,13 +339,17 @@ export async function getEmbeddingProvider(): Promise<EmbeddingProvider> {
 
   if (ollamaAvailable) {
     console.log("[RAG] Ollama detected, using Ollama provider");
-    console.log(`[RAG] Model: ${ragConfig.ollama.model} (dimensions will be auto-detected)`);
+    console.log(
+      `[RAG] Model: ${ragConfig.ollama.model} (dimensions will be auto-detected)`
+    );
     return new OllamaEmbeddingProvider();
   }
 
   // Fallback to transformers.js
   console.log("[RAG] Ollama not available, using transformers.js provider");
-  console.log(`[RAG] Model: ${ragConfig.transformers.model} (${ragConfig.transformers.dimensions}d)`);
+  console.log(
+    `[RAG] Model: ${ragConfig.transformers.model} (${ragConfig.transformers.dimensions}d)`
+  );
   return new TransformersEmbeddingProvider();
 }
 

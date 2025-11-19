@@ -68,8 +68,8 @@ export class LanceDBStorage {
       // Load or create metadata
       let metadata = await this.loadMetadata();
 
-      if (!metadata || metadata.embeddingDim !== embeddingDim) {
-        // Initialize fresh metadata
+      if (!metadata) {
+        // Initialize fresh metadata (no existing index)
         metadata = {
           version: "1.0.0",
           created: new Date().toISOString(),
@@ -83,6 +83,12 @@ export class LanceDBStorage {
           },
         };
         await this.saveMetadata(metadata);
+      } else if (metadata.embeddingDim !== embeddingDim) {
+        // Metadata exists but dimensions don't match - log warning but don't overwrite
+        console.warn(
+          `[RAG Storage] Dimension mismatch: existing index has ${metadata.embeddingDim}d, ` +
+            `but initializing with ${embeddingDim}d. Keeping existing metadata.`
+        );
       }
 
       // Initialize tables (or open existing ones)

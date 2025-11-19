@@ -81,8 +81,11 @@ export class RAGService {
     try {
       console.log("[RAG] Initializing RAG service...");
 
-      // Get embedding provider
-      this.provider = await getEmbeddingProvider();
+      // Check for existing index metadata to guide provider selection
+      const existingMetadata = await this.loadExistingMetadata();
+
+      // Get embedding provider (will try to match existing index if found)
+      this.provider = await getEmbeddingProvider(existingMetadata);
 
       // Initialize storage
       this.storage = await createStorage(
@@ -90,11 +93,49 @@ export class RAGService {
         this.provider.name
       );
 
+      // Verify provider compatibility with existing index (should match now)
+      const metadata = await this.storage.getMetadata();
+      if (metadata && metadata.embeddingDim !== this.provider.dimensions) {
+        const errorMsg =
+          `[RAG] DIMENSION MISMATCH!\n` +
+          `   Existing index: ${metadata.embeddingModel} (${metadata.embeddingDim}d)\n` +
+          `   Current provider: ${this.provider.name} (${this.provider.dimensions}d)\n` +
+          `   This should not happen - provider selection failed to match existing index.`;
+        console.error(errorMsg);
+        throw new Error(
+          `Embedding dimension mismatch: index has ${metadata.embeddingDim}d but provider uses ${this.provider.dimensions}d.`
+        );
+      }
+
       this.initialized = true;
       console.log("[RAG] Service initialized successfully");
     } catch (error) {
       console.error("[RAG] Failed to initialize service:", error);
       throw error;
+    }
+  }
+
+  /**
+   * Load existing index metadata without initializing storage
+   */
+  private async loadExistingMetadata(): Promise<{
+    embeddingModel: string;
+    embeddingDim: number;
+  } | null> {
+    try {
+      const fs = await import("fs/promises");
+      const path = await import("path");
+      const RAG_DATA_DIR = process.env.RAG_DATA_DIR || "./data/rag";
+      const metadataPath = path.join(RAG_DATA_DIR, "metadata.json");
+      const data = await fs.readFile(metadataPath, "utf-8");
+      const metadata = JSON.parse(data);
+      return {
+        embeddingModel: metadata.embeddingModel,
+        embeddingDim: metadata.embeddingDim,
+      };
+    } catch {
+      // No existing metadata
+      return null;
     }
   }
 
