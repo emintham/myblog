@@ -36,8 +36,8 @@ export default function IndexStats() {
     try {
       const response = await fetch("/api/rag-stats");
       await validateFetchResponse(response, "Fetch stats");
-      const result: { data: IndexStatsData } = await response.json();
-      setStatsData(result.data);
+      const result: IndexStatsData = await response.json();
+      setStatsData(result);
     } catch (err) {
       setError(extractErrorMessage(err));
     } finally {

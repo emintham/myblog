@@ -55,8 +55,8 @@ export function useSynthesisData() {
 
       await validateFetchResponse(response, "Fetch synthesis data");
 
-      const result: { data: SynthesisData } = await response.json();
-      setData(result.data);
+      const result: SynthesisData = await response.json();
+      setData(result);
     } catch (err) {
       setError(extractErrorMessage(err));
       setData(null);
