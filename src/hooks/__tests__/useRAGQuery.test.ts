@@ -34,7 +34,9 @@ describe("useRAGQuery", () => {
       {
         ok: true,
         json: async () => ({
-          data: { results: mockResults, queryTime: 123, count: 1 },
+          results: mockResults,
+          queryTime: 123,
+          count: 1,
         }),
       }
     );
@@ -111,7 +113,9 @@ describe("useRAGQuery", () => {
       {
         ok: true,
         json: async () => ({
-          data: { results: mockResults, queryTime: 123, count: 1 },
+          results: mockResults,
+          queryTime: 123,
+          count: 1,
         }),
       }
     );
@@ -142,7 +146,9 @@ describe("useRAGQuery", () => {
       {
         ok: true,
         json: async () => ({
-          data: { results: [], queryTime: 0, count: 0 },
+          results: [],
+          queryTime: 0,
+          count: 0,
         }),
       }
     );
