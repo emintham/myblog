@@ -13,7 +13,7 @@
 - Added Ollama integration for RAG system (Phase 3).
 - RAG system now supports dual embedding providers: Ollama HTTP API (preferred) and Transformers.js (fallback).
 - Automatic provider detection via Ollama's HTTP API with graceful fallback to ensure zero-config operation.
-- Created `src/ragConfig.ts` for explicit, non-secret RAG configuration.
+- Created consolidated configuration in `src/config/index.ts` for all app settings.
 - RAG configuration displays on dev server start showing active provider and model.
 - Configurable Ollama embedding model via `OLLAMA_EMBEDDING_MODEL` (defaults to `nomic-embed-text`).
 - Auto-detect embedding dimensions from Ollama API - no manual configuration needed.

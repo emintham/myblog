@@ -21,7 +21,7 @@ This guide explains how to set up the Kinfolk Inspired Astro Blog Template.
 
 3.  **Initial Configuration (Important TODOs):**
     - **Site URL:** Open `astro.config.mjs` and set the `site` property to your blog's final URL (e.g., `site: 'https://your-domain.com',`). This is crucial for SEO and sitemap generation.
-    - **Site Name & Author Details:** Modify `src/siteConfig.ts` to match your details.
+    - **Site Name & Author Details:** Modify `src/config/index.ts` to match your details.
     - **About Page:** Customize the content in `src/pages/about.astro`.
     - **Favicon & Public Assets:** Replace `public/favicon.svg` with your own. Update other assets in `public/` as needed.
     - **Image Source Directory:** Create `images/originals/` in project root for your original images.
@@ -44,7 +44,7 @@ This guide explains how to set up the Kinfolk Inspired Astro Blog Template.
     - **Pull chat model (for AI assistant):** `ollama pull llama3.2` (or any other chat model)
     - **Start Ollama:** Run `ollama serve` (or Ollama starts automatically on macOS/Windows)
     - **Automatic detection:** The RAG system will auto-detect Ollama, the model, and embedding dimensions
-    - **Configuration:** Edit `src/ragConfig.ts` to change the embedding model (no need to specify dimensions!)
+    - **Configuration:** Edit `src/config/index.ts` to change the embedding model (no need to specify dimensions!)
     - **On dev start:** The system displays active provider and model configuration
 
     **Note:** Without Ollama, the RAG content intelligence dashboard and AI writing assistant will display error messages. The RAG system has a fallback to transformers.js for embeddings, but the AI assistant requires Ollama.

@@ -16,7 +16,7 @@
 
 import type { APIRoute } from "astro";
 import { getRAGService } from "../../services/rag/index.js";
-import { OLLAMA_CONFIG } from "../../config/ollama";
+import { OLLAMA_CONFIG } from "../../config/index";
 import {
   createErrorResponse,
   createSuccessResponse,

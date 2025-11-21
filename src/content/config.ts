@@ -1,6 +1,6 @@
 // src/content/config.ts
 import { defineCollection, z } from "astro:content";
-import { AUTHOR_NAME } from "../siteConfig.ts"; // Adjust path if siteConfig.ts is not in src/
+import { AUTHOR_NAME } from "../config/index";
 
 // Define the schema for an individual quote
 const quoteSchema = z.object({

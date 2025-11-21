@@ -7,7 +7,7 @@
  */
 
 import { pipeline, Pipeline } from "@xenova/transformers";
-import { ragConfig } from "../../ragConfig.js";
+import { ragConfig } from "../../config/index.js";
 
 export interface EmbeddingProvider {
   name: string;

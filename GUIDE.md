@@ -40,7 +40,7 @@ This guide provides instructions on how to use, develop, and maintain your Kinfo
     1. **Ollama** (preferred): Higher quality embeddings via local Ollama HTTP API
     2. **Transformers.js** (fallback): Zero-config 384-dimensional embeddings, works offline
 
-    **Configuration:** Edit `src/ragConfig.ts` to customize:
+    **Configuration:** Edit `src/config/index.ts` to customize:
     - Embedding model (e.g., `nomic-embed-text`, `mxbai-embed-large`, `snowflake-arctic-embed`)
     - Provider selection (auto-detect, force ollama, or force transformers)
     - Ollama base URL
