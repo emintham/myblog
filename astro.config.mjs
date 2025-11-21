@@ -15,7 +15,7 @@ function ragConfigLogger() {
     name: "rag-config-logger",
     configureServer() {
       // Dynamic import to avoid issues during build
-      import("./src/ragConfig.ts").then((module) => {
+      import("./src/config/index.ts").then((module) => {
         module.logRagConfig();
       });
     },

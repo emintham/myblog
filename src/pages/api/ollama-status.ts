@@ -8,7 +8,7 @@
  */
 
 import type { APIRoute } from "astro";
-import { OLLAMA_CONFIG } from "../../config/ollama";
+import { OLLAMA_CONFIG } from "../../config/index";
 import {
   createErrorResponse,
   createSuccessResponse,

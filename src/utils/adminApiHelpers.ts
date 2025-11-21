@@ -1,7 +1,7 @@
 // src/utils/adminApiHelpers.ts
 import { dump } from "js-yaml";
 import type { PostApiPayload, FrontmatterObject } from "../types/admin";
-import { AUTHOR_NAME } from "../siteConfig"; // Assuming AUTHOR_NAME is exported from siteConfig
+import { AUTHOR_NAME } from "../config/index";
 import sharp from "sharp";
 import path from "node:path";
 import fs from "node:fs/promises";

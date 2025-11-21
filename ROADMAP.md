@@ -36,7 +36,7 @@ Persistent semantic search across all content types during local authoring, with
 #### Environment Variables Configuration ✅ **COMPLETED**
 
 - [x] Create `.env.example` with: `SITE_TITLE`, `SITE_DESCRIPTION`, `AUTHOR_NAME`, `REMARK42_HOST`, `REMARK42_SITE_ID`, `PUBLIC_SITE_URL`
-- [x] Update `src/siteConfig.ts` to read from env with fallbacks
+- [x] Update `src/config/index.ts` to read from env with fallbacks
 - [ ] Add validation for required variables (future enhancement)
 - [x] Document in CLAUDE.md
 
