@@ -4,7 +4,7 @@ pubDate: 2025-11-16T00:00:00.000Z
 author: Emin Tham
 postType: standard
 draft: false
-lastEdited: 2025-11-16T23:02:03.713Z
+lastEdited: 2025-11-17T03:14:59.242Z
 description: >-
   A guide to creating a Raspberry Pi Car controlled with a PS4 controller as a
   programmer
@@ -23,13 +23,15 @@ Jay recently expressed an interest in learning robotics and coding which present
 
 ## Choices/Preamble
 
-There were three main categories based on my research: Lego Spike, robot kits, and free-form building from basic parts.
+There were three main categories of robot cars based on my research: Lego Spike, robot kits, and free-form building from basic parts.
 
-Although the Lego route paired well with our existing Technic parts, Jay vehemently opposed the [cutesy look](https://www.lego.com/en-ca/product/lego-education-spike-prime-set-45678) and wanted something more "adult" and could conceivably be extended into a real robot. Of the two remaining options, there were a number of choices with different emphases.
+Although the Lego route paired well with our existing Technic parts, Jay vehemently opposed the [cutesy look](https://www.lego.com/en-ca/product/lego-education-spike-prime-set-45678) and wanted something more "adult" that could conceivably be extended into a real robot. Of the two remaining options, there were a number of choices with different emphases.
 
-Some, like the [Picar-X](https://ca.robotshop.com/products/sunfounder-picarx-smart-robot-car-kit-raspberry-pi?gad_source=1&gad_campaignid=20151185247&gclid=Cj0KCQiA5uDIBhDAARIsAOxj0CEcaeVnpEdQ9RGAW1Sz92Rb_V09rS-9SPttCms3V4Lh4ufRmgvULTQaAh5xEALw_wcB) prioritized a cohesive guided experience with instructions that taught one to go from assembly to coding a robot car, providing parts that work well together, library code, and a custom mobile app to control the robot in most cases. [Others](https://www.makeblock.com/pages/mbot-ultimate-robotics-kit) were more free-form with a wealth of interesting parts but were more of a [walled garden](https://www.servocity.com/actobotics). In most cases, the coding was restricted to the manufacturer's ecosystem, limiting the potential of personally building a library of robotics code that could be evolved as one progressed. As such, I sold Jay on the idea that we would be able to learn much more about each step of the process if we built a robot car from scratch, using parts we sourced ourselves, and coding things ourselves without prebuilt libraries.
+Some, like the [Picar-X](https://ca.robotshop.com/products/sunfounder-picarx-smart-robot-car-kit-raspberry-pi?gad_source=1&gad_campaignid=20151185247&gclid=Cj0KCQiA5uDIBhDAARIsAOxj0CEcaeVnpEdQ9RGAW1Sz92Rb_V09rS-9SPttCms3V4Lh4ufRmgvULTQaAh5xEALw_wcB) prioritized a cohesive guided experience with instructions that taught one to go from assembly to coding a robot car, providing parts that work well together, library code, and a custom mobile app to control the robot in most cases. [Others](https://www.makeblock.com/pages/mbot-ultimate-robotics-kit) were more free-form with a wealth of interesting parts but were more of a [walled garden](https://www.servocity.com/actobotics). In most cases, the coding was restricted to the manufacturer's ecosystem, limiting the potential of personally building a library of robotics code that could be evolved as one progressed. As such, I sold Jay on the idea that we would be able to learn much more about each step of the process if we built the robot car from scratch, using parts we sourced ourselves, and coding it ourselves without prebuilt libraries.
 
 ## Parts
+
+Here are the list of parts and tools required for this project.
 
 1. 2 x 18650 batteries
 2. 18650 battery charger
@@ -60,13 +62,13 @@ Test your controller next. The reason for going with a PS4 controller is the mat
 
 ## Programming the Car
 
-If you're like me and not a gamer, it might surprise you that the PS4 controller's joystick is sensitive around the middle and less sensitive around the outside. This results in a jittery motor movement at rest if you map the joystick value linearly against motor movement. A simple solve is to define a "dead zone" around a small area of the middle that maps to 0 to avoid this sensitive jitter.
+If you don't game much, it might surprise you that the PS4 controller's joystick is sensitive around the middle and less so around the outside. As such, a linear map of the joystick value to motor movement results in a jittery motor movement at rest. A simple solution is to define a "dead zone" around a small area of the middle that maps to 0 to work around this sensitivity.
 
-Secondly, there's probably a minimum amount of drive you need to provide your motor in order for it to overcome its inertia. When mapping joystick value to motor value, the minimum drive should start at your motor's threshold.
+Secondly, there's a minimum amount of drive you need to provide your motor in order for it to overcome its inertia. When mapping joystick value to motor value, the minimum drive should start at your motor's threshold.
 
 Thirdly, a linear map feels somewhat unnatural when actually controlling the car. Map it to a cubic or quadratic curve such that the sensitive inside area of the joystick shifts speed slowly while the outer area ramps up much quicker.
 
-I initially programmed the car to have the joysticks each control their respective motors directly (i.e. tank controls) given my familiarity with driving my zero-turn mower. However, the small range of motion on the joysticks made it much more difficult than I had anticipated. The more common control scheme seems to be to isolate forward-back into one joystick and left-right into another. The left-right value would then be added to or subtracted from the forward-back value to get the individual values for the left and right motors.
+I initially programmed the car to have the joysticks each control their respective motors directly (i.e. tank controls) given my familiarity with the zero-turn mower. However, the small range of motion on the joysticks made it much more difficult to control than I had anticipated. The more common control scheme seems to be to isolate forward-back into one joystick and left-right into another. The left-right value would then be added to or subtracted from the forward-back value to get the individual values for the left and right motors.
 
 Putting all these together, you'll end up with something akin to the following:
 
@@ -147,7 +149,7 @@ class MyController(Controller):
 
 ## Running as a toy car
 
-After you're happy with your code, you'll want to ensure that your controller is able to automatically pair with the RPi across restarts and that your script for running the car starts upon boot up. To do that, you'll need to set up a systemd service.
+After you're happy with your code, you'll want to ensure that your controller is able to automatically pair with the RPi across restarts and that your script for running the car starts upon boot up. To do the latter, you'll need to set up a systemd service.
 
 Create a file in `/etc/systemd/system/robot.service` similar to the following:
 
