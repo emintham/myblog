@@ -51,16 +51,17 @@
 }
 
 .ai-assistant-panel.collapsed .ai-assistant-header {
-  padding: 1rem 0.5rem;
+  padding: 1rem 0;
 }
 
 .ai-assistant-panel.collapsed .collapse-button {
-  padding: 0.5rem;
+  padding: 0.75rem;
   background: none;
   color: var(--color-text, #1f2937);
   transition: all 0.2s;
   justify-content: center;
   width: 40px;
+  min-height: 40px;
 }
 
 .ai-assistant-panel.collapsed .collapse-button:hover {
