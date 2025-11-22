@@ -7,7 +7,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import yaml from "js-yaml";
 import "../../../styles/admin.css";
-import type { PostSourceData, Quote } from "../../../types/admin";
+import type { PostSourceData } from "../../../types/admin";
 import {
   getUniqueTagNames,
   getUniqueSeriesNames,
@@ -15,8 +15,10 @@ import {
 import FeedbackDisplay from "../../../components/admin/feedback/FeedbackDisplay";
 import ToastContainer from "../../../components/admin/feedback/ToastContainer";
 import { AIAssistantPanel } from "../../../components/admin/ai-assistant/AIAssistantPanel";
+import { TextAnalysisPanel } from "../../../components/admin/text-analysis/TextAnalysisPanel";
 import { ErrorBoundary } from "../../../components/admin/shared/ErrorBoundary";
 import "../../../styles/ai-assistant.css";
+import "../../../styles/text-analysis.css";
 
 // Return empty paths in production (admin only available in dev)
 export async function getStaticPaths() {
@@ -92,13 +94,16 @@ if (!slug) {
         );
         try {
           const quotesFileContent = await fs.readFile(quotesFilePath, "utf-8");
+
           const parsedQuotesData = yaml.load(quotesFileContent) as {
             bookSlug?: string;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             quotes?: any[];
           };
 
           if (parsedQuotesData && Array.isArray(parsedQuotesData.quotes)) {
             postToEdit.inlineQuotes = parsedQuotesData.quotes.map(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (q: any, index: number) => ({
                 id: `loaded-${slug}-${index}-${Date.now()}`, // Generate a unique ID for React key
                 text: q.text || "",
@@ -124,7 +129,7 @@ if (!slug) {
 
       fileFound = true;
       break;
-    } catch (e) {
+    } catch {
       // File not found or error reading
     }
   }
@@ -218,14 +223,17 @@ const pageDescription = `Edit the post: ${pageTitleDisplay}. This page is availa
 
   <div id="formFeedback" class="form-feedback-container">
     <p id="feedbackMessage"></p>
+    {/* eslint-disable-next-line astro/jsx-a11y/anchor-is-valid */}
     <a id="viewPostLink" href="#" class="button-edit" style="display:none;"
       >View Post</a
     >
   </div>
   <FeedbackDisplay client:only="react" formId="editPostForm" />
   <ToastContainer client:only="react" formId="editPostForm" />
+  <ErrorBoundary componentName="Text Analysis" client:load>
+    <TextAnalysisPanel client:load position="left" />
+  </ErrorBoundary>
   <ErrorBoundary componentName="AI Assistant" client:load>
     <AIAssistantPanel client:load sessionId={slug || "unknown"} />
   </ErrorBoundary>
-  {/* Changed to client:only="react" */}
 </BaseLayout>

@@ -113,6 +113,7 @@ const PostForm: React.FC<PostFormProps> = ({
 
   const watchedPostType = watch("postType", defaultValues.postType);
   const watchedBookTitle = watch("bookTitle");
+  const watchedBodyContent = watch("bodyContent", "");
   const [showBookNoteFieldsUI, setShowBookNoteFieldsUI] = useState(
     watchedPostType === "bookNote"
   );
@@ -437,6 +438,12 @@ const PostForm: React.FC<PostFormProps> = ({
               />
             )}
           />
+          <div className="word-count">
+            {(() => {
+              const words = watchedBodyContent.trim().split(/\s+/).filter(Boolean);
+              return `${words.length} word${words.length !== 1 ? 's' : ''}`;
+            })()}
+          </div>
         </div>
       </CollapsibleFieldset>
     </>
