@@ -1,5 +1,10 @@
 # Changelog
 
+## Nov 22, 2025
+
+- Added Text Analysis panel with Lexi API integration for writing metrics (vocabulary diversity, adverb density, cognitive load, semantic pacing, sentiment arc).
+- Added interpretive tooltips for each metric with recommended ranges.
+
 ## Nov 18, 2025
 
 - Added AI Writing Assistant with Ollama integration, chat interface, prompt library, and conversation persistence.
