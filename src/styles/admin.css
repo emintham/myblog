@@ -431,6 +431,13 @@ body.admin-scope .form-field .field-error-message {
   display: block;
 }
 
+body.admin-scope .word-count {
+  font-size: 0.8rem;
+  color: var(--color-text-muted-admin);
+  text-align: right;
+  margin-top: var(--spacing-sm-admin);
+}
+
 /* -------------------------------------------------------------------------- */
 
 /* Button Variants - Using base styles                                        */
