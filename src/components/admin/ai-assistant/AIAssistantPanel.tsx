@@ -6,7 +6,6 @@
 import React, { useState, useEffect } from "react";
 import { useOllamaChat } from "../../../hooks/useOllamaChat";
 import {
-  ChevronLeft,
   ChevronRight,
   MessageSquare,
   AlertCircle,
@@ -177,10 +176,7 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
           }
         >
           {isCollapsed ? (
-            <>
-              <ChevronLeft size={16} />
-              <MessageSquare size={16} />
-            </>
+            <span className="collapse-indicator">«</span>
           ) : (
             <>
               <MessageSquare size={16} />
