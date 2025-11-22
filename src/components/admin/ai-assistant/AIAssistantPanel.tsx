@@ -27,7 +27,7 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
   currentPost: currentPostProp,
   onInsertText, // eslint-disable-line @typescript-eslint/no-unused-vars
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [selectedPromptId, setSelectedPromptId] = useState<string>("");
   const [customPrompt, setCustomPrompt] = useState("");
