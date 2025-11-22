@@ -1,96 +1,54 @@
-This guide provides instructions on how to use, develop, and maintain your Kinfolk Inspired Astro Blog.
+# Usage Guide
 
-## Development Workflow
+## Development
 
-1.  **Start the Dev Server:**
+```bash
+pnpm dev          # Start dev server at localhost:4321
+pnpm dev --host   # Allow network access
+```
 
-    ```bash
-    pnpm run dev
-    ```
+## Image Processing
 
-    Access your site at `http://localhost:4321`. For access from other devices on your network:
+1. Place originals in `images/originals/`
+2. Run `pnpm img` to generate WebP variants in `public/images/processed/`
 
-    ```bash
-    pnpm run dev --host
-    ```
+## Content Creation
 
-2.  **Image Processing:**
-    - Place your original high-resolution images (JPG, PNG) in the `images/originals/` directory at the root of your project.
-    - Run the image processing script to generate optimized WebP versions and responsive sizes:
-      ```bash
-      pnpm run img
-      ```
-    - Processed images are saved to `public/images/processed/`. Run when new/changed originals are added.
+Create posts via `/admin/create-post` in dev mode. Set `draft: false` in frontmatter to publish.
 
-3.  **Content Creation:**
-    New content (Standard Posts, Fleeting Thoughts, Book Notes) can be created via the admin interface in development mode (e.g., `/admin/create-post`).
-    This interface provides fields for all post types, including specific sections for book details and inline quote management for Book Notes.
+## RAG Index
 
-    **Publishing:** All new content defaults to `draft: true`. Change to `draft: false` in the Markdown frontmatter (or via the admin edit interface) to publish.
+```bash
+pnpm rq "search"  # Query index
+pnpm rrb          # Rebuild index
+pnpm rst          # View stats
+```
 
-4.  **RAG Index Management:**
+**Providers:** Ollama (preferred) or Transformers.js (fallback). Configure in `src/config/index.ts`.
 
-    The blog includes a local semantic search system that indexes your content for intelligent similarity search:
-    - **Query index:** `pnpm rq "search term"` - Find semantically similar content
-    - **Rebuild index:** `pnpm rrb` - Rebuild from scratch (if corrupted or after bulk changes)
-    - **View statistics:** `pnpm rst` - See index stats, storage info, and active embedding provider
+Index stored in `data/rag/` (gitignored). Auto-indexes on save.
 
-    **Embedding Providers:**
-    The system supports two embedding providers:
-    1. **Ollama** (preferred): Higher quality embeddings via local Ollama HTTP API
-    2. **Transformers.js** (fallback): Zero-config 384-dimensional embeddings, works offline
+## Code Quality
 
-    **Configuration:** Edit `src/config/index.ts` to customize:
-    - Embedding model (e.g., `nomic-embed-text`, `mxbai-embed-large`, `snowflake-arctic-embed`)
-    - Provider selection (auto-detect, force ollama, or force transformers)
-    - Ollama base URL
-
-    **Note:** Model dimensions are auto-detected from Ollama's response - no manual configuration needed!
-
-    The system auto-detects Ollama and displays the active configuration on dev server start (`pnpm dev`).
-
-    **Storage:** The index is stored in `data/rag/` (gitignored) and persists between dev server restarts.
-
-    **Auto-indexing:** Posts and quotes are automatically indexed when you create, update, or delete them through the admin interface. Manual rebuild is only needed if the index becomes corrupted.
-
-5.  **Linting & Formatting:**
-    - Apply formatting: `pnpm run format`
-    - Check for lint errors: `pnpm run lint`
-    - Attempt to auto-fix lint errors: `pnpm run lint:fix`
+```bash
+pnpm fmt          # Format code
+pnpm lint         # Check lint errors
+pnpm lint:fix     # Auto-fix lint
+```
 
 ## Deployment
 
-This Astro blog is a static site, ready for deployment on platforms like Cloudflare Pages, Vercel, Netlify, or GitHub Pages. Connect your Git repository to your chosen platform for automatic builds and deployments. Remember to include the `public/images/processed/` directory in your deployment.
+Static site ready for Cloudflare Pages, Vercel, Netlify, or GitHub Pages. Include `public/images/processed/` in deployment.
 
-## Updating from the Original Template
+## Updating from Template
 
-If this template repository receives updates, you can merge them into your project. This requires understanding Git, especially merge conflict resolution.
-
-**Before You Update:**
-
-1.  Commit all your local changes: `git add . && git commit -m "My work before updating template"`
-2.  (Recommended) Export your content: `pnpm run export-posts`
-    (Backs up content to `.exported-content/`)
-
-**Update Process:**
-
-1.  Add Template as Upstream (One-time setup, replace URL):
-    ```bash
-    git remote add template_upstream git@github.com:emintham/blog-template.git
-    ```
-    Verify with `git remote -v`.
-2.  Fetch Latest Template Changes: `git fetch template_upstream`
-3.  Merge Template (ensure you're on your main branch): `git merge template_upstream/master`
-4.  **Resolve Merge Conflicts:**
-    - **Content Files (`src/content/...`):** Almost always keep **your version**.
-    - **Template Code Files (Layouts, Components, etc.):** Manually resolve if you've modified them; otherwise, the template's version is often safe.
-    - Use `git status`, edit files, `git add <resolved_file>`, then `git commit`.
-    - If stuck, `git merge --abort` cancels the merge.
-5.  Install/Update Dependencies: `pnpm install` (if `package.json` or lockfile changed).
-6.  Test Thoroughly: `pnpm run dev`.
-7.  Content Recovery (If needed): If content was affected, clean up/reset the `src/content/...` directories, then restore from backup using `pnpm run import-posts`.
+1. Commit changes and export content: `pnpm export-posts`
+2. Add upstream: `git remote add template_upstream git@github.com:emintham/blog-template.git`
+3. Fetch and merge: `git fetch template_upstream && git merge template_upstream/master`
+4. Resolve conflicts (keep your content files), run `pnpm install`, test with `pnpm dev`
+5. Restore content if needed: `pnpm import-posts`
 
 ## Customization
 
-- **Colors & Fonts:** Edit CSS variables in `src/styles/global.css`.
-- **Layouts & Components:** Modify Astro components in `src/layouts/` and `src/components/`. Be mindful of potential merge conflicts with future template updates.
+- **Styles:** `src/styles/global.css`
+- **Layouts:** `src/layouts/` and `src/components/`
