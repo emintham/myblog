@@ -1,1037 +1,134 @@
-# Local RAG System Implementation
+# Local RAG System
 
-## Overview
-
-A persistent, local-first RAG (Retrieval-Augmented Generation) system for semantic search across all blog content during authoring. The system automatically indexes content on save and provides real-time related content suggestions in the admin interface.
+Local semantic search across blog content with automatic indexing on save.
 
 ## Design Principles
 
-1. **Persistent by default**: Index survives dev server restarts
-2. **Incremental updates**: Only re-embed changed content
-3. **Offline-capable**: Works via CLI even without dev server
-4. **Flexible embedding**: Auto-detects Ollama MCP, falls back to transformers.js
-5. **Zero-config**: Works out of the box with sensible defaults
+- Persistent index survives dev server restarts
+- Incremental updates (only re-embed changed content)
+- Offline-capable via CLI
+- Auto-detects Ollama, falls back to transformers.js
+- Zero-config defaults
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────┐
-│  Admin UI (React)                   │
-│  - PostForm.tsx                     │
-│  - RelatedContentPanel.tsx          │
-│  - useRAGQuery() hook               │
-└──────────────┬──────────────────────┘
-               │
-               │ HTTP API
-               ▼
-┌─────────────────────────────────────┐
-│  API Handlers                       │
-│  /api/rag-query.ts (NEW)            │
-│  /api/create-post-handler.ts ───────┼──> Auto-index on save
-│  /api/update-post-handler.ts        │
-│  /api/delete-post-handler.ts        │
-└──────────────┬──────────────────────┘
-               │
-               │ Import
-               ▼
-┌─────────────────────────────────────┐
-│  RAG Service Layer                  │
-│  src/services/rag/                  │
-│  - index.ts (public API)            │
-│  - embeddings.ts (provider logic)   │
-│  - chunking.ts (paragraph split)    │
-│  - storage.ts (LanceDB wrapper)     │
-└──────────────┬──────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────┐
-│  Vector Database (LanceDB)          │
-│  data/rag/                          │
-│  - posts.lance (post paragraphs)    │
-│  - quotes.lance (book quotes)       │
-│  - metadata.json (config, stats)    │
-└─────────────────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────┐
-│  Embedding Providers (auto-detect)  │
-│  1. Ollama MCP (preferred)          │
-│  2. @xenova/transformers (fallback) │
-└─────────────────────────────────────┘
+Admin UI (React) → API Handlers → RAG Service → LanceDB → Embedding Providers
 ```
 
-## Storage Structure
+**Storage:** `data/rag/` (gitignored)
+- `posts.lance/` - Post paragraphs
+- `quotes.lance/` - Book quotes
+- `metadata.json` - Config and stats
 
-```
-data/rag/                      # Gitignored
-├── posts.lance/               # LanceDB table for post paragraphs
-│   ├── data/                  # Arrow files
-│   └── versions/              # Version metadata
-├── quotes.lance/              # LanceDB table for book quotes
-│   ├── data/
-│   └── versions/
-└── metadata.json              # Index metadata
-    {
-      "version": "1.0.0",
-      "created": "2025-11-17T...",
-      "lastUpdated": "2025-11-17T...",
-      "embeddingModel": "nomic-embed-text",
-      "embeddingDim": 768,
-      "stats": {
-        "totalPosts": 42,
-        "totalParagraphs": 456,
-        "totalQuotes": 89
-      }
-    }
-```
+## Content Chunking
 
-## Content Chunking Strategy
+**Posts:** Split on `\n\n`, min 50 chars, max 2000 chars with sentence splitting
 
-### Posts (all types: standard, fleeting, bookNote)
-
-**Paragraph-level chunking:**
-
-- Split on double newlines (`\n\n`)
-- Min paragraph length: 50 characters (filter out short fragments)
-- Max paragraph length: 2000 characters (split long paragraphs at sentence boundaries)
-- Include metadata: `slug`, `title`, `postType`, `tags`, `series`, `pubDate`
-
-**Example document:**
-
-```json
-{
-  "id": "post:my-first-post:0",
-  "content": "This is the first paragraph of my post...",
-  "vector": [0.123, 0.456, ...],
-  "metadata": {
-    "slug": "my-first-post",
-    "title": "My First Post",
-    "postType": "standard",
-    "paragraphIndex": 0,
-    "tags": ["tech", "writing"],
-    "series": "Getting Started",
-    "pubDate": "2025-01-15"
-  }
-}
-```
-
-### Book Quotes
-
-**Quote-level chunking:**
-
-- Each quote is a separate document
-- Include book metadata: `quotesRef`, `bookTitle`, `bookAuthor`
-- Include quote metadata: `tags`, `quoteAuthor`, `quoteSource`
-
-**Example document:**
-
-```json
-{
-  "id": "quote:atomic-habits:0",
-  "content": "You do not rise to the level of your goals...",
-  "vector": [0.789, 0.012, ...],
-  "metadata": {
-    "quotesRef": "atomic-habits",
-    "bookTitle": "Atomic Habits",
-    "bookAuthor": "James Clear",
-    "tags": ["habits", "systems"],
-    "quoteAuthor": "James Clear",
-    "quoteSource": "Chapter 1"
-  }
-}
-```
+**Quotes:** Each quote is a separate document with book metadata
 
 ## Embedding Providers
 
-### Provider 1: Ollama MCP (Preferred)
-
-**Detection:**
-
-```typescript
-async function isOllamaMCPAvailable(): Promise<boolean> {
-  try {
-    const client = await createMCPClient();
-    await client.connect();
-    const tools = await client.listTools();
-    return tools.some((t) => t.name === "generate_embeddings");
-  } catch {
-    return false;
-  }
-}
-```
-
-**Usage:**
-
-- Model: `nomic-embed-text` (768 dimensions)
-- Batch size: 10 documents at a time
-- Timeout: 30 seconds per batch
-
-**Advantages:**
-
-- Better quality embeddings
-- Larger context window
-- User's local models
-- No external API calls
-
-### Provider 2: Transformers.js (Fallback)
-
-**Model:** `Xenova/all-MiniLM-L6-v2`
-
-- Dimensions: 384
-- Size: ~25MB download
-- Performance: ~50ms per embedding
-
-**Usage:**
-
-```typescript
-import { pipeline } from "@xenova/transformers";
-
-const embedder = await pipeline(
-  "feature-extraction",
-  "Xenova/all-MiniLM-L6-v2"
-);
-const output = await embedder(text, {
-  pooling: "mean",
-  normalize: true,
-});
-```
-
-**Advantages:**
-
-- Zero setup
-- Works offline
-- Consistent performance
-
-### Provider Selection
-
-1. Check for Ollama MCP on first use
-2. Cache selection in `metadata.json`
-3. Allow override via environment variable: `RAG_EMBEDDING_PROVIDER=transformers`
-4. Log warning if switching providers (requires reindex)
+| Provider | Model | Dimensions | Notes |
+|----------|-------|------------|-------|
+| Ollama (preferred) | nomic-embed-text | 768 | Better quality, local |
+| Transformers.js (fallback) | all-MiniLM-L6-v2 | 384 | Zero setup, offline |
 
 ## API Endpoints
 
-### POST /api/rag-query
-
-Query the RAG index for related content.
-
-**Request:**
-
+**POST /api/rag-query** - Search for related content
 ```json
-{
-  "query": "text to search for",
-  "topK": 5,
-  "filter": {
-    "postType": ["standard", "fleeting"], // Optional
-    "tags": ["tech"], // Optional
-    "contentType": "posts" // Optional: "posts" | "quotes" | "all"
-  }
-}
+{ "query": "text", "topK": 5, "filter": { "postType": ["standard"], "contentType": "posts" } }
 ```
 
-**Response:**
+**GET /api/rag-stats** - Index statistics
 
-```json
-{
-  "results": [
-    {
-      "content": "Relevant paragraph text...",
-      "score": 0.89,
-      "metadata": {
-        "slug": "related-post",
-        "title": "Related Post",
-        "postType": "standard",
-        "paragraphIndex": 2,
-        "url": "/blog/related-post"
-      }
-    }
-  ],
-  "queryTime": 45,
-  "provider": "ollama"
-}
-```
-
-### GET /api/rag-stats
-
-Get index statistics.
-
-**Response:**
-
-```json
-{
-  "version": "1.0.0",
-  "embeddingModel": "nomic-embed-text",
-  "embeddingDim": 768,
-  "stats": {
-    "totalPosts": 42,
-    "totalParagraphs": 456,
-    "totalQuotes": 89,
-    "lastUpdated": "2025-11-17T10:30:00Z"
-  },
-  "provider": "ollama"
-}
-```
-
-## Service Layer API
-
-### RAGService Class
-
-```typescript
-class RAGService {
-  // Index management
-  async upsertPost(slug: string, data: PostData): Promise<void>;
-  async deletePost(slug: string): Promise<void>;
-  async upsertQuotes(quotesRef: string, quotes: Quote[]): Promise<void>;
-  async deleteQuotes(quotesRef: string): Promise<void>;
-
-  // Querying
-  async query(text: string, options: QueryOptions): Promise<QueryResult[]>;
-
-  // Maintenance
-  async rebuild(): Promise<RebuildStats>;
-  async getStats(): Promise<IndexStats>;
-  async optimize(): Promise<void>;
-}
-```
-
-### Integration Points
-
-**In `/api/create-post-handler.ts`:**
-
-```typescript
-// After successful file write
-await ragService.upsertPost(slug, {
-  title: data.title,
-  content: data.body,
-  postType: data.postType,
-  tags: data.tags,
-  series: data.series,
-  pubDate: data.pubDate,
-});
-
-// For book notes
-if (data.postType === "bookNote" && data.quotes) {
-  await ragService.upsertQuotes(data.quotesRef, data.quotes);
-}
-```
-
-**In `/api/update-post-handler.ts`:**
-
-```typescript
-// After successful update
-if (slugChanged) {
-  await ragService.deletePost(oldSlug);
-}
-await ragService.upsertPost(newSlug, postData);
-```
-
-**In `/api/delete-post-handler.ts`:**
-
-```typescript
-// After successful deletion
-await ragService.deletePost(slug);
-
-if (quotesRef) {
-  await ragService.deleteQuotes(quotesRef);
-}
-```
+**POST /api/rag-synthesis** - Get synthesis opportunities
 
 ## CLI Tools
 
-### rag-query
-
-**Usage:**
-
 ```bash
-pnpm rag-query "semantic search concept" [--top-k 5] [--type posts|quotes]
+pnpm rq "query"     # Search
+pnpm rrb            # Rebuild index
+pnpm rst            # View stats
 ```
 
-**Output:**
+## Service API
 
-```
-🔍 Searching for: "semantic search concept"
-
-📝 Post: "Understanding Embeddings" (score: 0.89)
-   /blog/understanding-embeddings#para-3
-   "Semantic search works by converting text into dense vectors..."
-
-📝 Post: "Vector Databases Explained" (score: 0.82)
-   /blog/vector-databases#para-1
-   "Traditional keyword search fails to capture meaning..."
-
-💬 Quote from "Designing Data-Intensive Applications" (score: 0.76)
-   Tags: databases, search
-   "Full-text search indexes are optimized for..."
-
-Found 3 results in 45ms
+```typescript
+class RAGService {
+  async upsertPost(slug, data): Promise<void>
+  async deletePost(slug): Promise<void>
+  async upsertQuotes(quotesRef, quotes): Promise<void>
+  async deleteQuotes(quotesRef): Promise<void>
+  async query(text, options): Promise<QueryResult[]>
+  async rebuild(): Promise<RebuildStats>
+  async getStats(): Promise<IndexStats>
+}
 ```
 
-### rag-rebuild
-
-**Usage:**
-
-```bash
-pnpm rag-rebuild [--force]
-```
-
-**Output:**
-
-```
-🔄 Rebuilding RAG index...
-
-📂 Scanning content...
-   - Found 42 posts
-   - Found 15 book quote files
-
-🧮 Generating embeddings...
-   - Provider: Ollama (nomic-embed-text)
-   - Posts: [========================================] 456/456 paragraphs
-   - Quotes: [========================================] 89/89 quotes
-
-💾 Writing to database...
-   - Posts table: 456 documents
-   - Quotes table: 89 documents
-
-✅ Index rebuilt successfully in 23.4s
-```
-
-### rag-stats
-
-**Usage:**
-
-```bash
-pnpm rag-stats
-```
-
-**Output:**
-
-```
-📊 RAG Index Statistics
-
-Embedding Model: nomic-embed-text (768 dimensions)
-Provider: Ollama MCP
-Last Updated: 2025-11-17 10:30:00
-
-Content:
-  Posts: 42
-  Paragraphs: 456
-  Quotes: 89
-
-Storage:
-  Posts table: 12.3 MB
-  Quotes table: 2.1 MB
-  Total: 14.4 MB
-
-Performance (last 100 queries):
-  Avg query time: 45ms
-  P95 query time: 78ms
-```
-
-## Admin UI Components
-
-### RelatedContentPanel
-
-**Location:** Right sidebar in `/admin/edit`
-
-**Features:**
-
-- Real-time updates as user types (debounced 2s)
-- Tabs: "Related Posts" | "Relevant Quotes"
-- Click to insert reference
-- Show/hide toggle
-- Loading states
-
-**UI Mockup:**
-
-```
-┌─────────────────────────────────┐
-│ 📚 Related Content              │
-├─────────────────────────────────┤
-│ [Posts] [Quotes]                │
-├─────────────────────────────────┤
-│ 📝 Understanding Embeddings     │
-│    Series: ML Basics · 2024     │
-│    "Semantic search works..."   │
-│    [Insert Link]                │
-├─────────────────────────────────┤
-│ 📝 Vector Databases             │
-│    Tags: tech, databases        │
-│    "Traditional keyword..."     │
-│    [Insert Link]                │
-├─────────────────────────────────┤
-│ 💬 Quote from "Designing..."    │
-│    Tags: databases, search      │
-│    "Full-text search..."        │
-│    [Insert Quote]               │
-└─────────────────────────────────┘
-```
-
-### Tag/Series Suggestions
-
-**Location:** Below tag input in PostForm
-
-**Logic:**
-
-- Extract key phrases from post body
-- Query RAG for similar content
-- Suggest tags/series from top matches
-- Show confidence scores
-
-**Example:**
-
-```
-Suggested tags based on content:
-  [+ embeddings] (89% match)
-  [+ machine-learning] (76% match)
-  [+ vector-search] (65% match)
-```
-
-### Quote Finder (Book Notes)
-
-**Location:** Modal dialog, triggered by button in PostForm
-
-**Features:**
-
-- Search across all book quotes
-- Filter by book, author, tags
-- Preview quote in context
-- Insert into post with citation
-
-## Documentation Update Plan
-
-Each phase requires specific documentation updates to keep all files in sync:
-
-### Phase 1: Core Infrastructure
-
-**Update after completion:**
-
-- **ROADMAP.md**: Check off Phase 1 tasks
-- **INSTALL.md**: Add optional Ollama setup section
-
-  ```markdown
-  ## Optional: Ollama for Better Embeddings (Recommended)
-
-  For higher-quality semantic search, install Ollama:
-
-  1. Install Ollama: https://ollama.com/download
-  2. Pull embedding model: `ollama pull nomic-embed-text`
-  3. RAG system will auto-detect and use Ollama when available
-  ```
-
-- **GUIDE.md**: Add new "RAG Index Management" section
-
-  ```markdown
-  ## RAG Index Management
-
-  The blog includes a local semantic search system that indexes your content:
-
-  - **Automatic indexing**: Posts/quotes are indexed when you save them
-  - **Manual rebuild**: `pnpm rag-rebuild` (run if index gets corrupted)
-  - **Query index**: `pnpm rag-query "search term"`
-  - **View stats**: `pnpm rag-stats`
-
-  The index is stored in `data/rag/` and persists between dev server restarts.
-  ```
-
-- **package.json**: Verify new scripts are documented
-- **CLAUDE.md**: Add RAG service to "Architecture Overview" and "Important Files Reference"
-
-  ```markdown
-  ### RAG System
-
-  **Location:** `src/services/rag/`
-
-  **Purpose:** Local semantic search across all content types
-
-  **Components:**
-
-  - `index.ts` - Public RAG service API
-  - `storage.ts` - LanceDB wrapper
-  - `chunking.ts` - Paragraph splitting
-  - `embeddings.ts` - Provider abstraction
-
-  **Integration:** Auto-indexes posts/quotes on save via API handlers
-
-  **CLI Tools:** `rag-query`, `rag-rebuild`, `rag-stats`
-  ```
-
-### Phase 2: Ollama MCP Integration
-
-**Update after completion:**
-
-- **ROADMAP.md**: Check off Phase 2 tasks
-- **INSTALL.md**: Enhance Ollama section with MCP server setup
-
-  ```markdown
-  ## Ollama MCP Server (Optional)
-
-  For automatic Ollama detection:
-
-  1. Install Ollama MCP server: `npm install -g @modelcontextprotocol/server-ollama`
-  2. RAG system will detect and use it automatically
-  3. Or force provider: `RAG_EMBEDDING_PROVIDER=ollama pnpm rag-rebuild`
-  ```
-
-- **GUIDE.md**: Update RAG section with provider info
-
-  ```markdown
-  ### Embedding Providers
-
-  The RAG system supports two embedding providers:
-
-  1. **Ollama** (preferred): Better quality, local models
-  2. **Transformers.js** (fallback): Zero-config, works offline
-
-  Check current provider: `pnpm rag-stats`
-  ```
-
-- **.env.example**: Create if doesn't exist, add RAG variables
-  ```bash
-  # RAG Configuration (optional)
-  RAG_EMBEDDING_PROVIDER=ollama  # or 'transformers'
-  RAG_DATA_DIR=./data/rag
-  RAG_OLLAMA_MODEL=nomic-embed-text
-  ```
-- **CLAUDE.md**: Update RAG section with provider details
-
-### Phase 3: Admin UI
-
-**Update after completion:**
-
-- **ROADMAP.md**: Check off Phase 3 tasks, mark entire RAG feature complete
-- **README.md**: Add RAG to "Advanced Content & Knowledge Management" section
-  ```markdown
-  - **Semantic Search & Related Content:**
-    - Real-time related content suggestions while writing
-    - Semantic search across all posts and book quotes
-    - Smart tag/series recommendations based on content
-    - Quote finder for quick reference insertion
-      ![Related Content Panel Screenshot](images/rag-panel.png)
-  ```
-- **GUIDE.md**: Add "Writing with RAG Assistance" section
-
-  ```markdown
-  ## Writing with RAG Assistance
-
-  When editing posts in the admin interface, the Related Content panel
-  shows semantically similar content as you type:
-
-  - **Related Posts**: Similar posts from your archive
-  - **Relevant Quotes**: Book quotes matching your content
-  - **Tag Suggestions**: Recommended tags based on similar posts
-  - **Insert Links**: Click to add markdown references
-
-  The panel updates automatically every 2 seconds while typing.
-  Toggle visibility with the sidebar button.
-  ```
-
-- **CLAUDE.md**: Add to "Development Patterns" section
-
-  ```markdown
-  ### Working with RAG Suggestions
-
-  The admin UI includes a RelatedContentPanel component:
-
-  - Auto-queries RAG index as user types (debounced 2s)
-  - Shows related posts and relevant quotes
-  - Enables quick reference insertion
-  - Gracefully degrades if RAG unavailable
-
-  Location: `src/components/admin/RelatedContentPanel.tsx`
-  Hook: `src/hooks/useRAGQuery.ts`
-  ```
-
-- **CHANGELOG.md**: Add entry for RAG feature
-
-  ```markdown
-  ## [Date]
-
-  ### Added
-
-  - Local RAG system for semantic search during authoring
-  - Related content panel in post editor
-  - Automatic content indexing on save
-  - CLI tools for index management
-  - Ollama MCP integration for better embeddings
-  ```
-
-### Post-Implementation (All Phases Complete)
-
-**Final documentation tasks:**
-
-- **README.md**: Add screenshots of RAG panel
-- **docs/RAG_IMPLEMENTATION.md**: Mark as "IMPLEMENTED" at top
-- **ROADMAP.md**: Move RAG to "Completed" section
-- **.gitignore**: Verify `data/rag/` is listed
-- **CLAUDE.md**: Final review of all RAG references
-
-## Implementation Phases
-
-### Phase 1: Core Infrastructure ✅ **COMPLETED**
-
-**Goal:** Working RAG service with CLI tools
-
-**Tasks:**
-
-1. ✅ Install dependencies: `@lancedb/lancedb`, `@xenova/transformers`, `apache-arrow`
-2. ✅ Create service layer structure:
-   - `src/services/rag/index.ts`
-   - `src/services/rag/storage.ts`
-   - `src/services/rag/chunking.ts`
-   - `src/services/rag/embeddings.ts`
-   - `src/services/rag/fs-loader.ts` (CLI support)
-3. ✅ Implement transformers.js provider (384-dim, `Xenova/all-MiniLM-L6-v2`)
-4. ✅ Implement paragraph chunking (min 50 chars, max 2000 chars with sentence splitting)
-5. ✅ Create LanceDB tables with Apache Arrow schemas (posts, quotes)
-6. ✅ Build CLI tools: `rq` (query), `rrb` (rebuild), `rst` (stats)
-7. ✅ Add to `.gitignore`: `data/rag/`
-8. ✅ Add scripts to `package.json`
-9. ✅ Write unit tests for chunking logic (17 tests)
-10. ✅ Write integration tests for end-to-end validation (14 tests)
-
-**Testing:**
-
-- ✅ Unit tests: 17 passing
-- ✅ Integration tests: 14 passing
-- ✅ LanceDB schema validation
-- ✅ Chunking edge cases validated
-- ⚠️ Embedding model download requires internet (works in production)
-
-**Success Criteria:**
-
-- [x] Can rebuild index from existing content
-- [x] Can query and get relevant results (infrastructure ready)
-- [x] Index persists after restart (schema validated)
-- [x] CLI tools work correctly (tested with mocks)
-
-**Notes:**
-
-- Auto-indexing on save deferred to Phase 2
-- Actual embedding functionality requires internet access for model download
-- All infrastructure tested and validated with 31 passing tests
-
-### Phase 2: Auto-Indexing (Est: 4-6 hours)
-
-**Goal:** Automatic incremental updates on save
-
-**Tasks:**
-
-1. Hook `ragService.upsertPost()` into create/update handlers
-2. Hook `ragService.deletePost()` into delete handler
-3. Handle book quotes separately (upsertQuotes/deleteQuotes)
-4. Add error handling and fallbacks
-5. Create `/api/rag-stats` endpoint
-6. Add logging for index operations
-7. Test all CRUD operations
-
-**Testing:**
-
-- Create new post → verify indexed
-- Update post → verify re-indexed
-- Delete post → verify removed
-- Restart server → verify index intact
-
-**Success Criteria:**
-
-- [ ] New posts auto-indexed on creation
-- [ ] Updates re-index only changed post
-- [ ] Deletions remove from index
-- [ ] No manual rebuild needed for normal workflow
-
-### Phase 3: Ollama MCP Integration (Est: 6-8 hours)
-
-**Goal:** Better embeddings via local Ollama
-
-**Tasks:**
-
-1. Install MCP SDK: `@modelcontextprotocol/sdk`
-2. Create Ollama embedding provider
-3. Implement auto-detection logic
-4. Add provider fallback chain
-5. Document Ollama setup in README
-6. Add environment variable override
-7. Test with/without Ollama running
-
-**Testing:**
-
-- Start Ollama with nomic-embed-text
-- Rebuild index → verify Ollama used
-- Stop Ollama → verify fallback to transformers.js
-- Compare embedding quality
-
-**Success Criteria:**
-
-- [ ] Auto-detects Ollama MCP when available
-- [ ] Falls back gracefully to transformers.js
-- [ ] Can force provider via env var
-- [ ] Logs which provider is used
-
-### Phase 4A: Content Intelligence Dashboard (Est: 8-10 hours)
-
-**Goal:** Replace `/admin/analyze` with RAG-powered content discovery and synthesis
-
-**Tasks:**
-
-1. Create unified semantic search interface (no filters)
-2. Build rich result cards for posts and quotes
-3. Implement synthesis opportunities detection:
-   - Fleeting thoughts to expand (3+ related posts)
-   - Orphaned content (<2 semantic connections)
-   - Unreferenced quotes
-4. Add collapsible sections (synthesis, stats)
-5. Create `/api/rag-query` endpoint (unified posts + quotes)
-6. Create `/api/rag-synthesis` endpoint
-7. Build action buttons (Open, Insert Link, Insert Quote, Copy)
-8. Update `/admin/analyze` route
-9. Style to match admin theme with collapsible sections
-
-**Components:**
-
-- `ContentIntelligenceDashboard.tsx` - Main container
-- `SemanticSearchBox.tsx` - Search input
-- `UnifiedSearchResults.tsx` - Results container
-- `PostResultCard.tsx` - Post result display
-- `QuoteResultCard.tsx` - Quote result display
-- `SynthesisOpportunities.tsx` - Collapsible synthesis section
-- `IndexStats.tsx` - Collapsible statistics
-- `useRAGQuery.ts` - Query hook
-- `useSynthesisData.ts` - Synthesis hook
-
-**Testing:**
-
-- Search query → see unified results (posts + quotes)
-- Click actions → verify correct behavior
-- Test synthesis opportunities detection
-- Test collapsible sections
-- Test empty states
-
-**Success Criteria:**
-
-- [ ] Unified search returns both posts and quotes
-- [ ] Rich result cards show all relevant metadata
-- [ ] Synthesis opportunities correctly identify targets
-- [ ] Actions work correctly (open, insert, copy)
-- [ ] Collapsible sections persist state
-- [ ] Performance is acceptable with large result sets
-
-### Phase 4B: Ollama Writing Assistant (Est: 10-12 hours)
-
-**Goal:** AI assistant panel in PostForm for idea bouncing and editing
-
-**Tasks:**
-
-1. Create `prompts.yaml` with initial prompt library
-2. Set up SQLite schema for conversation history (`data/assistant.db`)
-3. Build AI assistant panel with collapse/expand
-4. Create chat interface components
-5. Implement prompt selector dropdown
-6. Build conversation history with SQLite persistence
-7. Create `/api/ollama-chat` endpoint with context injection
-8. Create `/api/ollama-status` endpoint
-9. Create `/api/conversations` endpoint (CRUD)
-10. Add assistant panel to PostForm layout
-11. Style ai-assistant.css
-12. Show error message if Ollama unavailable (required dependency)
-
-**Components:**
-
-- `AIAssistantPanel.tsx` - Main panel
-- `ChatInterface.tsx` - Message display and input
-- `PromptSelector.tsx` - Dropdown with YAML prompts
-- `ConversationHistory.tsx` - Message list
-- `useOllamaChat.ts` - Ollama API + conversation hook
-- `useConversationStore.ts` - SQLite CRUD hook
-
-**Context Modes:**
-
-- **Current Post**: Sends title + body
-- **Post + Related**: Includes RAG results
-- **Just Prompt**: No context
-
-**Prompt Library Examples:**
-
-- Brainstorm ideas
-- Critique this draft
-- Check grammar & clarity
-- Suggest better title
-- Help me conclude
-- Find gaps in argument
-
-**Testing:**
-
-- Send message → verify Ollama response
-- Switch prompts → verify context changes
-- Reload page → verify conversation persists
-- Test collapse/expand functionality
-- Test with Ollama unavailable → verify error message
-- Test insert response into editor
-
-**Success Criteria:**
-
-- [ ] Chat interface works with Ollama
-- [ ] Conversations persist in SQLite
-- [ ] Prompt library loads from YAML
-- [ ] Context injection works correctly
-- [ ] Panel collapses/expands smoothly
-- [ ] Error shown if Ollama unavailable
-- [ ] Can insert AI responses into editor
-
-### Phase 4C: Advanced Features (Future)
-
-**Content Clusters:**
-
-- Detect content clusters using k-means or DBSCAN on embeddings
-- List clusters with metadata (post count, latest post)
-- Click cluster to view all posts in that cluster
-- Convert cluster to tag or series
-- Text-based display (defer visualization to later phase)
-
-**Manual Tag Suggester (PostForm):**
-
-- Button in PostForm: "Suggest Tags from Content"
-- Only shows when body has 200+ characters
-- Extract key phrases, query RAG for similar posts
-- Show tag suggestions with confidence scores
-- One-click to add suggested tags
-- Component: `TagSuggester.tsx`
-
-**Series Builder:**
-
-- Detect posts that form natural sequences
-- Suggest ordering based on content progression
-- Generate series metadata automatically
-- Create series TOC/overview post
-
-**Embedding Visualization:**
-
-- 2D/3D visualization of post embeddings using UMAP or t-SNE
-- Interactive clustering view showing semantic relationships
-- Color-code posts by tags, series, or post type
-- Click to navigate to posts from visualization
-- Zoom/pan controls for exploring the embedding space
-- Integration with content intelligence dashboard
-- Export visualization as static image or interactive HTML
-- Temporal view showing how topics evolve over time
-
-**Benefits:**
-
-- Discover hidden connections between posts
-- Identify content gaps in your knowledge base
-- See how your writing themes cluster together
-- Find outliers (unique posts that don't fit existing clusters)
-- Visual confirmation that RAG is working correctly
-
-**Technical approach:**
-
-- Use `umap-js` or `tsne-js` for dimensionality reduction (768→2 or 3 dimensions)
-- Render with D3.js, Plotly.js, or Three.js for 3D
-- Cache reduced embeddings to avoid recomputation
-- Update visualization incrementally as new posts are added
-
-**Writing Metrics:**
-
-- Readability scores (Flesch-Kincaid)
-- Passive voice detection
-- Word/paragraph count stats
-- Estimated reading time
+## Implementation Status
+
+### ✅ Phase 1: Core Infrastructure
+- LanceDB storage with Apache Arrow schemas
+- Transformers.js embeddings
+- Paragraph chunking
+- CLI tools
+- Unit and integration tests
+
+### ✅ Phase 2: Auto-Indexing
+- Hooks in create/update/delete handlers
+- `/api/rag-stats` endpoint
+
+### ✅ Phase 3: Ollama Integration
+- Auto-detection with fallback
+- Environment variable override
+
+### ✅ Phase 4A: Content Intelligence Dashboard
+- Unified semantic search
+- Rich result cards
+- Synthesis opportunities
+- Action buttons (Open, Insert, Copy)
+
+### ✅ Phase 4B: AI Writing Assistant
+- Chat interface with Ollama
+- Prompt library (YAML)
+- SQLite conversation persistence
+- Context injection modes
+
+### Future (Phase 4C)
+- Content clusters
+- Tag suggester
+- Series builder
+- Embedding visualization
+- Writing metrics
 
 ## Configuration
 
-### Environment Variables
-
 ```bash
-# Optional: force specific embedding provider
 RAG_EMBEDDING_PROVIDER=ollama|transformers
-
-# Optional: custom data directory
 RAG_DATA_DIR=./data/rag
-
-# Optional: embedding model
 RAG_OLLAMA_MODEL=nomic-embed-text
-RAG_TRANSFORMERS_MODEL=Xenova/all-MiniLM-L6-v2
-```
-
-### .gitignore
-
-```
-# RAG index (do not commit)
-data/rag/
-```
-
-### package.json Scripts
-
-```json
-{
-  "scripts": {
-    "rag-query": "node scripts/rag-query.mjs",
-    "rag-rebuild": "node scripts/rag-rebuild.mjs",
-    "rag-stats": "node scripts/rag-stats.mjs"
-  }
-}
 ```
 
 ## Performance Targets
 
-- **Index rebuild**: < 30s for 100 posts
-- **Incremental update**: < 1s per post
-- **Query latency**: < 100ms (P95)
-- **Memory usage**: < 200MB for 1000 posts
-- **Storage size**: ~30KB per post (averaged)
+- Index rebuild: <30s for 100 posts
+- Incremental update: <1s per post
+- Query latency: <100ms (P95)
+- Memory: <200MB for 1000 posts
 
 ## Error Handling
 
-### Graceful Degradation
-
-If RAG service fails:
-
-1. Log error to console
-2. Continue with post save/update
-3. Show warning in admin UI
-4. Provide "rebuild index" button
-
-### Recovery Strategies
-
-- **Corrupted index**: Auto-rebuild on startup
-- **Embedding timeout**: Retry with exponential backoff
-- **Out of disk**: Warn user, disable indexing
-- **Provider unavailable**: Fall back to other provider
-
-## Testing Strategy
-
-### Unit Tests
-
-- Chunking logic (paragraph splitting)
-- Embedding provider selection
-- Query result scoring
-- Metadata extraction
-
-### Integration Tests
-
-- End-to-end indexing workflow
-- API endpoint contracts
-- CLI tool outputs
-- Error scenarios
-
-### Manual Testing
-
-- Real content from blog
-- Performance with large corpus
-- UI responsiveness
-- Cross-browser compatibility
-
-## Future Enhancements
-
-1. **Multi-modal embeddings**: Index images via CLIP
-2. **Temporal filtering**: "Show related posts from last 6 months"
-3. **Negative search**: "Similar to X but not about Y"
-4. **Hybrid search**: Combine semantic + keyword (BM25)
-5. **Export/import**: Share index between machines
-6. **Analytics**: Track which suggestions are used
-7. **A/B testing**: Compare embedding models
+- Log errors, continue with save
+- Show warning in admin UI
+- Provide rebuild button
+- Auto-rebuild on corrupted index
+- Retry with backoff on timeout
+- Fall back between providers
 
 ## References
 
-- [LanceDB Documentation](https://lancedb.github.io/lancedb/)
+- [LanceDB](https://lancedb.github.io/lancedb/)
 - [Transformers.js](https://huggingface.co/docs/transformers.js)
-- [Model Context Protocol](https://modelcontextprotocol.io/)
 - [Ollama Embeddings](https://ollama.com/blog/embedding-models)

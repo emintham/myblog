@@ -1,51 +1,28 @@
-# Utilities Directory
+# Utilities
 
-This directory contains utility functions organized by purpose.
+## API
 
-## File Organization
+- **`api-helpers.ts`** - Client/server utilities (error handling, fetch, production guards)
+- **`adminApiHelpers.ts`** - Server-side transformations for admin API handlers
 
-### API Utilities
+## Content
 
-- **`api-helpers.ts`** - General-purpose API utilities for both client and server
-  - Error handling (`extractErrorMessage`)
-  - Production guards (`createProductionGuard`)
-  - Fetch utilities (`validateFetchResponse`, `fetchWithTimeout`)
-  - Used by: Hooks, API endpoints, components
-
-- **`adminApiHelpers.ts`** - Server-side admin API transformation logic
-  - Post payload transformations (`transformApiPayloadToFrontmatter`)
-  - File content generation (`generatePostFileContent`)
-  - Image metadata extraction
-  - Used by: Admin API handlers (create-post, update-post)
-
-**Note:** These files serve different purposes and should not be consolidated.
-
-### Content Utilities
-
-- **`contentUtils.ts`** - Content collection helpers
-  - Tag extraction (`getUniqueTagNames`)
-  - Series extraction (`getUniqueSeriesNames`)
-
+- **`contentUtils.ts`** - Tag/series extraction from collections
 - **`seriesUtils.ts`** - Series navigation logic
-  - Get series posts and navigation
+- **`content.ts`** - Preview extraction and truncation
 
-- **`content.ts`** - Content processing
-  - Preview extraction
-  - Content truncation
+## Form & Data
 
-### Form & Data Utilities
+- **`slugify.ts`** - Slug generation
+- **`searchUtils.ts`** - Fuse.js search integration
 
-- **`slugify.ts`** - Slug generation from titles
-
-- **`searchUtils.ts`** - Search index and Fuse.js integration
-
-### UI Utilities
+## UI
 
 - **`clipboard.ts`** - Clipboard operations
-- **`formatting.ts`** - Text formatting helpers
+- **`formatting.ts`** - Text formatting
 - **`navigation.ts`** - Navigation helpers
-- **`prompts.ts`** - Prompt library loading (YAML)
+- **`prompts.ts`** - YAML prompt loading
 
-### Image Utilities
+## Images
 
-- **`imagePaths.ts`** - Image path resolution (future - see ROADMAP)
+- **`imagePaths.ts`** - Path resolution (future)
