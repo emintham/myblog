@@ -5,7 +5,9 @@
   border: 1px solid var(--color-border-admin-subtle, #ededed);
   border-radius: var(--border-radius-admin, 3px);
   background-color: var(--color-background-admin, #faf8f5);
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition:
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
 }
 
 .markdown-editor .cm-editor {

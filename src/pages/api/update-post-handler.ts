@@ -1,8 +1,6 @@
 import type { APIRoute } from "astro";
 import fs from "node:fs/promises";
 import path from "node:path";
-import yaml from "js-yaml";
-import matter from "gray-matter";
 import { generateSlug } from "../../utils/slugify";
 import type { PostApiPayload } from "../../types/admin";
 import {
@@ -15,6 +13,13 @@ import {
   createSuccessResponse,
   formatZodError,
 } from "../../schemas/responses";
+import {
+  handleDraftToPublishedTransition,
+  handleSlugChange,
+  checkSlugConflict,
+  handleQuotesUpdate,
+  handleRAGIndexUpdate,
+} from "../../utils/postUpdateHelpers";
 
 // Mark as server-rendered endpoint (required for POST requests in dev mode)
 export const prerender = false;
@@ -104,41 +109,21 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const payload: PostApiPayload = validationResult.data;
+    let payload: PostApiPayload = validationResult.data;
     const { originalFilePath, originalExtension, title, bodyContent } = payload;
 
-    // Check for draft-to-published transition and bump date if needed
+    // Extract original slug from originalFilePath for RAG cleanup
+    let originalSlug: string | undefined;
     if (originalFilePath) {
-      try {
-        const existingContent = await fs.readFile(originalFilePath, "utf-8");
-        const parsed = matter(existingContent);
-        const existingDraft = parsed.data.draft === true;
-        const newDraft =
-          payload.draft === true ||
-          payload.draft === "on" ||
-          (typeof payload.draft === "string" &&
-            payload.draft.toLowerCase() === "true");
-
-        // If transitioning from draft to published, bump the date to today
-        if (existingDraft && !newDraft) {
-          const today = new Date();
-          payload.pubDate = today.toISOString().split("T")[0]; // Format as YYYY-MM-DD
-          if (import.meta.env.DEV) {
-            console.log(
-              `[API Update] Post transitioning from draft to published, updating pubDate to ${payload.pubDate}`
-            );
-          }
-        }
-      } catch (readError) {
-        // If we can't read the original file, just log and continue
-        // This might happen if the file was moved or deleted
-        if (import.meta.env.DEV) {
-          console.warn(
-            `[API Update] Could not read original file to check draft status: ${readError}`
-          );
-        }
-      }
+      const basename = path.basename(
+        originalFilePath,
+        path.extname(originalFilePath)
+      );
+      originalSlug = basename;
     }
+
+    // Check for draft-to-published transition and bump date if needed
+    payload = await handleDraftToPublishedTransition(originalFilePath, payload);
 
     const currentTitle = title || "untitled"; // Should always have a title from the form
     const newSlug = generateSlug(currentTitle);
@@ -161,17 +146,17 @@ export const POST: APIRoute = async ({ request }) => {
     const newFilePath = path.join(contentBlogDir, newFilename);
 
     // Check if a different file exists at the new path (potential slug change conflict)
-    if (newFilePath !== originalFilePath) {
-      try {
-        await fs.access(newFilePath);
-        // If fs.access doesn't throw, a file exists at the new path, which is a conflict
-        return createErrorResponse(
-          `Cannot update post. A different file already exists with the new title/slug: ${newFilename}. Please choose a different title or resolve the conflict.`,
-          409
-        );
-      } catch {
-        // File does not exist at newFilePath, safe to proceed with rename/move.
+    try {
+      await checkSlugConflict(originalFilePath, newFilePath, newFilename);
+    } catch (conflictError) {
+      if (
+        conflictError instanceof Error &&
+        conflictError.message.includes("|409")
+      ) {
+        const [message] = conflictError.message.split("|");
+        return createErrorResponse(message, 409);
       }
+      throw conflictError;
     }
 
     const frontmatterObject = await transformApiPayloadToFrontmatter(
@@ -188,78 +173,20 @@ export const POST: APIRoute = async ({ request }) => {
     await fs.writeFile(newFilePath, fileContent);
 
     // If the filename/path changed, delete the old file
-    if (newFilePath !== originalFilePath && originalFilePath) {
-      try {
-        await fs.access(originalFilePath); // Check if old file actually exists before unlinking
-        await fs.unlink(originalFilePath);
-        if (import.meta.env.DEV) {
-          console.log(
-            `[API Update] Successfully deleted old file: ${originalFilePath}`
-          );
-        }
-      } catch (err) {
-        // Log a warning if the old file couldn't be deleted, but don't fail the whole operation
-        // as the new file has been successfully written.
-        const errMessage = err instanceof Error ? err.message : "Unknown error";
-        console.warn(
-          `[API Update] Could not delete old file at ${originalFilePath} (it might have been already moved/deleted or permissions issue): ${errMessage}`
-        );
-      }
-    }
+    await handleSlugChange(originalFilePath, newFilePath);
 
     // --- Handle Inline Quotes Update ---
-    if (
-      payload.postType === "bookNote" &&
-      payload.quotesRef &&
-      payload.inlineQuotes !== undefined
-    ) {
-      const quotesDir = path.join(projectRoot, "src", "content", "bookQuotes");
-      const quotesFilePath = path.join(quotesDir, `${payload.quotesRef}.yaml`);
-
-      // Ensure the bookQuotes directory exists
-      try {
-        await fs.mkdir(quotesDir, { recursive: true });
-      } catch (mkdirError) {
-        console.error(
-          `[API Update] Error creating bookQuotes directory ${quotesDir}:`,
-          mkdirError
-        );
-        // Potentially return an error or log and continue without saving quotes
-        // For now, we'll log and attempt to write, which might fail if dir doesn't exist.
-      }
-
-      const quotesToSave = payload.inlineQuotes.map((q) => ({
-        text: q.text,
-        quoteAuthor: q.quoteAuthor,
-        tags: q.tags,
-        quoteSource: q.quoteSource,
-        // Client-side 'id' is not saved
-      }));
-
-      const yamlData = {
-        bookSlug: newSlug, // Use the new slug of the post
-        quotes: quotesToSave,
-      };
-
-      try {
-        const yamlString = yaml.dump(yamlData);
-        await fs.writeFile(quotesFilePath, yamlString);
-        if (import.meta.env.DEV) {
-          console.log(
-            `[API Update] Successfully updated quotes file: ${quotesFilePath}`
-          );
-        }
-      } catch (quoteError) {
-        console.error(
-          `[API Update] Error writing quotes file ${quotesFilePath}:`,
-          quoteError
-        );
-        // Decide if this should be a critical error. For now, log and continue.
-        // The main post was updated, but quotes might be out of sync.
-        // Could add a warning to the response message.
-      }
-    }
+    await handleQuotesUpdate(payload, newSlug, projectRoot);
     // --- End Handle Inline Quotes Update ---
+
+    // --- RAG Indexing ---
+    await handleRAGIndexUpdate(
+      payload,
+      frontmatterObject,
+      originalSlug,
+      newSlug
+    );
+    // --- End RAG Indexing ---
 
     return createSuccessResponse({
       message: "Post updated successfully!",

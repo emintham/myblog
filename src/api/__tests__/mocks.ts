@@ -1,5 +1,12 @@
 import { vi } from "vitest";
 
+// Mock astro:content module
+vi.mock("astro:content", () => ({
+  getCollection: vi.fn().mockResolvedValue([]),
+  getEntry: vi.fn().mockResolvedValue(null),
+  getEntryBySlug: vi.fn().mockResolvedValue(null),
+}));
+
 // Mock fs module
 export const mockFs = {
   access: vi.fn(),
@@ -62,4 +69,40 @@ ${body}`
 vi.mock("../../../utils/adminApiHelpers", () => ({
   transformApiPayloadToFrontmatter: mockTransformApiPayloadToFrontmatter,
   generatePostFileContent: mockGeneratePostFileContent,
+}));
+
+// Mock RAG service
+vi.mock("../../../services/rag/index", () => ({
+  getRAGService: vi.fn().mockResolvedValue({
+    upsertPost: vi.fn().mockResolvedValue(undefined),
+    deletePost: vi.fn().mockResolvedValue(undefined),
+    upsertQuotes: vi.fn().mockResolvedValue(undefined),
+    deleteQuotes: vi.fn().mockResolvedValue(undefined),
+    query: vi.fn().mockResolvedValue([]),
+    rebuild: vi.fn().mockResolvedValue({
+      postsProcessed: 0,
+      paragraphsIndexed: 0,
+      quotesIndexed: 0,
+      timeMs: 0,
+    }),
+    getStats: vi.fn().mockResolvedValue(null),
+    initialize: vi.fn().mockResolvedValue(undefined),
+    optimize: vi.fn().mockResolvedValue(undefined),
+  }),
+  RAGService: vi.fn().mockImplementation(() => ({
+    upsertPost: vi.fn().mockResolvedValue(undefined),
+    deletePost: vi.fn().mockResolvedValue(undefined),
+    upsertQuotes: vi.fn().mockResolvedValue(undefined),
+    deleteQuotes: vi.fn().mockResolvedValue(undefined),
+    query: vi.fn().mockResolvedValue([]),
+    rebuild: vi.fn().mockResolvedValue({
+      postsProcessed: 0,
+      paragraphsIndexed: 0,
+      quotesIndexed: 0,
+      timeMs: 0,
+    }),
+    getStats: vi.fn().mockResolvedValue(null),
+    initialize: vi.fn().mockResolvedValue(undefined),
+    optimize: vi.fn().mockResolvedValue(undefined),
+  })),
 }));

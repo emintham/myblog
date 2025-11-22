@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import PostForm from "../../../components/admin/PostForm";
-import { SITE_TITLE } from "../../../siteConfig";
+import PostForm from "../../../components/admin/form/PostForm";
+import { SITE_TITLE } from "../../../config/index";
 import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
@@ -12,8 +12,11 @@ import {
   getUniqueTagNames,
   getUniqueSeriesNames,
 } from "../../../utils/contentUtils"; // Updated path
-import FeedbackDisplay from "../../../components/admin/FeedbackDisplay";
-import ToastContainer from "../../../components/admin/ToastContainer";
+import FeedbackDisplay from "../../../components/admin/feedback/FeedbackDisplay";
+import ToastContainer from "../../../components/admin/feedback/ToastContainer";
+import { AIAssistantPanel } from "../../../components/admin/ai-assistant/AIAssistantPanel";
+import { ErrorBoundary } from "../../../components/admin/shared/ErrorBoundary";
+import "../../../styles/ai-assistant.css";
 
 // Return empty paths in production (admin only available in dev)
 export async function getStaticPaths() {
@@ -194,15 +197,17 @@ const pageDescription = `Edit the post: ${pageTitleDisplay}. This page is availa
           value={postToEdit.originalExtension}
         />
 
-        <PostForm
-          client:load
-          postData={postToEdit}
-          formId="editPostForm"
-          allPostTags={allPostTags}
-          allBookTags={allBookTags}
-          allQuoteTags={allQuoteTags}
-          allSeriesNames={allSeriesNames}
-        />
+        <ErrorBoundary componentName="Post Form" client:load>
+          <PostForm
+            client:load
+            postData={postToEdit}
+            formId="editPostForm"
+            allPostTags={allPostTags}
+            allBookTags={allBookTags}
+            allQuoteTags={allQuoteTags}
+            allSeriesNames={allSeriesNames}
+          />
+        </ErrorBoundary>
 
         <button type="submit" class="button-primary">
           Update Post
@@ -219,5 +224,8 @@ const pageDescription = `Edit the post: ${pageTitleDisplay}. This page is availa
   </div>
   <FeedbackDisplay client:only="react" formId="editPostForm" />
   <ToastContainer client:only="react" formId="editPostForm" />
+  <ErrorBoundary componentName="AI Assistant" client:load>
+    <AIAssistantPanel client:load sessionId={slug || "unknown"} />
+  </ErrorBoundary>
   {/* Changed to client:only="react" */}
 </BaseLayout>

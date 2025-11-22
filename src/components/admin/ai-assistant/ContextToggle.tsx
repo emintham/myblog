@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { BookOpen, PencilLine } from "lucide-react";
-import "../../styles/context-toggle.css"; // Adjusted path
+import "../../../styles/context-toggle.css"; // Adjusted path
 
 const STORAGE_KEY = "dev-context";
 const DEFAULT_CONTEXT = "reader";

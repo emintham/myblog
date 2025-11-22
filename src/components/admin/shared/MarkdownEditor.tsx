@@ -7,7 +7,7 @@ import React, {
 import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { markdown } from "@codemirror/lang-markdown";
-import "./MarkdownEditor.css";
+import "./markdown-editor.css";
 
 interface MarkdownEditorProps {
   value: string;

@@ -1,14 +1,17 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import PostForm from "../../components/admin/PostForm"; // Removed .tsx extension
-import { SITE_TITLE } from "../../siteConfig";
+import PostForm from "../../components/admin/form/PostForm"; // Removed .tsx extension
+import { SITE_TITLE } from "../../config/index";
 import {
   getUniqueTagNames,
   getUniqueSeriesNames,
 } from "../../utils/contentUtils"; // Updated path
-import FeedbackDisplay from "../../components/admin/FeedbackDisplay";
-import ToastContainer from "../../components/admin/ToastContainer";
+import FeedbackDisplay from "../../components/admin/feedback/FeedbackDisplay";
+import ToastContainer from "../../components/admin/feedback/ToastContainer";
+import { AIAssistantPanel } from "../../components/admin/ai-assistant/AIAssistantPanel";
+import { ErrorBoundary } from "../../components/admin/shared/ErrorBoundary";
 import "../../styles/admin.css"; // Import admin styles
+import "../../styles/ai-assistant.css"; // Import AI assistant styles
 
 if (import.meta.env.PROD) {
   return new Response(null, { status: 404, statusText: "Not Found" });
@@ -40,19 +43,17 @@ const postToEdit = null; // or the post data you want to edit
     </header>
 
     <form id="postAdminForm" class="post-form">
-      <PostForm
-        client:load
-        postData={postToEdit}
-        formId="postAdminForm"
-        allPostTags={allPostTags}
-        allBookTags={allBookTags}
-        allQuoteTags={allQuoteTags}
-        allSeriesNames={allSeriesNames}
-        PASS
-        THE
-        PROP
-        HERE
-      />
+      <ErrorBoundary componentName="Post Form" client:load>
+        <PostForm
+          client:load
+          postData={postToEdit}
+          formId="postAdminForm"
+          allPostTags={allPostTags}
+          allBookTags={allBookTags}
+          allQuoteTags={allQuoteTags}
+          allSeriesNames={allSeriesNames}
+        />
+      </ErrorBoundary>
       <div class="admin-actions">
         <button type="submit" class="button-primary">
           {isEditMode ? "Update Post" : "Create Post"}
@@ -61,5 +62,8 @@ const postToEdit = null; // or the post data you want to edit
     </form>
     <FeedbackDisplay client:load formId="postAdminForm" />
     <ToastContainer client:only="react" formId="postAdminForm" />
+    <ErrorBoundary componentName="AI Assistant" client:load>
+      <AIAssistantPanel client:load sessionId="new-post" />
+    </ErrorBoundary>
   </div>
 </BaseLayout>

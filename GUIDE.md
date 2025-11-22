@@ -15,7 +15,6 @@ This guide provides instructions on how to use, develop, and maintain your Kinfo
     ```
 
 2.  **Image Processing:**
-
     - Place your original high-resolution images (JPG, PNG) in the `images/originals/` directory at the root of your project.
     - Run the image processing script to generate optimized WebP versions and responsive sizes:
       ```bash
@@ -29,7 +28,32 @@ This guide provides instructions on how to use, develop, and maintain your Kinfo
 
     **Publishing:** All new content defaults to `draft: true`. Change to `draft: false` in the Markdown frontmatter (or via the admin edit interface) to publish.
 
-4.  **Linting & Formatting:**
+4.  **RAG Index Management:**
+
+    The blog includes a local semantic search system that indexes your content for intelligent similarity search:
+    - **Query index:** `pnpm rq "search term"` - Find semantically similar content
+    - **Rebuild index:** `pnpm rrb` - Rebuild from scratch (if corrupted or after bulk changes)
+    - **View statistics:** `pnpm rst` - See index stats, storage info, and active embedding provider
+
+    **Embedding Providers:**
+    The system supports two embedding providers:
+    1. **Ollama** (preferred): Higher quality embeddings via local Ollama HTTP API
+    2. **Transformers.js** (fallback): Zero-config 384-dimensional embeddings, works offline
+
+    **Configuration:** Edit `src/config/index.ts` to customize:
+    - Embedding model (e.g., `nomic-embed-text`, `mxbai-embed-large`, `snowflake-arctic-embed`)
+    - Provider selection (auto-detect, force ollama, or force transformers)
+    - Ollama base URL
+
+    **Note:** Model dimensions are auto-detected from Ollama's response - no manual configuration needed!
+
+    The system auto-detects Ollama and displays the active configuration on dev server start (`pnpm dev`).
+
+    **Storage:** The index is stored in `data/rag/` (gitignored) and persists between dev server restarts.
+
+    **Auto-indexing:** Posts and quotes are automatically indexed when you create, update, or delete them through the admin interface. Manual rebuild is only needed if the index becomes corrupted.
+
+5.  **Linting & Formatting:**
     - Apply formatting: `pnpm run format`
     - Check for lint errors: `pnpm run lint`
     - Attempt to auto-fix lint errors: `pnpm run lint:fix`

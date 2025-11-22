@@ -1,28 +1,25 @@
 ---
-// src/pages/analyze.astro (or your relevant Astro page)
+// src/pages/admin/analyze.astro
 
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { SITE_TITLE } from "../../siteConfig";
+import { SITE_TITLE } from "../../config/index";
 import "../../styles/admin.css";
-import "../../styles/analyze.css";
+import "../../styles/content-intelligence.css";
 
-// Import your main React TSX component
-import CloseReadingAnalyzer from "../../components/admin/CloseReadingAnalyzer.tsx";
+// Import the Content Intelligence Dashboard
+import ContentIntelligenceDashboard from "../../components/admin/rag-search/ContentIntelligenceDashboard";
+import { ErrorBoundary } from "../../components/admin/shared/ErrorBoundary";
 
 if (import.meta.env.PROD) {
   return new Response(null, { status: 404, statusText: "Not Found" });
 }
-const pageTitle = `Close Reading Analyzer - ${SITE_TITLE}`;
-const pageDescription = "A tool for close reading analysis of text passages.";
+const pageTitle = `Content Intelligence - ${SITE_TITLE}`;
+const pageDescription =
+  "Discover connections and synthesis opportunities across your content.";
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription} isAdminPage={true}>
-  <script
-    defer
-    src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"
-    xintegrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"></script>
-
-  <CloseReadingAnalyzer client:load />
+  <ErrorBoundary componentName="Content Intelligence Dashboard" client:load>
+    <ContentIntelligenceDashboard client:load />
+  </ErrorBoundary>
 </BaseLayout>

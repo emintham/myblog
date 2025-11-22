@@ -8,6 +8,7 @@ import {
   createSuccessResponse,
   formatZodError,
 } from "../../schemas/responses";
+import { getRAGService } from "../../services/rag/index";
 
 // Mark as server-rendered endpoint (required for POST requests in dev mode)
 export const prerender = false;
@@ -88,6 +89,30 @@ export const POST: APIRoute = async ({ request }) => {
         quotesMessage = ` Could not delete associated quotes file: ${quotesFileName} (may not exist or permissions issue).`;
       }
     }
+
+    // --- RAG Index Cleanup ---
+    try {
+      const ragService = await getRAGService();
+
+      // Delete post from index
+      await ragService.deletePost(slug);
+
+      // Delete quotes from index if this was a book note
+      if (postEntry.data.postType === "bookNote" && postEntry.data.quotesRef) {
+        await ragService.deleteQuotes(postEntry.data.quotesRef);
+      }
+
+      if (import.meta.env.DEV) {
+        console.log(`[RAG] Successfully deleted post from index: ${slug}`);
+      }
+    } catch (ragError) {
+      // Log but don't fail the request if RAG deletion fails
+      console.error(
+        `[RAG] Failed to delete post from index ${slug}:`,
+        ragError
+      );
+    }
+    // --- End RAG Index Cleanup ---
 
     return createSuccessResponse({
       message: `Post '${slug}' deleted successfully.${quotesMessage}`,

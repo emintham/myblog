@@ -4,21 +4,50 @@
 
 ### High Priority
 
-#### Improve Image Processing Error Handling (Low effort)
+#### Local RAG System for Authoring ✅ **COMPLETED**
 
-- [ ] Check for missing `images/originals/` directory
-- [ ] Handle corrupted/invalid image files gracefully
-- [ ] Add summary output (X succeeded, Y failed)
-- [ ] Exit with proper codes (0 = success, 1 = error)
+**See `docs/RAG_IMPLEMENTATION.md` for detailed requirements and architecture.**
+
+Persistent semantic search across all content types during local authoring, with automatic indexing on save. Full implementation includes:
+- RAG service layer with LanceDB and dual embedding providers (Ollama + Transformers.js)
+- Automatic indexing on create/update/delete operations
+- Content Intelligence Dashboard with semantic search and synthesis opportunities
+- AI Writing Assistant with Ollama integration and conversation history
+
+**Advanced Features (Future):**
+
+- [ ] Content clusters (text-based)
+- [ ] Manual tag suggester in PostForm
+- [ ] Series builder
+- [ ] Embedding visualization (2D/3D)
+- [ ] Writing metrics
 
 ---
 
-#### Environment Variables Configuration (Low effort)
+#### Improve Image Processing Error Handling ✅ **COMPLETED**
 
-- [ ] Create `.env.example` with: `SITE_TITLE`, `SITE_DESCRIPTION`, `AUTHOR_NAME`, `REMARK42_HOST`, `REMARK42_SITE_ID`, `PUBLIC_SITE_URL`
-- [ ] Update `src/siteConfig.ts` to read from env with fallbacks
-- [ ] Add validation for required variables
-- [ ] Document in INSTALL.md and CLAUDE.md
+- [x] Check for missing `images/originals/` directory
+- [x] Handle corrupted/invalid image files gracefully
+- [x] Add summary output (X succeeded, Y failed)
+- [x] Exit with proper codes (0 = success, 1 = error)
+
+---
+
+#### Environment Variables Configuration ✅ **COMPLETED**
+
+- [x] Create `.env.example` with: `SITE_TITLE`, `SITE_DESCRIPTION`, `AUTHOR_NAME`, `REMARK42_HOST`, `REMARK42_SITE_ID`, `PUBLIC_SITE_URL`
+- [x] Update `src/config/index.ts` to read from env with fallbacks
+- [ ] Add validation for required variables (future enhancement)
+- [x] Document in CLAUDE.md
+
+---
+
+#### Refactor Large API Handlers (Medium effort)
+
+- [ ] Break down `update-post-handler.ts` (340 lines) into smaller, testable functions
+- [ ] Extract slug change logic to `src/utils/postUpdateHelpers.ts`
+- [ ] Extract quotes YAML update logic to separate function
+- [ ] Add unit tests for extracted helpers
 
 ---
 
@@ -50,69 +79,15 @@ Schedule posts for future publication with automated rebuilds.
 // Example filter
 const posts = await getCollection("blog", ({ data }) => {
   const publishDate = data.scheduledPublishDate || data.pubDate;
-  return import.meta.env.PROD ? data.draft !== true && publishDate <= now : true;
+  return import.meta.env.PROD
+    ? data.draft !== true && publishDate <= now
+    : true;
 });
 ```
 
 ---
 
-#### Related Posts (Medium effort)
-
-Display 3-5 related posts via similarity scoring (series > tags > type).
-
-- [ ] Create `src/utils/relatedPosts.ts` with scoring logic
-- [ ] Create `RelatedPosts.astro` component
-- [ ] Add to post detail pages
-- [ ] Make count configurable
-
----
-
 ### Medium Priority
-
-#### Idea Development Dashboard (Medium effort)
-
-**Location:** Analyze tab (separate exploration mode)
-
-Query-driven interface to review and develop captured ideas into articles.
-
-**Core Features:**
-- [ ] **Undeveloped quotes**: Book highlights not yet referenced in posts
-- [ ] **Orphaned fleeting thoughts**: Quick notes that share tags but haven't been expanded
-- [ ] **Synthesis suggestions**: "These 3 fleeting thoughts all touch on [theme]"
-- [ ] **Evolution view**: How thinking on a tag/topic has progressed over time
-- [ ] **Query interface**: "Show me all quotes about X that I haven't written about"
-
-**Workflow:** Reading → Book Notes/Fleeting Thoughts → Dashboard → Standard Posts
-
-**Replaces:** Close reading feature (better aligned with actual workflow)
-
----
-
-#### Integrated Writing Assistant (Medium-High effort)
-
-**Location:** PostForm editor (active writing help, low-friction)
-
-Contextual suggestions and tools while writing, without breaking flow.
-
-**Phase 1 - Local/Passive (Medium effort):**
-- [ ] Related content sidebar (similar posts/quotes as you type)
-- [ ] Writing quality metrics (readability scores, word count, passive voice)
-- [ ] Tag co-occurrence suggestions
-- [ ] Internal link suggestions (posts that share themes)
-
-**Phase 2 - AI-Powered (High effort, opt-in):**
-- [ ] Text selection → rewrite suggestions
-- [ ] Idea expansion from fleeting thoughts
-- [ ] Auto-generated descriptions/summaries
-- [ ] Tone/style adjustments
-
-**Technical:**
-- Phase 1: Pure JavaScript/regex, TF-IDF similarity, local only
-- Phase 2: OpenAI/Claude/Ollama, API security, rate limits, graceful degradation
-
-**Design Principle:** Passive presence, no forced interaction, available when needed
-
----
 
 #### Link Helper (Low-Medium effort)
 
@@ -131,16 +106,19 @@ Quick link insertion with internal post search and validation.
 
 ## Implementation Priority
 
+**Highest:** Local RAG System (enables semantic search, related content, writing assistance)
+
 **Quick Wins:** Env config, image path utility, image processing errors
 
-**High Value:** Scheduled publishing, related posts, Idea Development Dashboard
+**High Value:** Scheduled publishing, link helper
 
-**Future:** Integrated Writing Assistant (Phase 1 → Phase 2), link helper
+**Future:** Advanced RAG features (idea synthesis, writing metrics, AI-powered suggestions)
 
 ---
 
-## Completed
+## Recently Completed
 
+- ✅ Local RAG System (Phases 1-4B): Semantic search, auto-indexing, Ollama integration, Content Intelligence Dashboard, AI Writing Assistant
 - ✅ Test scripts in package.json
 - ✅ Error handling standardization
 - ✅ Remark42 configuration

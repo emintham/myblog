@@ -1,0 +1,367 @@
+/**
+ * Utility Classes
+ * Reusable component and layout styles
+ */
+
+/* == Common Page Section Title == */
+
+/* Used for: "Latest Writings", "All Tags", "All Series", "About" titles */
+.section-title {
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-meta);
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 400;
+}
+
+/* == Common Page Introductory Text == */
+
+/* Used for descriptive text below a .section-title */
+.page-intro-text {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  color: var(--color-text);
+  text-align: center;
+  max-width: 60ch;
+  margin: 0 auto 2.5rem; /* Centering and space below */
+  line-height: 1.6;
+}
+
+/* == Common Item Listing Styles == */
+
+/* Used for lists on Tags page, Series page */
+.item-list-container {
+  list-style: none;
+  padding: 0;
+  margin: 0; /* Width is handled by the parent .content-wrapper */
+}
+
+.list-item-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-family: var(--font-sans);
+}
+
+.list-item-entry:last-child {
+  border-bottom: none;
+}
+
+.list-item-name {
+  /* For the main link in a list item */
+  font-size: 1.1rem;
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.list-item-name:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+.list-item-count {
+  font-size: 0.9rem;
+  color: var(--color-meta);
+  margin-left: 0.5rem;
+}
+
+/* == Common Detail Page Header == */
+
+/* For headers on individual tag/series pages */
+.page-detail-header {
+  text-align: left; /* Default, can be overridden locally if needed */
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.page-detail-header h1 {
+  font-family: var(--font-sans);
+  font-size: 2.6rem; /* Slightly adjusted for general use */
+  margin-bottom: 0.25rem;
+  line-height: 1.2;
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+/* == Common Breadcrumb Style == */
+.breadcrumb-nav {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--color-meta);
+  margin-bottom: 0.75rem;
+}
+
+.breadcrumb-nav a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.breadcrumb-nav a:hover {
+  text-decoration: underline;
+}
+
+/* == Common Empty State Message == */
+.empty-state-message {
+  text-align: center;
+  font-family: var(--font-serif);
+  color: var(--color-meta);
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+/* == Common Post Preview Styles == */
+.post-preview {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.post-preview:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.preview-title {
+  /* Applied to h2 or h3 in previews */
+  font-family: var(--font-display-title);
+  font-weight: 700; /* Base weight, can be adjusted per component if truly needed */
+  line-height: 1.3;
+  margin-top: 0;
+  color: var(--color-text);
+}
+
+.preview-title a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.preview-title a:hover {
+  color: var(--color-accent);
+}
+
+.meta {
+  /* Common class for meta text (date, author) */
+  font-family: var(--font-sans);
+  font-size: 0.85rem; /* Standardized size */
+  color: var(--color-meta);
+  margin-bottom: 1rem; /* Standardized margin */
+}
+
+.preview-text-content p {
+  /* For paragraphs within preview content areas */
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--color-text);
+  margin-bottom: 1em;
+}
+
+.preview-text-content p:last-child {
+  margin-bottom: 0;
+}
+
+.read-more {
+  /* Common class for read-more links */
+  font-family: var(--font-sans);
+  font-size: 0.8rem; /* Base size, can be fine-tuned in component if needed */
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-accent);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.read-more:hover {
+  color: var(--color-text);
+}
+
+/* Common Button Styles */
+.button-primary {
+  display: inline-block;
+  padding: 0.65em 1.3em;
+  background-color: var(--color-accent);
+  color: var(--color-background, #fff); /* Fallback for background color */
+  text-decoration: none;
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.9rem;
+  border: 1px solid var(--color-accent);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+}
+
+.button-primary:hover {
+  background-color: var(--color-text);
+  border-color: var(--color-text);
+  color: var(--color-background, #fff);
+}
+
+.button-edit {
+  /* Style for edit buttons, e.g., on manage-posts page */
+  display: inline-block;
+  padding: 0.5em 1em;
+  background-color: transparent;
+  color: var(--color-accent);
+  text-decoration: none;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+  white-space: nowrap; /* Prevents button text from wrapping */
+}
+
+.button-edit:hover {
+  background-color: var(--color-accent);
+  color: var(--color-background, #fff);
+  border-color: var(--color-accent);
+}
+
+/* Styles for the admin post creation/editing form */
+.post-form fieldset {
+  border: 1px solid var(--color-border-subtle);
+  padding: 1rem 1.5rem 1.5rem; /* top, horizontal, bottom */
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+}
+
+.post-form legend {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--color-accent);
+  padding: 0 0.5em; /* Space around legend text */
+}
+
+.post-form .form-field {
+  margin-bottom: 1rem;
+}
+
+.post-form .form-field:last-child {
+  margin-bottom: 0;
+}
+
+.post-form .form-field label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+.post-form .form-field input[type="text"],
+.post-form .form-field input[type="date"],
+.post-form .form-field select,
+.post-form .form-field textarea {
+  width: 100%;
+  padding: 0.6em 0.8em;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 3px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  box-sizing: border-box; /* Important for 100% width + padding */
+  transition:
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+.post-form .form-field input[type="text"]:focus,
+.post-form .form-field input[type="date"]:focus,
+.post-form .form-field select:focus,
+.post-form .form-field textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 25%, transparent); /* Subtle focus ring */
+}
+
+.post-form .form-field textarea {
+  /* General textarea in form */
+  min-height: 80px;
+  line-height: 1.6;
+}
+
+/* Specific styling for the main body content textarea using its ID */
+.post-form #bodyContent {
+  min-height: 200px;
+}
+
+.post-form .form-field input[type="checkbox"] {
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+/* Ensures label containing checkbox doesn't force 100% width on the checkbox input itself */
+.post-form .form-field label input[type="checkbox"] {
+  width: auto;
+}
+
+/* Styles for the 'Book Note Details' fieldset */
+.post-form .book-note-fields {
+  border-color: var(--color-accent);
+}
+
+.post-form .book-note-fields legend {
+  color: var(--color-accent);
+}
+
+#generatedOutput,
+#formFeedback {
+  background-color: color-mix(in srgb, var(--color-background) 95%, black);
+  padding: 1.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border-subtle);
+}
+
+#generatedOutput h2,
+#formFeedback h2 {
+  margin-top: 0;
+  font-family: var(--font-sans);
+  font-size: 1.5rem;
+}
+
+#generatedOutput pre {
+  background-color: var(--color-background);
+  padding: 1em;
+  overflow-x: auto;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 0.9em;
+  white-space: pre; /* Or pre-wrap */
+  line-height: 1.5;
+}
+
+/* Status badge for drafts, potentially reusable in admin areas */
+.status-draft-badge {
+  background-color: var(
+    --color-accent-secondary
+  ); /* Example: a muted yellow/orange */
+
+  border-radius: 3px;
+  color: var(--color-background, #fff);
+  display: inline-block;
+  font-size: 0.75em;
+  font-weight: bold;
+  line-height: 1.2;
+  margin-right: 0.3em; /* Space between badge and title */
+  padding: 0.15em 0.4em;
+  text-transform: uppercase;
+  vertical-align: baseline;
+  white-space: nowrap;
+}

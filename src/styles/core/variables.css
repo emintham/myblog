@@ -1,0 +1,20 @@
+/**
+ * Global Design Tokens
+ * Core CSS variables for the entire site
+ */
+
+:root {
+  --font-serif: "Lora", serif;
+  --font-sans: "Montserrat", sans-serif;
+  --font-display-title: "Spectral", serif;
+  --font-fleeting-title: "Corinthia", cursive;
+  --color-background: #faf9f6; /* Creamy off-white */
+  --color-text: #333; /* Dark grey */
+  --color-accent: #5d7a88; /* Muted blue-grey */
+  --color-meta: #777; /* For dates, subtle info */
+  --color-border-subtle: #eee;
+  --color-note-paper: #fbfaf9; /* Example: extremely close to page background */
+  --color-code-background: #f4f4f4; /* For <pre> blocks */
+  --color-accent-secondary: #f7a76c;
+  --content-max-width: 720px; /* Adjust for optimal line length */
+}
