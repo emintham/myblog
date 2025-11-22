@@ -49,10 +49,11 @@ export const config = {
      * - "ollama": Force Ollama (requires Ollama running)
      * - "transformers": Force transformers.js (zero-config, offline)
      */
-    provider: (process.env.RAG_EMBEDDING_PROVIDER as
-      | "auto"
-      | "ollama"
-      | "transformers") || "auto",
+    provider:
+      (process.env.RAG_EMBEDDING_PROVIDER as
+        | "auto"
+        | "ollama"
+        | "transformers") || "auto",
 
     /**
      * Directory for RAG index storage
@@ -74,6 +75,24 @@ export const config = {
       "https://YOUR_REMARK42_SERVER_DOMAIN.com",
     siteId: import.meta.env?.REMARK42_SITE_ID || "remark",
   },
+
+  lexi: {
+    /**
+     * Base URL for Lexi text analysis API
+     * Default: http://localhost:8000
+     */
+    baseUrl: process.env.LEXI_BASE_URL || "http://localhost:8000",
+
+    /**
+     * Request timeout in milliseconds
+     */
+    timeout: 30000,
+
+    /**
+     * Default Ollama model for semantic pacing
+     */
+    ollamaModel: "nomic-embed-text",
+  },
 } as const;
 
 // Convenience exports for common values
@@ -87,6 +106,7 @@ export const REMARK42_SITE_ID = config.remark42.siteId;
 
 // Legacy export for backwards compatibility during migration
 export const OLLAMA_CONFIG = config.ollama;
+export const LEXI_CONFIG = config.lexi;
 export const ragConfig = {
   provider: config.rag.provider,
   ollama: {
