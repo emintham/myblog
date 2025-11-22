@@ -5,12 +5,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useOllamaChat } from "../../../hooks/useOllamaChat";
-import {
-  ChevronLeft,
-  ChevronRight,
-  MessageSquare,
-  AlertCircle,
-} from "lucide-react";
+import { ChevronRight, MessageSquare, AlertCircle } from "lucide-react";
 import type { Prompt } from "../../../utils/prompts";
 import { copyToClipboard } from "../../../utils/clipboard";
 
@@ -177,10 +172,7 @@ export const AIAssistantPanel: React.FC<AIAssistantPanelProps> = ({
           }
         >
           {isCollapsed ? (
-            <>
-              <ChevronLeft size={16} />
-              <MessageSquare size={16} />
-            </>
+            <span className="collapse-indicator">«</span>
           ) : (
             <>
               <MessageSquare size={16} />
