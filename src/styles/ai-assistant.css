@@ -53,19 +53,19 @@
 .ai-assistant-panel.collapsed .collapse-button {
   padding: 0.75rem 0.5rem;
   background: none;
-  color: var(--color-text-secondary, #6b7280);
+  color: var(--color-text, #1f2937);
   border-radius: 6px 0 0 6px;
   transition: all 0.2s;
   justify-content: center;
 }
 
 .ai-assistant-panel.collapsed .collapse-button:hover {
-  color: var(--color-text, #1f2937);
+  color: var(--color-primary, #2563eb);
 }
 
 .collapse-indicator {
-  font-size: 1.25rem;
-  font-weight: 300;
+  font-size: 1.5rem;
+  font-weight: 400;
   line-height: 1;
 }
 
