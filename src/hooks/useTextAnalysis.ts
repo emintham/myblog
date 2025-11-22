@@ -36,7 +36,14 @@ export const METRIC_INFO: Record<
 • Standard: 70-80%
 • Repetitive: <65% - reusing "crutch" words (think, just, very)
 • Rich: >85% - high lexical density, common in descriptive fiction`,
-    format: (v) => (typeof v === "number" ? `${(v * 100).toFixed(1)}%` : "-"),
+    format: (v) => {
+      if (typeof v !== "number") return "-";
+      const pct = v * 100;
+      if (pct < 65) return "Repetitive";
+      if (pct <= 80) return "Standard";
+      if (pct <= 85) return "Rich";
+      return "Very rich";
+    },
   },
   sentence_structure_variety: {
     name: "Sentence Structure Variety",
@@ -44,7 +51,12 @@ export const METRIC_INFO: Record<
     tooltip: `Measures variety in sentence construction patterns.
 
 Higher values indicate more diverse sentence structures.`,
-    format: (v) => (typeof v === "number" ? v.toFixed(2) : "-"),
+    format: (v) => {
+      if (typeof v !== "number") return "-";
+      if (v < 2) return "Low variety";
+      if (v < 3) return "Moderate";
+      return "High variety";
+    },
   },
   semantic_pacing_vectors: {
     name: "Semantic Pacing",
@@ -54,10 +66,14 @@ Higher values indicate more diverse sentence structures.`,
 • High (>0.75): Stalling - rephrasing previous sentence
 • Low (<0.30): Whiplash - jumping topics too aggressively
 • Flow state (0.40-0.65): Ideas connected but moving forward`,
-    format: (v) =>
-      Array.isArray(v)
-        ? `avg: ${(v.reduce((a: number, b: number) => a + b, 0) / v.length).toFixed(2)}`
-        : "-",
+    format: (v) => {
+      if (!Array.isArray(v) || v.length === 0) return "-";
+      const avg = v.reduce((a: number, b: number) => a + b, 0) / v.length;
+      if (avg < 0.3) return "Whiplash";
+      if (avg <= 0.65) return "Good flow";
+      if (avg <= 0.75) return "Slow";
+      return "Stalling";
+    },
   },
   adverb_usage: {
     name: "Adverb Density",
@@ -69,7 +85,13 @@ Higher values indicate more diverse sentence structures.`,
   (e.g., "closed loudly" vs "slammed")
 
 Philosophy may be higher (transcendentally, metaphysically) - check if replaceable with precise nouns.`,
-    format: (v) => (typeof v === "number" ? `${v.toFixed(1)}%` : "-"),
+    format: (v) => {
+      if (typeof v !== "number") return "-";
+      if (v < 3) return "Hemingway";
+      if (v <= 5) return "Good";
+      if (v <= 6) return "Watch it";
+      return "Too many";
+    },
   },
   sentiment_arc: {
     name: "Sentiment Arc",
@@ -77,10 +99,14 @@ Philosophy may be higher (transcendentally, metaphysically) - check if replaceab
     tooltip: `Tracks emotional tone throughout the text.
 
 Positive values indicate positive sentiment, negative values indicate negative sentiment. Useful for seeing emotional progression.`,
-    format: (v) =>
-      Array.isArray(v)
-        ? `avg: ${(v.reduce((a: number, b: number) => a + b, 0) / v.length).toFixed(2)}`
-        : "-",
+    format: (v) => {
+      if (!Array.isArray(v) || v.length === 0) return "-";
+      const avg = v.reduce((a: number, b: number) => a + b, 0) / v.length;
+      if (avg < -0.3) return "Negative";
+      if (avg < 0.1) return "Neutral";
+      if (avg < 0.3) return "Positive";
+      return "Very positive";
+    },
   },
   cognitive_load: {
     name: "Cognitive Load",
@@ -91,7 +117,13 @@ Positive values indicate positive sentiment, negative values indicate negative s
 • Standard Adult (3.5-5.0): Clear non-fiction, standard novels
 • Complex/Dense (>6.0): Legal, academic, Victorian literature
 • Red flag (>8.0): Reader likely getting lost in clause structure`,
-    format: (v) => (typeof v === "number" ? v.toFixed(2) : "-"),
+    format: (v) => {
+      if (typeof v !== "number") return "-";
+      if (v < 3.5) return "Simple";
+      if (v <= 5) return "Standard";
+      if (v <= 8) return "Dense";
+      return "Too complex";
+    },
   },
 };
 
