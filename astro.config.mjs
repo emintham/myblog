@@ -1,6 +1,6 @@
 // @ts-check
 import { config } from "dotenv";
-config(); // Load .env file before any other imports
+config({ path: "./env" }); // Load .env file before any other imports
 
 import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";

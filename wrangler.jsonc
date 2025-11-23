@@ -3,6 +3,13 @@
   "compatibility_date": "2025-05-13",
   "assets": {
     "directory": "./dist"
+  },
+  "vars": {
+    "SITE_TITLE": "Emin Tham",
+    "SITE_DESCRIPTION": "Second Brain and Blog",
+    "AUTHOR_NAME": "Emin Tham",
+    "PUBLIC_SITE_URL": "https://emintham.com",
+    "REMARK42_HOST": "https://comments.emintham.com",
+    "REMARK42_SITE_ID": "remark"
   }
 }
-
