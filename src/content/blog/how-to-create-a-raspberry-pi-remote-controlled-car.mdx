@@ -4,7 +4,7 @@ pubDate: 2025-11-16T00:00:00.000Z
 author: Emin Tham
 postType: standard
 draft: false
-lastEdited: 2025-11-17T03:14:59.242Z
+lastEdited: 2025-11-22T18:03:40.703Z
 description: >-
   A guide to creating a Raspberry Pi Car controlled with a PS4 controller as a
   programmer
@@ -56,7 +56,7 @@ Next, plug in your MicroSD card and flash the Raspberry Pi OS using the Raspberr
 
 Once you've verified that the RPi is working properly, power it down and attach your [Driver HAT](https://www.pishop.ca/product/servo-driver-hat-for-raspberry-pi-16-channel-12-bit-i2c/?searchid=0&search_query=driver+hat) to its own battery power and attach it onto your RPi. You would want one that is able to drive at least 2 motors. For simplicity, we had opted for the non-encoder version of motors. This does not allow extremely fine-grained control of the car which precludes expansion to a self-driving car in future. In you are interested in [SLAM](https://www.flyability.com/blog/simultaneous-localization-and-mapping), you'll need to get encoder motors, LiDar, Inertial Measurement Unit (IMU), and an extra Encoder Driver Module to decode the encoder pulses. This would almost significantly drive up the initial costs of the project as well as introduce complexity during the coding step. If you are a complete beginner or unsure of whether you'd want to continue in robotics long-term, I would advise against this high initial investment.
 
-After powering it up and ensuring everything still boots, you'll want to hunt down the manufacturer of your HAT for driver software or libraries to interpret the signals to and from the HAT. Test the library to see if everything works as expected, cycling all motors with varying speeds. Note that you must supply power to the motor with batteries. Even tethered, the power to the RPi will not flow to the driver HAT module. The reverse direction is not true: with the car untethered, the battery is able to power both the motors and the RPi -- you do not need to supply additional power into the RPi's power jack during play.
+After powering it up and ensuring everything still boots, you'll want to hunt down the manufacturer of your HAT for driver software or libraries to interpret the signals to and from the HAT. Test the library to see if everything works as expected, cycling all motors with varying speeds. Note that you must supply power to the motor with batteries. Even tethered, the power to the RPi will not flow to the driver HAT module. The reverse direction is not true: with the car untethered, the battery is able to power both the motors and the RPi---you do not need to supply additional power into the RPi's power jack during play.
 
 Test your controller next. The reason for going with a PS4 controller is the maturity of driver/library support. In addition, note that some older Xbox controllers do not support bluetooth and you may need additional hardware to pair it with your RPi. Two choices that came up in my research was [Pygame](https://www.pygame.org/news) and [PyPS4Controller](https://pypi.org/project/pyPS4Controller/). The latter had better ergonomics in my testing and was what we went with. Getting the DriverHAT library and PyPS4Controller library to work together is straightforward. We can now proceed to actually program the car.
 
