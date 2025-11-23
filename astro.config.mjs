@@ -26,18 +26,23 @@ function ragConfigLogger() {
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://emintham.com',
+  site: "https://emintham.com",
   output: "static", // Static site generation
   exclude: ["**/__tests__/**", "**/*.test.ts", "**/*.spec.ts"],
   integrations: [sitemap(), mdx(), react()],
   adapter: cloudflare(),
   vite: {
-    plugins: [ragConfigLogger()],
+    plugins: [
+      process.env.NODE_ENV === "development" ? ragConfigLogger() : null,
+    ].filter(Boolean),
     server: {
       watch: {
         // Ignore content directory to prevent HMR refresh during auto-save
         ignored: ["**/src/content/**"],
       },
+    },
+    ssr: {
+      external: ["@lancedb/lancedb"],
     },
   },
 });
